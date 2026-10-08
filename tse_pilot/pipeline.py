@@ -182,6 +182,16 @@ def run_pipeline(manifest_path: Path, output_dir: Path) -> dict:
     manifest = _load_manifest(Path(manifest_path))
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    approved_artifacts = (
+        "candidates_canonical.csv",
+        "expense_aggregate.csv",
+        "vote_aggregate.csv",
+        "analytical_base.csv",
+    )
+    for artifact_name in approved_artifacts:
+        artifact_path = output_dir / artifact_name
+        if artifact_path.exists():
+            artifact_path.unlink()
     database_path = output_dir / "pilot.sqlite"
     if database_path.exists():
         database_path.unlink()

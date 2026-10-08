@@ -19,9 +19,10 @@ python -m tse_pilot refresh --manifest data/manifests/manifest-<snapshot>.json
 python -m tse_pilot inspect --manifest data/manifests/manifest-<snapshot>.json --output data/layout-2022.json
 python -m tse_pilot run --manifest data/manifests/manifest-<snapshot>.json --output data/derived/2022
 python -m tse_pilot report --data-root data --output reports/tse-2022-pilot-exploratory.md
+python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --output reports/tse-2022-duplicate-diagnostics.json
 ```
 
-`refresh` recalcula tamanho e SHA-256 dos arquivos já congelados e completa o `version_id` sem baixar novamente. `inspect` abre somente amostras dos membros tabulares para registrar encoding, delimitador e colunas; também lista todos os membros do ZIP. `run` lê os ZIPs selecionados por streaming e cria a base SQLite e os CSVs derivados.
+`refresh` recalcula tamanho e SHA-256 dos arquivos já congelados e completa o `version_id` sem baixar novamente. `inspect` abre somente amostras dos membros tabulares para registrar encoding, delimitador e colunas; também lista todos os membros do ZIP. `run` lê os ZIPs selecionados por streaming e cria a base SQLite e os CSVs derivados. `duplicates` compara preservar/remover repetições exatas apenas como diagnóstico.
 
 ## Seleção e granularidade
 
@@ -56,7 +57,7 @@ Em `data/derived/2022/`:
 - `analytical_base.csv`: junção à esquerda da tabela de candidatos com as duas agregações;
 - `validation.json`: status, contagens, evidências, fontes selecionadas e reconciliações.
 
-A base analítica somente é escrita quando não há erro crítico. Duplicidade, campo essencial inválido, valor ausente de medida ou referência a candidato inexistente bloqueia a aprovação. Nenhum registro é deduplicado silenciosamente.
+A base analítica somente é escrita quando não há erro crítico. Cada execução remove primeiro os artefatos aprovados anteriores (`candidates_canonical.csv`, `expense_aggregate.csv`, `vote_aggregate.csv` e `analytical_base.csv`), para que uma execução bloqueada não deixe resultados antigos disponíveis como atuais. Duplicidade, campo essencial inválido, valor ausente de medida ou referência a candidato inexistente bloqueia a aprovação. Nenhum registro é deduplicado silenciosamente.
 
 ## Testes e auditoria
 

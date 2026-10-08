@@ -86,6 +86,23 @@ class PilotPipelineTests(unittest.TestCase):
             self.assertEqual(result["fatal_counts"]["duplicate_expense_rows"], 1)
             self.assertFalse((Path(directory) / "derived" / "analytical_base.csv").exists())
 
+    def test_blocked_run_removes_approved_artifacts_from_prior_run(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output_dir = Path(directory) / "derived"
+            approved = run_pipeline(self._fixture(directory), output_dir)
+            self.assertEqual(approved["status"], "approved")
+            approved_files = (
+                "candidates_canonical.csv",
+                "expense_aggregate.csv",
+                "vote_aggregate.csv",
+                "analytical_base.csv",
+            )
+            self.assertTrue(all((output_dir / name).exists() for name in approved_files))
+
+            blocked = run_pipeline(self._fixture(directory, duplicate_expense=True), output_dir)
+            self.assertEqual(blocked["status"], "blocked")
+            self.assertTrue(all(not (output_dir / name).exists() for name in approved_files))
+
     def test_unknown_candidate_reference_blocks_relationship_integration(self):
         with tempfile.TemporaryDirectory() as directory:
             result = run_pipeline(self._fixture(directory, unknown_expense=True), Path(directory) / "derived")
