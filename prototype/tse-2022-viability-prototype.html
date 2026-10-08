@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Protótipo — portão de viabilidade TSE 2022</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17211b;
+      --muted: #617066;
+      --line: #d9e2da;
+      --surface: #f7faf7;
+      --panel: #ffffff;
+      --accent: #176b49;
+      --accent-soft: #e4f2e9;
+      --warn: #8a5a00;
+      --warn-soft: #fff4d6;
+      --error: #a52f32;
+      --error-soft: #fde7e7;
+      --ok: #176b49;
+      --ok-soft: #e4f2e9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--surface);
+      color: var(--ink);
+      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 36px 22px 56px; }
+    h1, h2, h3 { line-height: 1.15; margin: 0; }
+    h1 { font-size: clamp(2rem, 5vw, 3.8rem); max-width: 880px; letter-spacing: -.045em; }
+    h2 { font-size: 1.35rem; margin-bottom: 12px; }
+    h3 { font-size: 1rem; margin-bottom: 8px; }
+    p { margin: 0 0 12px; }
+    .eyebrow { color: var(--accent); font-size: .78rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .intro { max-width: 850px; margin-top: 16px; color: #39483e; font-size: 1.08rem; }
+    .prototype-note { margin-top: 18px; padding: 12px 14px; border-left: 4px solid var(--accent); background: var(--accent-soft); max-width: 900px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr); gap: 18px; margin-top: 28px; }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: 0 8px 24px rgba(23, 33, 27, .04); }
+    .full { grid-column: 1 / -1; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+    label { display: grid; gap: 6px; font-weight: 700; color: #34443a; }
+    select, button { font: inherit; }
+    select { min-width: 250px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fff; color: var(--ink); }
+    button { border: 1px solid var(--line); border-radius: 9px; padding: 9px 12px; background: #fff; color: var(--ink); cursor: pointer; font-weight: 700; }
+    button:hover { border-color: var(--accent); color: var(--accent); }
+    button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    button.danger { color: var(--error); border-color: #efb7b8; }
+    button.small { padding: 7px 9px; font-size: .9rem; }
+    .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 9px; }
+    .state-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .metric { padding: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+    .metric span { display: block; color: var(--muted); font-size: .82rem; }
+    .metric strong { display: block; margin-top: 3px; font-size: 1.1rem; }
+    .status { display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; padding: 5px 10px; font-weight: 800; font-size: .88rem; }
+    .status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .status[data-kind="ok"] { color: var(--ok); background: var(--ok-soft); }
+    .status[data-kind="warn"] { color: var(--warn); background: var(--warn-soft); }
+    .status[data-kind="error"] { color: var(--error); background: var(--error-soft); }
+    .status[data-kind="neutral"] { color: var(--muted); background: #eef2ef; }
+    .event { min-height: 52px; padding: 12px 14px; border-radius: 10px; background: var(--surface); color: #34443a; }
+    .event[data-kind="error"] { background: var(--error-soft); color: var(--error); }
+    .event[data-kind="ok"] { background: var(--ok-soft); color: var(--ok); }
+    .event[data-kind="warn"] { background: var(--warn-soft); color: var(--warn); }
+    .scenario-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .scenario-tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .scenario-description { color: #48574c; min-height: 48px; }
+    .scenario-steps { display: flex; flex-wrap: wrap; gap: 8px; }
+    .scenario-steps button[disabled] { opacity: .46; cursor: not-allowed; }
+    .log { max-height: 190px; overflow: auto; display: grid; gap: 6px; }
+    .log-item { padding: 8px 10px; border-bottom: 1px solid var(--line); font-size: .9rem; }
+    .log-item:last-child { border-bottom: 0; }
+    .muted { color: var(--muted); }
+    code { padding: 2px 5px; background: #eef2ef; border-radius: 4px; }
+    @media (max-width: 820px) { .layout { grid-template-columns: 1fr; } .full { grid-column: auto; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">Protótipo descartável · branch prototype/tse-2022-feasibility</div>
+    <h1>O portão de viabilidade separa dados válidos de lacunas?</h1>
+    <p class="intro">Este demo testa um modelo de estado para o piloto TSE 2022: baixar uma fonte, congelar sua versão, ler o leiaute, validar chaves e só então aprovar o dataset. O ponto difícil é preservar <strong>zero válido</strong> sem confundi-lo com ausência, duplicidade ou registro inválido.</p>
+    <p class="prototype-note"><strong>Escopo:</strong> isto não baixa dados reais e não é pipeline de produção. A pergunta é se o estado do portão torna visíveis as decisões que precisam ser tomadas antes de modelar a unidade candidato-eleição.</p>
+
+    <section class="layout">
+      <div class="panel">
+        <h2>Estado atual</h2>
+        <div id="state-panel"></div>
+      </div>
+      <div class="panel">
+        <h2>Última decisão</h2>
+        <div id="event-panel" class="event"></div>
+        <h3 style="margin-top:18px">Histórico recente</h3>
+        <div id="log-panel" class="log"></div>
+      </div>
+
+      <div class="panel full">
+        <h2>Jogar livremente</h2>
+        <div class="toolbar" style="margin-bottom:14px">
+          <label>Fonte selecionada
+            <select id="source-select"></select>
+          </label>
+          <button id="reset" class="small">Reiniciar tudo</button>
+        </div>
+        <div class="action-grid">
+          <button data-action="download" class="primary">Baixar arquivo</button>
+          <button data-action="freeze">Congelar com checksum</button>
+          <button data-action="freezeWithoutHash" class="danger">Tentar congelar sem checksum</button>
+          <button data-action="inspectLayout">Ler leiaute</button>
+          <button data-action="validZero">Registrar zero válido</button>
+          <button data-action="missing">Registrar ausência</button>
+          <button data-action="invalid">Registrar registro inválido</button>
+          <button data-action="duplicate">Registrar duplicidade</button>
+          <button data-action="unmatched">Registrar chave sem correspondência</button>
+          <button data-action="validate" class="primary">Validar portão</button>
+          <button data-action="approve">Aprovar dataset</button>
+          <button data-action="block" class="danger">Bloquear fonte</button>
+        </div>
+      </div>
+
+      <div class="panel full">
+        <h2>Cenários guiados</h2>
+        <div id="scenario-tabs" class="scenario-tabs"></div>
+        <p id="scenario-description" class="scenario-description"></p>
+        <div id="scenario-steps" class="scenario-steps"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Portable logic module: no DOM, no persistence, no side effects.
+    const Pipeline = (() => {
+      const SOURCE_DEFS = {
+        candidates: { label: "Candidatos", kind: "unidade candidato-eleição" },
+        accounts: { label: "Contas de candidatos", kind: "gasto declarado de campanha" },
+        results: { label: "Resultados nominais", kind: "votação" },
+        turnout: { label: "Comparecimento e abstenção", kind: "participação eleitoral" },
+        electorate: { label: "Eleitorado", kind: "denominador" }
+      };
+
+      const blankSource = () => ({
+        status: "not-started",
+        version: { frozen: false, checksum: null, generatedAt: null },
+        issues: { validZero: 0, missing: 0, invalid: 0, duplicate: 0, unmatched: 0 },
+        stopReason: null
+      });
+
+      const initialState = () => ({
+        selectedSource: "candidates",
+        sources: Object.fromEntries(Object.keys(SOURCE_DEFS).map((key) => [key, blankSource()])),
+        lastEvent: { text: "Escolha uma fonte e comece o fluxo.", kind: "neutral" },
+        history: []
+      });
+
+      const STATUS = {
+        "not-started": "não iniciado",
+        downloaded: "arquivo baixado",
+        frozen: "versão congelada",
+        "layout-checked": "leiaute lido",
+        "needs-review": "precisa de revisão",
+        ready: "aprovado",
+        blocked: "bloqueado"
+      };
+
+      const can = (source, expected) => source.status === expected;
+      const hasBlockingIssues = (source) => ["missing", "invalid", "duplicate", "unmatched"].some((key) => source.issues[key] > 0);
+
+      function reduce(state, action) {
+        if (action.type === "reset") return initialState();
+        const next = structuredClone(state);
+        const key = action.source || state.selectedSource;
+        if (action.type === "selectSource") {
+          next.selectedSource = action.source;
+          return next;
+        }
+        const source = next.sources[key];
+        const label = SOURCE_DEFS[key].label;
+        let event = { text: "", kind: "neutral" };
+
+        const reject = (text) => { event = { text: `Não executado — ${text}`, kind: "error" }; };
+        const accept = (text) => { event = { text: `${label}: ${text}`, kind: "ok" }; };
+
+        if (action.type === "download") {
+          if (!can(source, "not-started")) reject(`o estado atual é “${STATUS[source.status]}”.`);
+          else { source.status = "downloaded"; accept("arquivo baixado; ainda não é uma versão reproduzível."); }
+        } else if (action.type === "freeze" || action.type === "freezeWithoutHash") {
+          if (!can(source, "downloaded")) reject("só é possível congelar depois de baixar o arquivo.");
+          else if (action.type === "freezeWithoutHash") reject("um checksum local é obrigatório para criar a versão congelada.");
+          else {
+            source.status = "frozen";
+            source.version = { frozen: true, checksum: "sha256:demo-2022", generatedAt: "2022-09-30T12:00:00Z" };
+            accept("versão congelada registrada com URL, data e checksum.");
+          }
+        } else if (action.type === "inspectLayout") {
+          if (!can(source, "frozen")) reject("o leiaute só pode ser lido depois de congelar a versão.");
+          else { source.status = "layout-checked"; accept("leiaute registrado; agora as chaves podem ser validadas."); }
+        } else if (["validZero", "missing", "invalid", "duplicate", "unmatched"].includes(action.type)) {
+          if (!source.version.frozen) reject("a ocorrência não pode ser registrada antes da versão congelada.");
+          else {
+            source.issues[action.type === "validZero" ? "validZero" : action.type] += 1;
+            const names = { validZero: "zero válido preservado", missing: "ausência separada de zero", invalid: "registro inválido marcado", duplicate: "duplicidade marcada", unmatched: "chave sem correspondência marcada" };
+            accept(names[action.type] + ".");
+          }
+        } else if (action.type === "validate") {
+          if (!can(source, "layout-checked")) reject("a validação exige uma versão congelada com leiaute lido.");
+          else if (hasBlockingIssues(source)) { source.status = "needs-review"; event = { text: `${label}: validação parada; existem ocorrências que precisam de regra explícita. Zero válido não bloqueia.`, kind: "warn" }; }
+          else { source.status = "ready"; accept("portão aprovado sem ocorrências bloqueantes."); }
+        } else if (action.type === "approve") {
+          if (source.status === "ready") accept("dataset já está aprovado para a próxima etapa.");
+          else if (!can(source, "layout-checked")) reject("o dataset ainda não passou por leiaute e validação.");
+          else if (hasBlockingIssues(source)) { source.status = "needs-review"; reject("há duplicidades, ausências, inválidos ou chaves sem correspondência."); }
+          else { source.status = "ready"; accept("dataset aprovado para a próxima etapa."); }
+        } else if (action.type === "block") {
+          source.status = "blocked";
+          source.stopReason = "fonte indisponível ou regra de acesso não satisfatória";
+          event = { text: `${label}: coleta parada e lacuna registrada.`, kind: "warn" };
+        }
+
+        next.lastEvent = event;
+        next.history = [{ source: label, text: event.text, kind: event.kind }, ...state.history].slice(0, 8);
+        return next;
+      }
+
+      return { SOURCE_DEFS, STATUS, initialState, reduce };
+    })();
+
+    const scenarios = [
+      {
+        id: "happy",
+        label: "Fluxo feliz",
+        description: "Uma fonte com arquivo e leiaute válidos chega ao portão sem ocorrências bloqueantes.",
+        steps: [
+          ["selectSource", "Candidatos"], ["download", "Baixar"], ["freeze", "Congelar"], ["inspectLayout", "Ler leiaute"], ["validate", "Validar"], ["approve", "Aprovar"]
+        ]
+      },
+      {
+        id: "zero",
+        label: "Zero não é ausência",
+        description: "Amostra de contas com zero válido e ausência. O portão mantém os dois conceitos separados e não aprova sem regra para a ausência.",
+        steps: [
+          ["selectSource", "Contas de candidatos"], ["download", "Baixar"], ["freeze", "Congelar"], ["inspectLayout", "Ler leiaute"], ["validZero", "Zero válido"], ["missing", "Ausência"], ["validate", "Validar"]
+        ]
+      },
+      {
+        id: "duplicate",
+        label: "Chave duplicada",
+        description: "Uma duplicidade na unidade candidato-eleição interrompe a aprovação até que a regra de deduplicação seja definida.",
+        steps: [
+          ["selectSource", "Resultados nominais"], ["download", "Baixar"], ["freeze", "Congelar"], ["inspectLayout", "Ler leiaute"], ["duplicate", "Duplicidade"], ["validate", "Validar"]
+        ]
+      },
+      {
+        id: "illegal",
+        label: "Ordem inválida",
+        description: "Tentativas fora de ordem devem ser visíveis: sem download não há congelamento; sem checksum não há versão reproduzível.",
+        steps: [
+          ["selectSource", "Eleitorado"], ["freeze", "Congelar antes de baixar"], ["download", "Baixar"], ["freezeWithoutHash", "Sem checksum"], ["freeze", "Congelar corretamente"]
+        ]
+      }
+    ];
+
+    let state = Pipeline.initialState();
+    let activeScenario = "happy";
+    let scenarioProgress = 0;
+
+    const $ = (id) => document.getElementById(id);
+    const sourceSelect = $("source-select");
+
+    Object.entries(Pipeline.SOURCE_DEFS).forEach(([key, source]) => {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = source.label;
+      sourceSelect.appendChild(option);
+    });
+
+    function statusKind(status) {
+      if (status === "ready") return "ok";
+      if (["needs-review", "blocked"].includes(status)) return status === "blocked" ? "error" : "warn";
+      return "neutral";
+    }
+
+    function render() {
+      sourceSelect.value = state.selectedSource;
+      const source = state.sources[state.selectedSource];
+      const definition = Pipeline.SOURCE_DEFS[state.selectedSource];
+      const issueTotal = Object.values(source.issues).reduce((sum, value) => sum + value, 0) - source.issues.validZero;
+      $("state-panel").innerHTML = `
+        <div style="margin-bottom:14px"><strong>${definition.label}</strong> · ${definition.kind}</div>
+        <div style="margin-bottom:14px"><span class="status" data-kind="${statusKind(source.status)}">${Pipeline.STATUS[source.status]}</span></div>
+        <div class="state-grid">
+          <div class="metric"><span>Versão congelada</span><strong>${source.version.frozen ? "sim" : "não"}</strong></div>
+          <div class="metric"><span>Checksum</span><strong>${source.version.checksum || "pendente"}</strong></div>
+          <div class="metric"><span>Zeros válidos</span><strong>${source.issues.validZero}</strong></div>
+          <div class="metric"><span>Ocorrências bloqueantes</span><strong>${issueTotal}</strong></div>
+          <div class="metric"><span>Ausências</span><strong>${source.issues.missing}</strong></div>
+          <div class="metric"><span>Duplicidades / sem correspondência</span><strong>${source.issues.duplicate} / ${source.issues.unmatched}</strong></div>
+        </div>
+        <p class="muted" style="margin-top:14px">${source.stopReason || "Sem motivo de parada registrado."}</p>`;
+
+      const event = state.lastEvent;
+      $("event-panel").dataset.kind = event.kind;
+      $("event-panel").textContent = event.text;
+      $("log-panel").innerHTML = state.history.length
+        ? state.history.map((item) => `<div class="log-item"><strong>${item.source}</strong><br>${item.text}</div>`).join("")
+        : `<div class="muted">As decisões aparecerão aqui.</div>`;
+
+      renderScenarios();
+    }
+
+    function renderScenarios() {
+      $("scenario-tabs").innerHTML = scenarios.map((scenario) => `<button class="scenario-tab small" aria-selected="${scenario.id === activeScenario}" data-scenario="${scenario.id}">${scenario.label}</button>`).join("");
+      const scenario = scenarios.find((item) => item.id === activeScenario);
+      $("scenario-description").textContent = scenario.description;
+      $("scenario-steps").innerHTML = scenario.steps.map(([type, label], index) => `<button class="small" data-step="${index}" ${index === scenarioProgress ? "" : "disabled"}>${index + 1}. ${label}</button>`).join("");
+    }
+
+    function dispatch(action) {
+      state = Pipeline.reduce(state, action);
+      render();
+    }
+
+    document.addEventListener("click", (event) => {
+      const actionButton = event.target.closest("[data-action]");
+      if (actionButton) dispatch({ type: actionButton.dataset.action, source: state.selectedSource });
+      const tab = event.target.closest("[data-scenario]");
+      if (tab) { activeScenario = tab.dataset.scenario; scenarioProgress = 0; state = Pipeline.initialState(); render(); }
+      const step = event.target.closest("[data-step]");
+      if (step) {
+        const scenario = scenarios.find((item) => item.id === activeScenario);
+        const [type] = scenario.steps[Number(step.dataset.step)];
+        if (type === "selectSource") dispatch({ type, source: Object.keys(Pipeline.SOURCE_DEFS).find((key) => Pipeline.SOURCE_DEFS[key].label === scenario.steps[Number(step.dataset.step)][1]) });
+        else dispatch({ type, source: state.selectedSource });
+        scenarioProgress = Math.min(scenarioProgress + 1, scenario.steps.length);
+        render();
+      }
+    });
+
+    sourceSelect.addEventListener("change", (event) => dispatch({ type: "selectSource", source: event.target.value }));
+    $("reset").addEventListener("click", () => { state = Pipeline.initialState(); scenarioProgress = 0; render(); });
+    render();
+  </script>
+</body>
+</html>
