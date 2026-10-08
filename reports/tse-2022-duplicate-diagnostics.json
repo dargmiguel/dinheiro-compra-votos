@@ -1,0 +1,548 @@
+{
+  "status": "diagnostic_only",
+  "database": "data\\derived\\2022\\pilot.sqlite",
+  "exact_repeat_rows": 21874,
+  "exact_repeat_candidates": 2026,
+  "exact_repeat_documents": 6682,
+  "documents_with_multiple_distinct_lines": 49744,
+  "remove_exact_repeats_centavos": 313708711015,
+  "preserve_all_lines_centavos": 316600011180,
+  "difference_centavos": 2891300165,
+  "remove_exact_repeats_brl": "R$ 3.137.087.110,15",
+  "preserve_all_lines_brl": "R$ 3.166.000.111,80",
+  "difference_brl": "R$ 28.913.001,65",
+  "by_uf": [
+    {
+      "uf": "AC",
+      "exact_repeat_rows": 356,
+      "affected_candidates": 14,
+      "exact_repeat_documents": 71,
+      "documents_with_multiple_distinct_lines": 649,
+      "remove_exact_repeats_centavos": 5153256370,
+      "preserve_all_lines_centavos": 5169796985,
+      "difference_centavos": 16540615
+    },
+    {
+      "uf": "AL",
+      "exact_repeat_rows": 239,
+      "affected_candidates": 34,
+      "exact_repeat_documents": 110,
+      "documents_with_multiple_distinct_lines": 926,
+      "remove_exact_repeats_centavos": 6840201624,
+      "preserve_all_lines_centavos": 6918519741,
+      "difference_centavos": 78318117
+    },
+    {
+      "uf": "AM",
+      "exact_repeat_rows": 1146,
+      "affected_candidates": 41,
+      "exact_repeat_documents": 118,
+      "documents_with_multiple_distinct_lines": 692,
+      "remove_exact_repeats_centavos": 6407414187,
+      "preserve_all_lines_centavos": 6436637840,
+      "difference_centavos": 29223653
+    },
+    {
+      "uf": "AP",
+      "exact_repeat_rows": 211,
+      "affected_candidates": 30,
+      "exact_repeat_documents": 67,
+      "documents_with_multiple_distinct_lines": 466,
+      "remove_exact_repeats_centavos": 6015863678,
+      "preserve_all_lines_centavos": 6057700129,
+      "difference_centavos": 41836451
+    },
+    {
+      "uf": "BA",
+      "exact_repeat_rows": 1033,
+      "affected_candidates": 124,
+      "exact_repeat_documents": 361,
+      "documents_with_multiple_distinct_lines": 2277,
+      "remove_exact_repeats_centavos": 19486509624,
+      "preserve_all_lines_centavos": 19740692663,
+      "difference_centavos": 254183039
+    },
+    {
+      "uf": "CE",
+      "exact_repeat_rows": 1003,
+      "affected_candidates": 79,
+      "exact_repeat_documents": 278,
+      "documents_with_multiple_distinct_lines": 1552,
+      "remove_exact_repeats_centavos": 10820919376,
+      "preserve_all_lines_centavos": 11051052195,
+      "difference_centavos": 230132819
+    },
+    {
+      "uf": "DF",
+      "exact_repeat_rows": 206,
+      "affected_candidates": 40,
+      "exact_repeat_documents": 148,
+      "documents_with_multiple_distinct_lines": 1093,
+      "remove_exact_repeats_centavos": 7048715448,
+      "preserve_all_lines_centavos": 7071688286,
+      "difference_centavos": 22972838
+    },
+    {
+      "uf": "ES",
+      "exact_repeat_rows": 324,
+      "affected_candidates": 66,
+      "exact_repeat_documents": 145,
+      "documents_with_multiple_distinct_lines": 1419,
+      "remove_exact_repeats_centavos": 8684485629,
+      "preserve_all_lines_centavos": 8756711963,
+      "difference_centavos": 72226334
+    },
+    {
+      "uf": "GO",
+      "exact_repeat_rows": 1076,
+      "affected_candidates": 80,
+      "exact_repeat_documents": 248,
+      "documents_with_multiple_distinct_lines": 2066,
+      "remove_exact_repeats_centavos": 12463376711,
+      "preserve_all_lines_centavos": 12533102403,
+      "difference_centavos": 69725692
+    },
+    {
+      "uf": "MA",
+      "exact_repeat_rows": 473,
+      "affected_candidates": 73,
+      "exact_repeat_documents": 173,
+      "documents_with_multiple_distinct_lines": 1374,
+      "remove_exact_repeats_centavos": 11009215145,
+      "preserve_all_lines_centavos": 11167192604,
+      "difference_centavos": 157977459
+    },
+    {
+      "uf": "MG",
+      "exact_repeat_rows": 1891,
+      "affected_candidates": 189,
+      "exact_repeat_documents": 537,
+      "documents_with_multiple_distinct_lines": 6062,
+      "remove_exact_repeats_centavos": 29792788746,
+      "preserve_all_lines_centavos": 29955263867,
+      "difference_centavos": 162475121
+    },
+    {
+      "uf": "MS",
+      "exact_repeat_rows": 112,
+      "affected_candidates": 28,
+      "exact_repeat_documents": 56,
+      "documents_with_multiple_distinct_lines": 501,
+      "remove_exact_repeats_centavos": 5340920899,
+      "preserve_all_lines_centavos": 5376464869,
+      "difference_centavos": 35543970
+    },
+    {
+      "uf": "MT",
+      "exact_repeat_rows": 567,
+      "affected_candidates": 47,
+      "exact_repeat_documents": 160,
+      "documents_with_multiple_distinct_lines": 1236,
+      "remove_exact_repeats_centavos": 8264476121,
+      "preserve_all_lines_centavos": 8290082688,
+      "difference_centavos": 25606567
+    },
+    {
+      "uf": "PA",
+      "exact_repeat_rows": 431,
+      "affected_candidates": 60,
+      "exact_repeat_documents": 179,
+      "documents_with_multiple_distinct_lines": 1401,
+      "remove_exact_repeats_centavos": 8867627752,
+      "preserve_all_lines_centavos": 9008444438,
+      "difference_centavos": 140816686
+    },
+    {
+      "uf": "PB",
+      "exact_repeat_rows": 205,
+      "affected_candidates": 39,
+      "exact_repeat_documents": 85,
+      "documents_with_multiple_distinct_lines": 1145,
+      "remove_exact_repeats_centavos": 7170123618,
+      "preserve_all_lines_centavos": 7199827119,
+      "difference_centavos": 29703501
+    },
+    {
+      "uf": "PE",
+      "exact_repeat_rows": 1062,
+      "affected_candidates": 77,
+      "exact_repeat_documents": 250,
+      "documents_with_multiple_distinct_lines": 1881,
+      "remove_exact_repeats_centavos": 15090785674,
+      "preserve_all_lines_centavos": 15251187603,
+      "difference_centavos": 160401929
+    },
+    {
+      "uf": "PI",
+      "exact_repeat_rows": 235,
+      "affected_candidates": 44,
+      "exact_repeat_documents": 102,
+      "documents_with_multiple_distinct_lines": 815,
+      "remove_exact_repeats_centavos": 6150865328,
+      "preserve_all_lines_centavos": 6256999717,
+      "difference_centavos": 106134389
+    },
+    {
+      "uf": "PR",
+      "exact_repeat_rows": 678,
+      "affected_candidates": 128,
+      "exact_repeat_documents": 324,
+      "documents_with_multiple_distinct_lines": 2712,
+      "remove_exact_repeats_centavos": 15922083715,
+      "preserve_all_lines_centavos": 15998126953,
+      "difference_centavos": 76043238
+    },
+    {
+      "uf": "RJ",
+      "exact_repeat_rows": 3298,
+      "affected_candidates": 164,
+      "exact_repeat_documents": 912,
+      "documents_with_multiple_distinct_lines": 4902,
+      "remove_exact_repeats_centavos": 24482924898,
+      "preserve_all_lines_centavos": 24935332548,
+      "difference_centavos": 452407650
+    },
+    {
+      "uf": "RN",
+      "exact_repeat_rows": 238,
+      "affected_candidates": 39,
+      "exact_repeat_documents": 99,
+      "documents_with_multiple_distinct_lines": 1016,
+      "remove_exact_repeats_centavos": 6455277797,
+      "preserve_all_lines_centavos": 6493287644,
+      "difference_centavos": 38009847
+    },
+    {
+      "uf": "RO",
+      "exact_repeat_rows": 285,
+      "affected_candidates": 51,
+      "exact_repeat_documents": 106,
+      "documents_with_multiple_distinct_lines": 1101,
+      "remove_exact_repeats_centavos": 6803177782,
+      "preserve_all_lines_centavos": 6846255438,
+      "difference_centavos": 43077656
+    },
+    {
+      "uf": "RR",
+      "exact_repeat_rows": 208,
+      "affected_candidates": 29,
+      "exact_repeat_documents": 134,
+      "documents_with_multiple_distinct_lines": 569,
+      "remove_exact_repeats_centavos": 4055631805,
+      "preserve_all_lines_centavos": 4080181335,
+      "difference_centavos": 24549530
+    },
+    {
+      "uf": "RS",
+      "exact_repeat_rows": 1759,
+      "affected_candidates": 123,
+      "exact_repeat_documents": 577,
+      "documents_with_multiple_distinct_lines": 3102,
+      "remove_exact_repeats_centavos": 13398783054,
+      "preserve_all_lines_centavos": 13570073639,
+      "difference_centavos": 171290585
+    },
+    {
+      "uf": "SC",
+      "exact_repeat_rows": 519,
+      "affected_candidates": 67,
+      "exact_repeat_documents": 229,
+      "documents_with_multiple_distinct_lines": 1542,
+      "remove_exact_repeats_centavos": 9122605806,
+      "preserve_all_lines_centavos": 9178119664,
+      "difference_centavos": 55513858
+    },
+    {
+      "uf": "SE",
+      "exact_repeat_rows": 167,
+      "affected_candidates": 24,
+      "exact_repeat_documents": 60,
+      "documents_with_multiple_distinct_lines": 800,
+      "remove_exact_repeats_centavos": 4666293762,
+      "preserve_all_lines_centavos": 4737227953,
+      "difference_centavos": 70934191
+    },
+    {
+      "uf": "SP",
+      "exact_repeat_rows": 3981,
+      "affected_candidates": 302,
+      "exact_repeat_documents": 1087,
+      "documents_with_multiple_distinct_lines": 7637,
+      "remove_exact_repeats_centavos": 47429245719,
+      "preserve_all_lines_centavos": 47725843956,
+      "difference_centavos": 296598237
+    },
+    {
+      "uf": "TO",
+      "exact_repeat_rows": 171,
+      "affected_candidates": 34,
+      "exact_repeat_documents": 66,
+      "documents_with_multiple_distinct_lines": 808,
+      "remove_exact_repeats_centavos": 6765140747,
+      "preserve_all_lines_centavos": 6794196940,
+      "difference_centavos": 29056193
+    }
+  ],
+  "duplicate_evidence_sample": [
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789637",
+      "amount_centavos": 220000,
+      "row_signature": "f8dc82f395dbf5d290cdff1aa1086506b28021783713b6dc88a7d8ce31f1649f",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 1411,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 1410
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789580",
+      "amount_centavos": 234900,
+      "row_signature": "5af5ad8d4573856f0246ef3095241a00ebce20d9fc245687a581d366723437f9",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 1495,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 1494
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789695",
+      "amount_centavos": 161060,
+      "row_signature": "00cacf093926bc98a96c27b38980a64ba017c09bff3fcc369c0b542e63ed796f",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 1505,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 1504
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789423",
+      "amount_centavos": 324700,
+      "row_signature": "9a921c86ba69e0959c052a1d1ff1b1376109068bb1015047647a4e7908f106cc",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 1629,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 1628
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789501",
+      "amount_centavos": 210200,
+      "row_signature": "18f5cc51be80fa1acdcfe7686d99cb07e9723c159530f6888727009610418b51",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 1656,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 1655
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789358",
+      "amount_centavos": 157800,
+      "row_signature": "d56b082ea10239093475fc4cd489dcc1c0d59112ef6baf5fd8e4dedb2fb7cf55",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 1683,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 1682
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789278",
+      "amount_centavos": 116300,
+      "row_signature": "aeb01fe1add11e7e109fc0a1fd77c83ccb6e3f3e8f4e5c5564cedd4bb593c3da",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 1791,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 1790
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789667",
+      "amount_centavos": 95400,
+      "row_signature": "70fc2e12c992c4848237af49d6ff8231514abb86965db9957d69c5d0e1aead34",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 1799,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 1798
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789635",
+      "amount_centavos": 324700,
+      "row_signature": "61fe9e72ef9b0601745bbf9c2dc93f185efebb478e7bd6ff031787f7fc0eced9",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 1815,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 1814
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789669",
+      "amount_centavos": 60000,
+      "row_signature": "32cead160c6d853c5a77d7056660f06c549fce315c962723c775ca2fecc0f726",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 1829,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 1828
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789356",
+      "amount_centavos": 116300,
+      "row_signature": "3a407abef57c35a0b4028030e82cda75193be77baa8816b2dcc1a95bde583151",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 2021,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 2020
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789575",
+      "amount_centavos": 327000,
+      "row_signature": "039618643de3aa0c1c180447541f2519aad391eaa8be074099b692037dfa1e26",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 2082,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 2081
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789277",
+      "amount_centavos": 60000,
+      "row_signature": "2eae1ee353016efdef3c799f43ff188f34ee61e0736b8eee362c68041d9894b2",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 2102,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 2094
+      }
+    },
+    {
+      "sq_candidate": "10001642332",
+      "sq_expense": "51789778",
+      "amount_centavos": 150000,
+      "row_signature": "f20369765258ff5a2fbf3fb2bf537a11d8da237655521f090bd6a8f21af3c28e",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 2109,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 2108
+      }
+    },
+    {
+      "sq_candidate": "10001621646",
+      "sq_expense": "50818042",
+      "amount_centavos": 698,
+      "row_signature": "e1fcb33ae5abcbb27067964e8546057ce94d3ed533307d7db6602e6f6dab300e",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 2898,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 2715
+      }
+    },
+    {
+      "sq_candidate": "10001622412",
+      "sq_expense": "47814950",
+      "amount_centavos": 40000,
+      "row_signature": "6e6dd48991770a2666f526d271670f96d6b7327ebd32235948f6d5d431a31efa",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 4387,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 4377
+      }
+    },
+    {
+      "sq_candidate": "10001621646",
+      "sq_expense": "50818143",
+      "amount_centavos": 28000,
+      "row_signature": "b8142795cd61263676e11b15d13c5c161d5e561f04f928bd5cb6f4f62b4bf6f2",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 4640,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 4639
+      }
+    },
+    {
+      "sq_candidate": "10001621646",
+      "sq_expense": "50818143",
+      "amount_centavos": 36000,
+      "row_signature": "69c9f4c0b2b803c6061923bf9beada41e9a72f3eb5ec2d1f2f4b2026d05d0a86",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 4645,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 4644
+      }
+    },
+    {
+      "sq_candidate": "10001642339",
+      "sq_expense": "52189431",
+      "amount_centavos": 518000,
+      "row_signature": "679e9086089d6ba3439df19047efeef604cd46dc6d26293c374054388a79ca2a",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 6820,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 6819
+      }
+    },
+    {
+      "sq_candidate": "10001642339",
+      "sq_expense": "52189264",
+      "amount_centavos": 130,
+      "row_signature": "1dfa7f14c37fff9f3bddcc787e901f7c0cd5e8a6f262f4cd1c5762281d2a4f20",
+      "source_archive": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+      "source_row": 7150,
+      "duplicate_of": {
+        "source_member": "despesas_contratadas_candidatos_2022_AC.csv",
+        "source_row": 7149
+      }
+    }
+  ]
+}

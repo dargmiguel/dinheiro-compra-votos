@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+
+# Original TSE snapshots are large; manifests and reports remain tracked.
+data/raw/
+data/derived/
+data/exploratory/

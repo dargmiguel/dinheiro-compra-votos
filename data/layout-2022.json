@@ -1,0 +1,1603 @@
+{
+  "schema_version": 1,
+  "manifest_id": "20261008T154908Z",
+  "election": 2022,
+  "resources": [
+    {
+      "resource_key": "candidates_2022",
+      "resource_id": "435145fd-bc9d-446a-ac9d-273f585a0bb9",
+      "local_path": "data/raw/2022/20261008T154908Z/consulta_cand_2022.zip",
+      "archive": {
+        "archive_name": "consulta_cand_2022.zip",
+        "member_count": 30,
+        "table_member_count": 29,
+        "members": [
+          {
+            "name": "leiame.pdf",
+            "size_bytes": 208302,
+            "compressed_size_bytes": 192143,
+            "is_table": false
+          },
+          {
+            "name": "consulta_cand_2022_RS.csv",
+            "size_bytes": 784454,
+            "compressed_size_bytes": 99548,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_SC.csv",
+            "size_bytes": 538146,
+            "compressed_size_bytes": 69673,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_RO.csv",
+            "size_bytes": 339316,
+            "compressed_size_bytes": 46270,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_RR.csv",
+            "size_bytes": 333879,
+            "compressed_size_bytes": 44702,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_SE.csv",
+            "size_bytes": 294369,
+            "compressed_size_bytes": 39303,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_SP.csv",
+            "size_bytes": 1950700,
+            "compressed_size_bytes": 247200,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_TO.csv",
+            "size_bytes": 287066,
+            "compressed_size_bytes": 38233,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_PI.csv",
+            "size_bytes": 234143,
+            "compressed_size_bytes": 30660,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_PR.csv",
+            "size_bytes": 845539,
+            "compressed_size_bytes": 111461,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_RN.csv",
+            "size_bytes": 308179,
+            "compressed_size_bytes": 40697,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_BR.csv",
+            "size_bytes": 17136,
+            "compressed_size_bytes": 3075,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_RJ.csv",
+            "size_bytes": 1507950,
+            "compressed_size_bytes": 190560,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_PE.csv",
+            "size_bytes": 618225,
+            "compressed_size_bytes": 81022,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_BRASIL.csv",
+            "size_bytes": 15769082,
+            "compressed_size_bytes": 2137741,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_PB.csv",
+            "size_bytes": 410187,
+            "compressed_size_bytes": 54382,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_MA.csv",
+            "size_bytes": 515452,
+            "compressed_size_bytes": 68389,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_MG.csv",
+            "size_bytes": 1382997,
+            "compressed_size_bytes": 174734,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_MT.csv",
+            "size_bytes": 283412,
+            "compressed_size_bytes": 37615,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_PA.csv",
+            "size_bytes": 558518,
+            "compressed_size_bytes": 73939,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_MS.csv",
+            "size_bytes": 329615,
+            "compressed_size_bytes": 43844,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_ES.csv",
+            "size_bytes": 423841,
+            "compressed_size_bytes": 55929,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_DF.csv",
+            "size_bytes": 488228,
+            "compressed_size_bytes": 66359,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_BA.csv",
+            "size_bytes": 915088,
+            "compressed_size_bytes": 118971,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_GO.csv",
+            "size_bytes": 659267,
+            "compressed_size_bytes": 88056,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_AP.csv",
+            "size_bytes": 297332,
+            "compressed_size_bytes": 39422,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_CE.csv",
+            "size_bytes": 550344,
+            "compressed_size_bytes": 72287,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_AM.csv",
+            "size_bytes": 356330,
+            "compressed_size_bytes": 47344,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_AL.csv",
+            "size_bytes": 270345,
+            "compressed_size_bytes": 36034,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "consulta_cand_2022_AC.csv",
+            "size_bytes": 290678,
+            "compressed_size_bytes": 38092,
+            "is_table": true,
+            "layout_id": "layout_1"
+          }
+        ],
+        "layouts": {
+          "layout_1": {
+            "encoding": "latin-1",
+            "delimiter": ";",
+            "columns": [
+              "DT_GERACAO",
+              "HH_GERACAO",
+              "ANO_ELEICAO",
+              "CD_TIPO_ELEICAO",
+              "NM_TIPO_ELEICAO",
+              "NR_TURNO",
+              "CD_ELEICAO",
+              "DS_ELEICAO",
+              "DT_ELEICAO",
+              "TP_ABRANGENCIA",
+              "SG_UF",
+              "SG_UE",
+              "NM_UE",
+              "CD_CARGO",
+              "DS_CARGO",
+              "SQ_CANDIDATO",
+              "NR_CANDIDATO",
+              "NM_CANDIDATO",
+              "NM_URNA_CANDIDATO",
+              "NM_SOCIAL_CANDIDATO",
+              "NR_CPF_CANDIDATO",
+              "DS_EMAIL",
+              "CD_SITUACAO_CANDIDATURA",
+              "DS_SITUACAO_CANDIDATURA",
+              "TP_AGREMIACAO",
+              "NR_PARTIDO",
+              "SG_PARTIDO",
+              "NM_PARTIDO",
+              "NR_FEDERACAO",
+              "NM_FEDERACAO",
+              "SG_FEDERACAO",
+              "DS_COMPOSICAO_FEDERACAO",
+              "SQ_COLIGACAO",
+              "NM_COLIGACAO",
+              "DS_COMPOSICAO_COLIGACAO",
+              "SG_UF_NASCIMENTO",
+              "DT_NASCIMENTO",
+              "NR_TITULO_ELEITORAL_CANDIDATO",
+              "CD_GENERO",
+              "DS_GENERO",
+              "CD_GRAU_INSTRUCAO",
+              "DS_GRAU_INSTRUCAO",
+              "CD_ESTADO_CIVIL",
+              "DS_ESTADO_CIVIL",
+              "CD_COR_RACA",
+              "DS_COR_RACA",
+              "CD_OCUPACAO",
+              "DS_OCUPACAO",
+              "CD_SIT_TOT_TURNO",
+              "DS_SIT_TOT_TURNO"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "resource_key": "accounts_2022",
+      "resource_id": "e45493d5-75df-4ccf-a4b4-7b1f5213577d",
+      "local_path": "data/raw/2022/20261008T154908Z/prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "archive": {
+        "archive_name": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+        "member_count": 120,
+        "table_member_count": 116,
+        "members": [
+          {
+            "name": "despesas_contratadas_candidatos_2022_BA.csv",
+            "size_bytes": 47427107,
+            "compressed_size_bytes": 3642436,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_AP.csv",
+            "size_bytes": 10743984,
+            "compressed_size_bytes": 870698,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_AM.csv",
+            "size_bytes": 46890234,
+            "compressed_size_bytes": 3555952,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_AC.csv",
+            "size_bytes": 21308343,
+            "compressed_size_bytes": 1666257,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_AL.csv",
+            "size_bytes": 16050457,
+            "compressed_size_bytes": 1203421,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_BR.csv",
+            "size_bytes": 5832250,
+            "compressed_size_bytes": 305747,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_PA.csv",
+            "size_bytes": 14681821,
+            "compressed_size_bytes": 1163572,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_PB.csv",
+            "size_bytes": 12750370,
+            "compressed_size_bytes": 931012,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_PE.csv",
+            "size_bytes": 39728876,
+            "compressed_size_bytes": 2648811,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_PI.csv",
+            "size_bytes": 6037549,
+            "compressed_size_bytes": 509139,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_PR.csv",
+            "size_bytes": 47649610,
+            "compressed_size_bytes": 3706460,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_RJ.csv",
+            "size_bytes": 95495408,
+            "compressed_size_bytes": 6407498,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_RN.csv",
+            "size_bytes": 7176766,
+            "compressed_size_bytes": 593107,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_RR.csv",
+            "size_bytes": 13535017,
+            "compressed_size_bytes": 899604,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_RS.csv",
+            "size_bytes": 47902437,
+            "compressed_size_bytes": 3772894,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_CE.csv",
+            "size_bytes": 37307925,
+            "compressed_size_bytes": 2712947,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_DF.csv",
+            "size_bytes": 41201028,
+            "compressed_size_bytes": 3252949,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_ES.csv",
+            "size_bytes": 31147272,
+            "compressed_size_bytes": 2564487,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_GO.csv",
+            "size_bytes": 73418731,
+            "compressed_size_bytes": 6222843,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_AL.csv",
+            "size_bytes": 113743,
+            "compressed_size_bytes": 7728,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_AC.csv",
+            "size_bytes": 157951,
+            "compressed_size_bytes": 11221,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_AM.csv",
+            "size_bytes": 158846,
+            "compressed_size_bytes": 11155,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_2022_AC.csv",
+            "size_bytes": 5167660,
+            "compressed_size_bytes": 421888,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_AL.csv",
+            "size_bytes": 2082343,
+            "compressed_size_bytes": 215132,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_MA.csv",
+            "size_bytes": 23135450,
+            "compressed_size_bytes": 1816268,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "receitas_candidatos_2022_AP.csv",
+            "size_bytes": 1983358,
+            "compressed_size_bytes": 200878,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_BA.csv",
+            "size_bytes": 7511988,
+            "compressed_size_bytes": 673525,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_RO.csv",
+            "size_bytes": 20565207,
+            "compressed_size_bytes": 1594274,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "receitas_candidatos_2022_AM.csv",
+            "size_bytes": 5155109,
+            "compressed_size_bytes": 464814,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_MG.csv",
+            "size_bytes": 166076556,
+            "compressed_size_bytes": 14350086,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "receitas_candidatos_2022_BR.csv",
+            "size_bytes": 234325808,
+            "compressed_size_bytes": 15867175,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_DF.csv",
+            "size_bytes": 7522219,
+            "compressed_size_bytes": 673796,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_BRASIL.csv",
+            "size_bytes": 432460696,
+            "compressed_size_bytes": 35380878,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_SC.csv",
+            "size_bytes": 23065503,
+            "compressed_size_bytes": 1847624,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_SE.csv",
+            "size_bytes": 11305314,
+            "compressed_size_bytes": 844505,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "receitas_candidatos_2022_CE.csv",
+            "size_bytes": 3893066,
+            "compressed_size_bytes": 386311,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_SP.csv",
+            "size_bytes": 123650180,
+            "compressed_size_bytes": 9531219,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_TO.csv",
+            "size_bytes": 15228257,
+            "compressed_size_bytes": 1142624,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_AP.csv",
+            "size_bytes": 118666,
+            "compressed_size_bytes": 7082,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_BA.csv",
+            "size_bytes": 664487,
+            "compressed_size_bytes": 59739,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_MS.csv",
+            "size_bytes": 38425147,
+            "compressed_size_bytes": 2900742,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_MT.csv",
+            "size_bytes": 42161551,
+            "compressed_size_bytes": 3134982,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_BR.csv",
+            "size_bytes": 23853253,
+            "compressed_size_bytes": 2203164,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_CE.csv",
+            "size_bytes": 719767,
+            "compressed_size_bytes": 65906,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_DF.csv",
+            "size_bytes": 1782212,
+            "compressed_size_bytes": 209510,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_ES.csv",
+            "size_bytes": 346981,
+            "compressed_size_bytes": 33961,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_GO.csv",
+            "size_bytes": 1029074,
+            "compressed_size_bytes": 117974,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_MA.csv",
+            "size_bytes": 327054,
+            "compressed_size_bytes": 26203,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_BRASIL.csv",
+            "size_bytes": 1343964030,
+            "compressed_size_bytes": 146541486,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_MS.csv",
+            "size_bytes": 648194,
+            "compressed_size_bytes": 53133,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_MG.csv",
+            "size_bytes": 2149116,
+            "compressed_size_bytes": 245960,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_MT.csv",
+            "size_bytes": 476897,
+            "compressed_size_bytes": 49901,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_PA.csv",
+            "size_bytes": 292707,
+            "compressed_size_bytes": 22119,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_PB.csv",
+            "size_bytes": 237487,
+            "compressed_size_bytes": 20021,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_PE.csv",
+            "size_bytes": 982550,
+            "compressed_size_bytes": 116360,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_PI.csv",
+            "size_bytes": 177423,
+            "compressed_size_bytes": 15153,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_BRASIL.csv",
+            "size_bytes": 54867837,
+            "compressed_size_bytes": 6138205,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_PR.csv",
+            "size_bytes": 3474541,
+            "compressed_size_bytes": 382368,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_RJ.csv",
+            "size_bytes": 3788758,
+            "compressed_size_bytes": 430114,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_RN.csv",
+            "size_bytes": 170846,
+            "compressed_size_bytes": 13762,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_RO.csv",
+            "size_bytes": 132609,
+            "compressed_size_bytes": 6966,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_RR.csv",
+            "size_bytes": 151003,
+            "compressed_size_bytes": 9617,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_RS.csv",
+            "size_bytes": 1886068,
+            "compressed_size_bytes": 222544,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_SC.csv",
+            "size_bytes": 1883614,
+            "compressed_size_bytes": 225668,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_SE.csv",
+            "size_bytes": 112971,
+            "compressed_size_bytes": 6094,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_SP.csv",
+            "size_bytes": 8932970,
+            "compressed_size_bytes": 996567,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_doador_originario_2022_TO.csv",
+            "size_bytes": 109200,
+            "compressed_size_bytes": 6412,
+            "is_table": true,
+            "layout_id": "layout_3"
+          },
+          {
+            "name": "receitas_candidatos_2022_ES.csv",
+            "size_bytes": 6859841,
+            "compressed_size_bytes": 588817,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_GO.csv",
+            "size_bytes": 8438686,
+            "compressed_size_bytes": 759837,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_MA.csv",
+            "size_bytes": 3919843,
+            "compressed_size_bytes": 395384,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_MT.csv",
+            "size_bytes": 5226147,
+            "compressed_size_bytes": 516992,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_MG.csv",
+            "size_bytes": 18291910,
+            "compressed_size_bytes": 1586018,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_MS.csv",
+            "size_bytes": 3310512,
+            "compressed_size_bytes": 316425,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_PB.csv",
+            "size_bytes": 21749927,
+            "compressed_size_bytes": 1704294,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_PI.csv",
+            "size_bytes": 13716078,
+            "compressed_size_bytes": 965390,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_RJ.csv",
+            "size_bytes": 130025391,
+            "compressed_size_bytes": 10338160,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_RO.csv",
+            "size_bytes": 37040229,
+            "compressed_size_bytes": 2897840,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_RS.csv",
+            "size_bytes": 75901166,
+            "compressed_size_bytes": 6363712,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_SE.csv",
+            "size_bytes": 18541105,
+            "compressed_size_bytes": 1428180,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_TO.csv",
+            "size_bytes": 25473542,
+            "compressed_size_bytes": 2057030,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_AL.csv",
+            "size_bytes": 9619417,
+            "compressed_size_bytes": 690633,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_AP.csv",
+            "size_bytes": 6799277,
+            "compressed_size_bytes": 492391,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_BR.csv",
+            "size_bytes": 2489621,
+            "compressed_size_bytes": 183508,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_DF.csv",
+            "size_bytes": 28495671,
+            "compressed_size_bytes": 1967622,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_GO.csv",
+            "size_bytes": 38745505,
+            "compressed_size_bytes": 3132292,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_MG.csv",
+            "size_bytes": 101535232,
+            "compressed_size_bytes": 8076504,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_MT.csv",
+            "size_bytes": 25621346,
+            "compressed_size_bytes": 1897194,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "receitas_candidatos_2022_PE.csv",
+            "size_bytes": 4751241,
+            "compressed_size_bytes": 441953,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_PI.csv",
+            "size_bytes": 3031939,
+            "compressed_size_bytes": 311529,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_TO.csv",
+            "size_bytes": 2646544,
+            "compressed_size_bytes": 271386,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_PR.csv",
+            "size_bytes": 13835081,
+            "compressed_size_bytes": 1224631,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_SP.csv",
+            "size_bytes": 191172474,
+            "compressed_size_bytes": 16714069,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_AC.csv",
+            "size_bytes": 12638670,
+            "compressed_size_bytes": 892920,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_AM.csv",
+            "size_bytes": 31192556,
+            "compressed_size_bytes": 1925161,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_BA.csv",
+            "size_bytes": 25581614,
+            "compressed_size_bytes": 2022801,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_CE.csv",
+            "size_bytes": 21998036,
+            "compressed_size_bytes": 1554215,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_MA.csv",
+            "size_bytes": 12401571,
+            "compressed_size_bytes": 974595,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_MS.csv",
+            "size_bytes": 27148339,
+            "compressed_size_bytes": 1793352,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_BRASIL.csv",
+            "size_bytes": 841446672,
+            "compressed_size_bytes": 74900029,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_PE.csv",
+            "size_bytes": 56074381,
+            "compressed_size_bytes": 4082028,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_RR.csv",
+            "size_bytes": 19478637,
+            "compressed_size_bytes": 1601933,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "receitas_candidatos_2022_PB.csv",
+            "size_bytes": 4444366,
+            "compressed_size_bytes": 391293,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_RR.csv",
+            "size_bytes": 2618391,
+            "compressed_size_bytes": 263906,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_SE.csv",
+            "size_bytes": 3390735,
+            "compressed_size_bytes": 280999,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_PA.csv",
+            "size_bytes": 26775979,
+            "compressed_size_bytes": 2094487,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "despesas_pagas_candidatos_2022_ES.csv",
+            "size_bytes": 18420705,
+            "compressed_size_bytes": 1483723,
+            "is_table": true,
+            "layout_id": "layout_2"
+          },
+          {
+            "name": "receitas_candidatos_2022_PA.csv",
+            "size_bytes": 8818796,
+            "compressed_size_bytes": 698049,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_RO.csv",
+            "size_bytes": 6658000,
+            "compressed_size_bytes": 610419,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_RN.csv",
+            "size_bytes": 14090954,
+            "compressed_size_bytes": 1080968,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "receitas_candidatos_2022_RJ.csv",
+            "size_bytes": 14642209,
+            "compressed_size_bytes": 1258548,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_SP.csv",
+            "size_bytes": 28076630,
+            "compressed_size_bytes": 2333713,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_SC.csv",
+            "size_bytes": 35785327,
+            "compressed_size_bytes": 2996055,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "receitas_candidatos_2022_RS.csv",
+            "size_bytes": 15936867,
+            "compressed_size_bytes": 1271180,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "despesas_contratadas_candidatos_2022_PR.csv",
+            "size_bytes": 77038968,
+            "compressed_size_bytes": 6789001,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "receitas_candidatos_2022_RN.csv",
+            "size_bytes": 3048145,
+            "compressed_size_bytes": 281945,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "receitas_candidatos_2022_SC.csv",
+            "size_bytes": 6902098,
+            "compressed_size_bytes": 660047,
+            "is_table": true,
+            "layout_id": "layout_4"
+          },
+          {
+            "name": "leiame_despesas-contratadas-candidatos.pdf",
+            "size_bytes": 221976,
+            "compressed_size_bytes": 202573,
+            "is_table": false
+          },
+          {
+            "name": "leiame_despesas-pagas-candidatos.pdf",
+            "size_bytes": 218453,
+            "compressed_size_bytes": 200760,
+            "is_table": false
+          },
+          {
+            "name": "leiame_receitas-candidatos.pdf",
+            "size_bytes": 219474,
+            "compressed_size_bytes": 200814,
+            "is_table": false
+          },
+          {
+            "name": "leiame_receitas-candidatos-doador-originario.pdf",
+            "size_bytes": 192785,
+            "compressed_size_bytes": 180569,
+            "is_table": false
+          }
+        ],
+        "layouts": {
+          "layout_1": {
+            "encoding": "latin-1",
+            "delimiter": ";",
+            "columns": [
+              "DT_GERACAO",
+              "HH_GERACAO",
+              "AA_ELEICAO",
+              "CD_TIPO_ELEICAO",
+              "NM_TIPO_ELEICAO",
+              "CD_ELEICAO",
+              "DS_ELEICAO",
+              "DT_ELEICAO",
+              "ST_TURNO",
+              "TP_PRESTACAO_CONTAS",
+              "DT_PRESTACAO_CONTAS",
+              "SQ_PRESTADOR_CONTAS",
+              "SG_UF",
+              "SG_UE",
+              "NM_UE",
+              "NR_CNPJ_PRESTADOR_CONTA",
+              "CD_CARGO",
+              "DS_CARGO",
+              "SQ_CANDIDATO",
+              "NR_CANDIDATO",
+              "NM_CANDIDATO",
+              "NR_CPF_CANDIDATO",
+              "NR_CPF_VICE_CANDIDATO",
+              "NR_PARTIDO",
+              "SG_PARTIDO",
+              "NM_PARTIDO",
+              "CD_TIPO_FORNECEDOR",
+              "DS_TIPO_FORNECEDOR",
+              "CD_CNAE_FORNECEDOR",
+              "DS_CNAE_FORNECEDOR",
+              "NR_CPF_CNPJ_FORNECEDOR",
+              "NM_FORNECEDOR",
+              "NM_FORNECEDOR_RFB",
+              "CD_ESFERA_PART_FORNECEDOR",
+              "DS_ESFERA_PART_FORNECEDOR",
+              "SG_UF_FORNECEDOR",
+              "CD_MUNICIPIO_FORNECEDOR",
+              "NM_MUNICIPIO_FORNECEDOR",
+              "SQ_CANDIDATO_FORNECEDOR",
+              "NR_CANDIDATO_FORNECEDOR",
+              "CD_CARGO_FORNECEDOR",
+              "DS_CARGO_FORNECEDOR",
+              "NR_PARTIDO_FORNECEDOR",
+              "SG_PARTIDO_FORNECEDOR",
+              "NM_PARTIDO_FORNECEDOR",
+              "DS_TIPO_DOCUMENTO",
+              "NR_DOCUMENTO",
+              "CD_ORIGEM_DESPESA",
+              "DS_ORIGEM_DESPESA",
+              "SQ_DESPESA",
+              "DT_DESPESA",
+              "DS_DESPESA",
+              "VR_DESPESA_CONTRATADA"
+            ]
+          },
+          "layout_2": {
+            "encoding": "latin-1",
+            "delimiter": ";",
+            "columns": [
+              "DT_GERACAO",
+              "HH_GERACAO",
+              "AA_ELEICAO",
+              "CD_TIPO_ELEICAO",
+              "NM_TIPO_ELEICAO",
+              "CD_ELEICAO",
+              "DS_ELEICAO",
+              "DT_ELEICAO",
+              "ST_TURNO",
+              "TP_PRESTACAO_CONTAS",
+              "DT_PRESTACAO_CONTAS",
+              "SQ_PRESTADOR_CONTAS",
+              "SG_UF",
+              "DS_TIPO_DOCUMENTO",
+              "NR_DOCUMENTO",
+              "CD_FONTE_DESPESA",
+              "DS_FONTE_DESPESA",
+              "CD_ORIGEM_DESPESA",
+              "DS_ORIGEM_DESPESA",
+              "CD_NATUREZA_DESPESA",
+              "DS_NATUREZA_DESPESA",
+              "CD_ESPECIE_RECURSO",
+              "DS_ESPECIE_RECURSO",
+              "SQ_DESPESA",
+              "SQ_PARCELAMENTO_DESPESA",
+              "DT_PAGTO_DESPESA",
+              "DS_DESPESA",
+              "VR_PAGTO_DESPESA"
+            ]
+          },
+          "layout_3": {
+            "encoding": "latin-1",
+            "delimiter": ";",
+            "columns": [
+              "DT_GERACAO",
+              "HH_GERACAO",
+              "AA_ELEICAO",
+              "CD_TIPO_ELEICAO",
+              "NM_TIPO_ELEICAO",
+              "CD_ELEICAO",
+              "DS_ELEICAO",
+              "DT_ELEICAO",
+              "ST_TURNO",
+              "TP_PRESTACAO_CONTAS",
+              "DT_PRESTACAO_CONTAS",
+              "SQ_PRESTADOR_CONTAS",
+              "SG_UF",
+              "NR_CPF_CNPJ_DOADOR_ORIGINARIO",
+              "NM_DOADOR_ORIGINARIO",
+              "NM_DOADOR_ORIGINARIO_RFB",
+              "TP_DOADOR_ORIGINARIO",
+              "CD_CNAE_DOADOR_ORIGINARIO",
+              "DS_CNAE_DOADOR_ORIGINARIO",
+              "SQ_RECEITA",
+              "DT_RECEITA",
+              "DS_RECEITA",
+              "VR_RECEITA"
+            ]
+          },
+          "layout_4": {
+            "encoding": "latin-1",
+            "delimiter": ";",
+            "columns": [
+              "DT_GERACAO",
+              "HH_GERACAO",
+              "AA_ELEICAO",
+              "CD_TIPO_ELEICAO",
+              "NM_TIPO_ELEICAO",
+              "CD_ELEICAO",
+              "DS_ELEICAO",
+              "DT_ELEICAO",
+              "ST_TURNO",
+              "TP_PRESTACAO_CONTAS",
+              "DT_PRESTACAO_CONTAS",
+              "SQ_PRESTADOR_CONTAS",
+              "SG_UF",
+              "SG_UE",
+              "NM_UE",
+              "NR_CNPJ_PRESTADOR_CONTA",
+              "CD_CARGO",
+              "DS_CARGO",
+              "SQ_CANDIDATO",
+              "NR_CANDIDATO",
+              "NM_CANDIDATO",
+              "NR_CPF_CANDIDATO",
+              "NR_CPF_VICE_CANDIDATO",
+              "NR_PARTIDO",
+              "SG_PARTIDO",
+              "NM_PARTIDO",
+              "CD_FONTE_RECEITA",
+              "DS_FONTE_RECEITA",
+              "CD_ORIGEM_RECEITA",
+              "DS_ORIGEM_RECEITA",
+              "CD_NATUREZA_RECEITA",
+              "DS_NATUREZA_RECEITA",
+              "CD_ESPECIE_RECEITA",
+              "DS_ESPECIE_RECEITA",
+              "CD_CNAE_DOADOR",
+              "DS_CNAE_DOADOR",
+              "NR_CPF_CNPJ_DOADOR",
+              "NM_DOADOR",
+              "NM_DOADOR_RFB",
+              "CD_ESFERA_PARTIDARIA_DOADOR",
+              "DS_ESFERA_PARTIDARIA_DOADOR",
+              "SG_UF_DOADOR",
+              "CD_MUNICIPIO_DOADOR",
+              "NM_MUNICIPIO_DOADOR",
+              "SQ_CANDIDATO_DOADOR",
+              "NR_CANDIDATO_DOADOR",
+              "CD_CARGO_CANDIDATO_DOADOR",
+              "DS_CARGO_CANDIDATO_DOADOR",
+              "NR_PARTIDO_DOADOR",
+              "SG_PARTIDO_DOADOR",
+              "NM_PARTIDO_DOADOR",
+              "NR_RECIBO_DOACAO",
+              "NR_DOCUMENTO_DOACAO",
+              "SQ_RECEITA",
+              "DT_RECEITA",
+              "DS_RECEITA",
+              "VR_RECEITA",
+              "DS_NATUREZA_RECURSO_ESTIMAVEL",
+              "DS_GENERO",
+              "DS_COR_RACA"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "resource_key": "votes_2022",
+      "resource_id": "40fdcf49-256a-4c81-87cf-711545bd1528",
+      "local_path": "data/raw/2022/20261008T154908Z/votacao_candidato_munzona_2022.zip",
+      "archive": {
+        "archive_name": "votacao_candidato_munzona_2022.zip",
+        "member_count": 30,
+        "table_member_count": 29,
+        "members": [
+          {
+            "name": "votacao_candidato_munzona_2022_BR.csv",
+            "size_bytes": 38081808,
+            "compressed_size_bytes": 2032053,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_BRASIL.csv",
+            "size_bytes": 4298078527,
+            "compressed_size_bytes": 315837551,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_SE.csv",
+            "size_bytes": 16672258,
+            "compressed_size_bytes": 773452,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_TO.csv",
+            "size_bytes": 28564712,
+            "compressed_size_bytes": 1295784,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_AC.csv",
+            "size_bytes": 4963464,
+            "compressed_size_bytes": 224033,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_SP.csv",
+            "size_bytes": 1198675687,
+            "compressed_size_bytes": 78662651,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_AL.csv",
+            "size_bytes": 20155726,
+            "compressed_size_bytes": 930996,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_AM.csv",
+            "size_bytes": 19531855,
+            "compressed_size_bytes": 935426,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_AP.csv",
+            "size_bytes": 3707097,
+            "compressed_size_bytes": 167992,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_BA.csv",
+            "size_bytes": 310544699,
+            "compressed_size_bytes": 18881762,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_DF.csv",
+            "size_bytes": 6965770,
+            "compressed_size_bytes": 343773,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_CE.csv",
+            "size_bytes": 81059463,
+            "compressed_size_bytes": 4440955,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_GO.csv",
+            "size_bytes": 128456941,
+            "compressed_size_bytes": 7221654,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_ES.csv",
+            "size_bytes": 27843196,
+            "compressed_size_bytes": 1394756,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_MA.csv",
+            "size_bytes": 88081235,
+            "compressed_size_bytes": 4648557,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_MG.csv",
+            "size_bytes": 996391532,
+            "compressed_size_bytes": 67043255,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_MS.csv",
+            "size_bytes": 22115170,
+            "compressed_size_bytes": 1017709,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_MT.csv",
+            "size_bytes": 29366914,
+            "compressed_size_bytes": 1317235,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_PA.csv",
+            "size_bytes": 66099063,
+            "compressed_size_bytes": 3569523,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_PB.csv",
+            "size_bytes": 66601016,
+            "compressed_size_bytes": 3388400,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_PE.csv",
+            "size_bytes": 94807078,
+            "compressed_size_bytes": 5244886,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_PI.csv",
+            "size_bytes": 39121981,
+            "compressed_size_bytes": 1871500,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_PR.csv",
+            "size_bytes": 282343297,
+            "compressed_size_bytes": 16848159,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_RN.csv",
+            "size_bytes": 40287975,
+            "compressed_size_bytes": 1928451,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_RJ.csv",
+            "size_bytes": 220342184,
+            "compressed_size_bytes": 13108898,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_RO.csv",
+            "size_bytes": 14173500,
+            "compressed_size_bytes": 661650,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_RR.csv",
+            "size_bytes": 3925920,
+            "compressed_size_bytes": 176163,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_RS.csv",
+            "size_bytes": 320245507,
+            "compressed_size_bytes": 19410952,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_candidato_munzona_2022_SC.csv",
+            "size_bytes": 128977617,
+            "compressed_size_bytes": 7143706,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "leiame.pdf",
+            "size_bytes": 125558,
+            "compressed_size_bytes": 111733,
+            "is_table": false
+          }
+        ],
+        "layouts": {
+          "layout_1": {
+            "encoding": "latin-1",
+            "delimiter": ";",
+            "columns": [
+              "DT_GERACAO",
+              "HH_GERACAO",
+              "ANO_ELEICAO",
+              "CD_TIPO_ELEICAO",
+              "NM_TIPO_ELEICAO",
+              "NR_TURNO",
+              "CD_ELEICAO",
+              "DS_ELEICAO",
+              "DT_ELEICAO",
+              "TP_ABRANGENCIA",
+              "SG_UF",
+              "SG_UE",
+              "NM_UE",
+              "CD_MUNICIPIO",
+              "NM_MUNICIPIO",
+              "NR_ZONA",
+              "CD_CARGO",
+              "DS_CARGO",
+              "SQ_CANDIDATO",
+              "NR_CANDIDATO",
+              "NM_CANDIDATO",
+              "NM_URNA_CANDIDATO",
+              "NM_SOCIAL_CANDIDATO",
+              "CD_SITUACAO_CANDIDATURA",
+              "DS_SITUACAO_CANDIDATURA",
+              "CD_DETALHE_SITUACAO_CAND",
+              "DS_DETALHE_SITUACAO_CAND",
+              "CD_SITUACAO_JULGAMENTO",
+              "DS_SITUACAO_JULGAMENTO",
+              "CD_SITUACAO_CASSACAO",
+              "DS_SITUACAO_CASSACAO",
+              "CD_SITUACAO_DCONST_DIPLOMA",
+              "DS_SITUACAO_DCONST_DIPLOMA",
+              "TP_AGREMIACAO",
+              "NR_PARTIDO",
+              "SG_PARTIDO",
+              "NM_PARTIDO",
+              "NR_FEDERACAO",
+              "NM_FEDERACAO",
+              "SG_FEDERACAO",
+              "DS_COMPOSICAO_FEDERACAO",
+              "SQ_COLIGACAO",
+              "NM_COLIGACAO",
+              "DS_COMPOSICAO_COLIGACAO",
+              "ST_VOTO_EM_TRANSITO",
+              "QT_VOTOS_NOMINAIS",
+              "NM_TIPO_DESTINACAO_VOTOS",
+              "QT_VOTOS_NOMINAIS_VALIDOS",
+              "CD_SIT_TOT_TURNO",
+              "DS_SIT_TOT_TURNO"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
