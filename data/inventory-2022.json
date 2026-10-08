@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "election": 2022,
+  "scope": "Brasil / todas as UFs",
+  "resources": [
+    {
+      "key": "candidates_2022",
+      "dataset": "candidatos-2022",
+      "resource_id": "435145fd-bc9d-446a-ac9d-273f585a0bb9",
+      "resource_name": "Candidatos",
+      "role": "unidade candidato-eleição",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand/consulta_cand_2022.zip",
+      "filename": "consulta_cand_2022.zip",
+      "format": "CSV dentro de ZIP",
+      "scope": "Brasil / todas as UFs"
+    },
+    {
+      "key": "accounts_2022",
+      "dataset": "dadosabertos-tse-jus-br-dataset-prestacao-de-contas-eleitorais-2022",
+      "resource_id": "e45493d5-75df-4ccf-a4b4-7b1f5213577d",
+      "resource_name": "Prestação de contas de candidatos",
+      "role": "gasto declarado de campanha",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/prestacao_contas/prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "filename": "prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "format": "CSV dentro de ZIP",
+      "scope": "Brasil / todas as UFs"
+    },
+    {
+      "key": "votes_2022",
+      "dataset": "resultados-2022",
+      "resource_id": "40fdcf49-256a-4c81-87cf-711545bd1528",
+      "resource_name": "Votação nominal por município e zona",
+      "role": "votação nominal",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_candidato_munzona/votacao_candidato_munzona_2022.zip",
+      "filename": "votacao_candidato_munzona_2022.zip",
+      "format": "CSV dentro de ZIP",
+      "scope": "Brasil / todas as UFs"
+    }
+  ]
+}

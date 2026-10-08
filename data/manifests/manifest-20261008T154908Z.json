@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "manifest_id": "20261008T154908Z",
+  "election": 2022,
+  "scope": "Brasil / todas as UFs",
+  "created_at": "2026-10-08T15:49:08.932335Z",
+  "resources": [
+    {
+      "resource_key": "candidates_2022",
+      "dataset": "candidatos-2022",
+      "resource_id": "435145fd-bc9d-446a-ac9d-273f585a0bb9",
+      "resource_name": "Candidatos",
+      "role": "unidade candidato-eleição",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/consulta_cand/consulta_cand_2022.zip",
+      "scope": "Brasil / todas as UFs",
+      "local_path": "data/raw/2022/20261008T154908Z/consulta_cand_2022.zip",
+      "downloaded_at": "2026-10-08T15:49:08.932335Z",
+      "http": {
+        "etag": "\"430229-65d4e39639830\"",
+        "last_modified": "Thu, 08 Oct 2026 06:20:11 GMT",
+        "content_length": 4391465
+      },
+      "file": {
+        "size_bytes": 4391465,
+        "sha256": "018034da2f251548eacdcf20ac03255743c738556ad83f9a4528ccbbd8b06f71"
+      },
+      "version_id": "resource:435145fd-bc9d-446a-ac9d-273f585a0bb9;sha256:018034da2f251548eacdcf20ac03255743c738556ad83f9a4528ccbbd8b06f71"
+    },
+    {
+      "resource_key": "accounts_2022",
+      "dataset": "dadosabertos-tse-jus-br-dataset-prestacao-de-contas-eleitorais-2022",
+      "resource_id": "e45493d5-75df-4ccf-a4b4-7b1f5213577d",
+      "resource_name": "Prestação de contas de candidatos",
+      "role": "gasto declarado de campanha",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/prestacao_contas/prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "scope": "Brasil / todas as UFs",
+      "local_path": "data/raw/2022/20261008T154908Z/prestacao_de_contas_eleitorais_candidatos_2022.zip",
+      "downloaded_at": "2026-10-08T15:49:08.932335Z",
+      "http": {
+        "etag": "\"1c4b5618-65d07ece19dcc\"",
+        "last_modified": "Sun, 04 Oct 2026 18:28:00 GMT",
+        "content_length": 474699288
+      },
+      "file": {
+        "size_bytes": 474699288,
+        "sha256": "d706fa9abaa8e00a222a4bdafc310bc198b8c8f2dd55a31c4177847344967bc4"
+      },
+      "version_id": "resource:e45493d5-75df-4ccf-a4b4-7b1f5213577d;sha256:d706fa9abaa8e00a222a4bdafc310bc198b8c8f2dd55a31c4177847344967bc4"
+    },
+    {
+      "resource_key": "votes_2022",
+      "dataset": "resultados-2022",
+      "resource_id": "40fdcf49-256a-4c81-87cf-711545bd1528",
+      "resource_name": "Votação nominal por município e zona",
+      "role": "votação nominal",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_candidato_munzona/votacao_candidato_munzona_2022.zip",
+      "scope": "Brasil / todas as UFs",
+      "local_path": "data/raw/2022/20261008T154908Z/votacao_candidato_munzona_2022.zip",
+      "downloaded_at": "2026-10-08T15:49:08.932335Z",
+      "http": {
+        "etag": "\"229bd5b3-65d4ed95b8888\"",
+        "last_modified": "Thu, 08 Oct 2026 07:04:55 GMT",
+        "content_length": 580638131
+      },
+      "file": {
+        "size_bytes": 580638131,
+        "sha256": "97b16f48facb61b3d11ef2ca877e7a1d379a1975126f72921995e915b0165fcb"
+      },
+      "version_id": "resource:40fdcf49-256a-4c81-87cf-711545bd1528;sha256:97b16f48facb61b3d11ef2ca877e7a1d379a1975126f72921995e915b0165fcb"
+    }
+  ]
+}
