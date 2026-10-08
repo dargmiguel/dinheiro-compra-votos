@@ -20,9 +20,14 @@ python -m tse_pilot inspect --manifest data/manifests/manifest-<snapshot>.json -
 python -m tse_pilot run --manifest data/manifests/manifest-<snapshot>.json --output data/derived/2022
 python -m tse_pilot report --data-root data --output reports/tse-2022-pilot-exploratory.md
 python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --output reports/tse-2022-duplicate-diagnostics.json
+python -m tse_pilot explore --manifest data/manifests/manifest-<snapshot>.json --validation data/derived/2022/validation.json --output data/exploratory/2022
 ```
 
 `refresh` recalcula tamanho e SHA-256 dos arquivos já congelados e completa o `version_id` sem baixar novamente. `inspect` abre somente amostras dos membros tabulares para registrar encoding, delimitador e colunas; também lista todos os membros do ZIP. `run` lê os ZIPs selecionados por streaming e cria a base SQLite e os CSVs derivados. `duplicates` compara preservar/remover repetições exatas apenas como diagnóstico.
+
+`explore` é separado de `run`: exige uma validação bloqueada apenas por `duplicate_expense_rows`, lê a população `APTO`, filtra `TP_PRESTACAO_CONTAS = Final` e emite somente artefatos marcados como exploratórios em `data/exploratory/2022/`. Não altera `data/derived/2022/` nem transforma a base bloqueada em aprovada. Os cenários A/B, ausências, zeros, gráficos e associações por UF ficam nesse diretório.
+
+Os resultados do snapshot deste comando estão resumidos em `reports/tse-2022-exploratory-provisional.md`; os CSVs e SVGs completos permanecem em `data/exploratory/2022/` e são regeneráveis pelo comando.
 
 ## Seleção e granularidade
 

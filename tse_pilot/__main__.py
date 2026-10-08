@@ -6,15 +6,17 @@ from pathlib import Path
 from .acquisition import acquire_core, refresh_manifest, write_inventory
 from .layout import write_layout_report
 from .pipeline import run_pipeline
-from .duplicates import write_duplicate_diagnostics
+from .exploratory import run_exploratory_scenarios
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Piloto TSE 2022: inventário, congelamento, leiautes e base analítica")
-    parser.add_argument("command", choices=("inventory", "acquire", "refresh", "inspect", "run", "report", "duplicates"))
+    parser.add_argument("command", choices=("inventory", "acquire", "refresh", "inspect", "run", "report", "duplicates", "explore"))
     parser.add_argument("--data-root", type=Path, default=Path("data"))
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--database", type=Path)
+    parser.add_argument("--validation", type=Path)
+    parser.add_argument("--output", type=Path)
     args = parser.parse_args()
 
     if args.command == "inventory":
@@ -43,7 +45,13 @@ def main() -> int:
             parser.error("duplicates exige --output")
         database = args.database or args.data_root / "derived" / "2022" / "pilot.sqlite"
         print(write_duplicate_diagnostics(database, args.output))
-    return 0
+    elif args.command == "explore":
+        if not args.manifest:
+            parser.error("explore exige --manifest")
+        validation = args.validation or args.data_root / "derived" / "2022" / "validation.json"
+        output = args.output or args.data_root / "exploratory" / "2022"
+        result = run_exploratory_scenarios(args.manifest, validation, output)
+        print(json.dumps(result, ensure_ascii=False))
 
 if __name__ == "__main__":
     raise SystemExit(main())
