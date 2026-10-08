@@ -37,6 +37,14 @@ A base analítica **não foi aprovada** e não foi emitida. Não há `analytical
 
 O próximo passo necessário é resolver a semântica dessas repetições exatas com evidência oficial ou uma versão de origem que diferencie atualização, parcela e lançamento. Até lá, qualquer custo por voto seria potencialmente enviesado.
 
+## Revisão metodológica da medida financeira
+
+O pipeline atual filtra eleição, primeiro turno e `DS_CARGO = Deputado Federal`, mas não filtra `TP_PRESTACAO_CONTAS`. No membro oficial `despesas_contratadas_candidatos_2022_BRASIL.csv`, os registros selecionados distribuem-se em `Final` (1.131.581), `Parcial` (3.793), `Regularização da Omissão` (3.377) e `Relatório Financeiro` (524). A soma diagnóstica atual inclui os quatro tipos.
+
+Isso não equivale automaticamente a `Gastos Financeiros` do DivulgaCandContas. O leia-me oficial descreve, para dívida de campanha, a última entrega `Final` recebida com sucesso, com exclusões específicas e comparação entre valores contratados e pagos. A regra de sucesso, retificação e prioridade entre entregas ainda não foi definida para este piloto. A seleção de candidaturas também ainda não aplica situação de candidatura; os 10.630 registros são o universo filtrado por eleição, turno e cargo.
+
+Ausência permanece distinta de zero: sem linha é `absent`; linha observada com valor zero é `observed_zero`. Nenhum desses estados foi convertido silenciosamente.
+
 ## Diagnóstico sem aprovação de tratamento
 
 As duas colunas abaixo são apenas cenários contábeis para medir o impacto da decisão, não bases aprovadas:

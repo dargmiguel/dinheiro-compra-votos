@@ -31,6 +31,7 @@ python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --outpu
 - Votos: membros por UF de `votacao_candidato_munzona_2022_<UF>.csv`, por município, zona e indicador de voto em trânsito.
 - Membros `BR` e `BRASIL` são registrados como excluídos no diagnóstico. Pela nomenclatura e pela coexistência com arquivos por UF, são tratados como possíveis agregados ou recortes sobrepostos; a regra conservadora não os mistura aos arquivos por UF.
 - O filtro final mantém `ANO_ELEICAO`/`AA_ELEICAO = 2022`, turno `1` e `DS_CARGO = Deputado Federal`.
+O recorte atual não aplica filtro de `TP_PRESTACAO_CONTAS` nem de situação da candidatura. No membro `BRASIL`, sob os mesmos filtros de eleição, turno e cargo, foram observados `Final` (1.131.581 linhas), `Parcial` (3.793), `Regularização da Omissão` (3.377) e `Relatório Financeiro` (524). Portanto, a medida atual inclui os quatro tipos observados e não deve ser chamada de `Gastos Financeiros` do DivulgaCandContas sem uma regra adicional validada. Os 10.630 candidatos são registros selecionados por eleição, turno e cargo, não necessariamente candidaturas válidas: a regra de situação (`CD_SITUACAO_CANDIDATURA`, `DS_SITUACAO_CANDIDATURA` ou `CD_SIT_TOT_TURNO`) ainda está pendente.
 - A unidade canônica de candidato é `SQ_CANDIDATO`.
 - A unidade de despesa canônica é a linha de origem `(source_member, source_row)`; `SQ_DESPESA` é uma referência documental que pode aparecer em várias linhas de itens do mesmo documento.
 - A unidade de voto é `(SQ_CANDIDATO, CD_MUNICIPIO, NR_ZONA, ST_VOTO_EM_TRANSITO)`.
@@ -38,6 +39,8 @@ python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --outpu
 ## Medidas
 
 A medida de gasto é a soma de `VR_DESPESA_CONTRATADA` em todas as linhas selecionadas de despesas contratadas, convertida para centavos de real sem ponto flutuante. A inspeção real encontrou `SQ_DESPESA` repetido em linhas diferentes do mesmo documento, com descrições e valores distintos; essas linhas não são deduplicadas. Isso mede despesa contratada declarada, não despesa paga. A medida de votação é a soma de `QT_VOTOS_NOMINAIS_VALIDOS` nos registros de município/zona.
+
+O leia-me oficial descreve uma medida diferente para dívida de campanha: a última entrega `Final` recebida com sucesso, com exclusões específicas, contraposta aos valores pagos. Essa definição não foi aplicada automaticamente ao piloto; a soma atual é diagnóstica e inclui todos os tipos de prestação observados. Retificações, sucesso de recebimento e prioridade entre entregas ainda exigem regra documental do TSE.
 
 A base mantém ausência distinta de zero:
 
