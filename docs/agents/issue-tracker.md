@@ -11,7 +11,7 @@ Issues e specs deste repositório vivem no GitHub Issues. Use a CLI `gh` para to
 - Aplicar/remover rótulos: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
 - Fechar: `gh issue close <number> --comment "..."`
 
-O repositório atualmente não possui remote Git configurado. Antes de publicar issues, configure um remote GitHub para que `gh` consiga inferir `owner/repository`.
+O remote `origin` aponta para `https://github.com/dargmiguel/dinheiro-compra-votos`. `gh` pode inferir o repositório automaticamente a partir deste clone.
 
 ## Pull requests como superfície de triagem
 

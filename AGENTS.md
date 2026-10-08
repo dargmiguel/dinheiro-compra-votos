@@ -2,7 +2,7 @@
 
 ### Issue tracker
 
-Issues e specs vivem no GitHub Issues e usam a CLI `gh`; este diretório ainda precisa de um remote GitHub configurado. Veja `docs/agents/issue-tracker.md`.
+Issues e specs vivem no GitHub Issues e usam a CLI `gh`; o remote `origin` aponta para `dargmiguel/dinheiro-compra-votos`. Veja `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
