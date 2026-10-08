@@ -42,6 +42,8 @@ A medida de gasto é a soma de `VR_DESPESA_CONTRATADA` em todas as linhas seleci
 
 O leia-me oficial descreve uma medida diferente para dívida de campanha: a última entrega `Final` recebida com sucesso, com exclusões específicas, contraposta aos valores pagos. Essa definição não foi aplicada automaticamente ao piloto; a soma atual é diagnóstica e inclui todos os tipos de prestação observados. Retificações, sucesso de recebimento e prioridade entre entregas ainda exigem regra documental do TSE.
 
+O inventário detalhado de situações, entregas, identificadores e medidas permitidas está em `reports/tse-2022-candidate-delivery-inventory.md`. Até a validação da regra de entrega, os únicos nomes seguros são “soma bruta declarada por entrega/tipo” e “cenários diagnósticos de repetição”; `Gastos Financeiros` e dívida não são nomes aprovados para a base.
+
 A base mantém ausência distinta de zero:
 
 - sem registro de despesa: `expense_observation = absent` e valor vazio;
