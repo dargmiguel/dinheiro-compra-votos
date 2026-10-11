@@ -29,6 +29,8 @@ python -m tse_pilot explore --manifest data/manifests/manifest-<snapshot>.json -
 
 Os resultados do snapshot deste comando estão resumidos em `reports/tse-2022-exploratory-provisional.md`; os CSVs e SVGs completos permanecem em `data/exploratory/2022/` e são regeneráveis pelo comando.
 
+`exploratory_uf_associations.csv` apresenta a correlação de Spearman por UF e cenário, usando candidatos com despesa e votação observadas; zeros observados permanecem na amostra e ausências são excluídas. `plots/exploratory_uf_spearman_by_scenario.svg` compara os coeficientes e as dicas dos pontos informam o número de pares completos por UF. São associações descritivas, não estimativas causais.
+
 ## Lendo os resultados exploratórios
 
 - Comece por `reports/tse-2022-exploratory-provisional.md` para o resumo metodológico e os números principais.

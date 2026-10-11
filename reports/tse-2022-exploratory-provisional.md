@@ -102,27 +102,55 @@ O custo por voto é calculado somente para candidatos com despesa observada e vo
 O custo agregado é `soma das despesas / soma dos votos` nos pares completos; não é a média simples do custo individual. Não há custo definido para candidato com despesa ausente ou com zero votos.
 O valor agregado do CSV é **R$ 29,79 por voto** no cenário A e **R$ 29,52 por voto** no cenário B. O campo antigo em centavos por voto (2.979,07 centavos = R$ 29,79) foi removido para evitar a leitura errada de escala.
 
+As diferenças A−B dependem do denominador. Entre todas as despesas observadas de candidatos `APTO` com entrega `Final`, a diferença é **R$ 28.535.072,93**. Nos 9.100 candidatos com despesa observada e votos positivos usados no custo por voto, é **R$ 28.489.806,83**. A diferença de **R$ 45.266,10** vem do A−B dos candidatos com votação observada igual a zero (107 candidatos), excluídos do recorte de custo; não há votos ausentes.
+
 Para abrir os dados: `data/exploratory/2022/exploratory_report.md` traz o relatório completo; os CSVs estão em `data/exploratory/2022/` e os SVGs em `data/exploratory/2022/plots/`. Excel, LibreOffice Calc ou Google Sheets servem para inspeção; use a importação CSV com vírgula como separador e ponto como separador decimal. Os cabeçalhos agora estão em português.
 
 Para uma leitura puramente agregada usando todo o voto observado do universo `APTO`, inclusive despesas de candidatos com zero votos, os quocientes seriam R$ 29,66 no cenário A e R$ 29,39 no cenário B. Essa leitura tem outra população de denominador e não substitui a regra por pares completos.
 
-## Associações descritivas por UF
+## Associação entre despesas e votação por UF
 
-O comando gera `exploratory_uf_associations.csv` com duas linhas por UF, uma para cada cenário. Para cada UF são preservados:
+Spearman foi calculado entre candidatos dentro de cada UF, separadamente nos cenários A e B. São usados pares com despesa e votação observadas; zeros observados permanecem incluídos e apenas ausências são excluídas. O custo por voto não é usado para explicar votos nem entra na associação.
 
-- população de candidatos `APTO`;
-- despesas observadas, zeros e ausências;
-- votos observados, zeros e ausências;
-- número de pares completos;
-- totais e medianas;
-- correlação de Pearson entre despesa e votos nos pares completos.
+Cobertura: **9.204 pares completos em cada cenário**, distribuídos por **27 de 27 UFs** com coeficiente definido. Há 272 despesas ausentes, 791 despesas observadas iguais a zero e 107 candidatos com votação observada igual a zero; esses zeros permanecem na correlação. O coeficiente varia de **0,722880 a 0,856801** no cenário A e de **0,722059 a 0,857010** no cenário B. Todas as associações por UF deste recorte são positivas, mas descritivas; isso não identifica causalidade nem escolhe o tratamento correto das repetições.
 
-A correlação inclui zeros observados e exclui somente ausências. É uma associação descritiva, não uma estimativa causal e não foi usada para selecionar cenário.
+| UF | Pares A | Spearman A | Pares B | Spearman B |
+|---|---:|---:|---:|---:|
+| AC | 122 | 0,854004 | 122 | 0,853977 |
+| AL | 144 | 0,856801 | 144 | 0,857010 |
+| AM | 137 | 0,745740 | 137 | 0,744649 |
+| AP | 122 | 0,758030 | 122 | 0,755307 |
+| BA | 651 | 0,745040 | 651 | 0,744293 |
+| CE | 325 | 0,807492 | 325 | 0,807562 |
+| DF | 193 | 0,793193 | 193 | 0,792530 |
+| ES | 180 | 0,826587 | 180 | 0,824303 |
+| GO | 334 | 0,763749 | 334 | 0,763615 |
+| MA | 311 | 0,788846 | 311 | 0,788648 |
+| MG | 993 | 0,792175 | 993 | 0,792232 |
+| MS | 147 | 0,778547 | 147 | 0,778184 |
+| MT | 147 | 0,853917 | 147 | 0,853715 |
+| PA | 281 | 0,784209 | 281 | 0,783526 |
+| PB | 175 | 0,783294 | 175 | 0,783090 |
+| PE | 399 | 0,777498 | 399 | 0,777636 |
+| PI | 142 | 0,804026 | 142 | 0,802331 |
+| PR | 573 | 0,792704 | 573 | 0,792257 |
+| RJ | 977 | 0,722880 | 977 | 0,722059 |
+| RN | 164 | 0,808563 | 164 | 0,807921 |
+| RO | 139 | 0,815481 | 139 | 0,815121 |
+| RR | 135 | 0,824214 | 135 | 0,822871 |
+| RS | 498 | 0,732349 | 498 | 0,732136 |
+| SC | 284 | 0,737360 | 284 | 0,736419 |
+| SE | 142 | 0,761607 | 142 | 0,760969 |
+| SP | 1.346 | 0,788043 | 1.346 | 0,787376 |
+| TO | 143 | 0,796510 | 143 | 0,795796 |
+
+`exploratory_uf_associations.csv` mantém também a correlação de Pearson como medida descritiva complementar, além das contagens, zeros, ausências, totais e medianas. O gráfico `plots/exploratory_uf_spearman_by_scenario.svg` compara Spearman por UF e mostra o número de pares completos nas dicas dos pontos. Coeficientes indefinidos seriam deixados em branco quando houvesse menos de dois pares ou variância nula.
 
 Também são gerados:
 
 - `plots/exploratory_expense_vs_votes_a.svg`;
 - `plots/exploratory_expense_vs_votes_b.svg`;
+- `plots/exploratory_uf_spearman_by_scenario.svg`;
 - `plots/exploratory_distributions.svg`;
 - `plots/exploratory_uf_expense_totals.svg`;
 - `exploratory_scenario_comparison.csv`, com valores A/B e custo por voto por candidato;
@@ -147,12 +175,11 @@ A entrega `Final` foi reconhecida pelo campo textual `TP_PRESTACAO_CONTAS`. O co
 
 ## Testes
 
-O conjunto de testes tem **13 testes aprovados**, incluindo:
+O conjunto completo tem **19 testes aprovados**, incluindo:
 
-- geração simultânea dos dois cenários;
-- preservação de zero observado;
-- preservação de ausência;
-- marcação explícita como `exploratory_only`;
-- ausência de artefatos com nomes de base aprovada;
-- recusa de execução quando `validation.json` está `approved`;
-- preservação de um artefato sentinela no diretório de produção.
+- geração dos dois cenários e comparação dos mesmos candidatos;
+- zero de despesa com votos positivos e custo zero;
+- voto zero e despesa ausente sem conversão em zero;
+- marcação exploratória e preservação da base bloqueada;
+- junção por chave quando a ordem difere e rejeição de duplicatas, comprimentos ou chaves incompatíveis;
+- média de postos correta em empates de Spearman.

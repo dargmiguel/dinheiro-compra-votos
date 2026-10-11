@@ -76,6 +76,7 @@ CSV_COLUMN_NAMES = {
     "expense_median_centavos": "mediana_despesa_centavos",
     "votes_median": "mediana_votos",
     "pearson_expense_votes": "correlacao_pearson_despesa_votos",
+    "spearman_expense_votes": "correlacao_spearman_despesa_votos",
 }
 
 
@@ -207,6 +208,28 @@ def _pearson(pairs: list[tuple[int, int]]) -> str:
     return f"{numerator / denominator:.6f}"
 
 
+def _rank(values: list[int]) -> list[float]:
+    ranks = [0.0] * len(values)
+    ordered = sorted(range(len(values)), key=values.__getitem__)
+    start = 0
+    while start < len(ordered):
+        end = start + 1
+        while end < len(ordered) and values[ordered[end]] == values[ordered[start]]:
+            end += 1
+        average_rank = (start + 1 + end) / 2
+        for index in ordered[start:end]:
+            ranks[index] = average_rank
+        start = end
+    return ranks
+
+
+def _spearman(pairs: list[tuple[int, int]]) -> str:
+    if len(pairs) < 2:
+        return ""
+    ranked_pairs = list(zip(_rank([x for x, _ in pairs]), _rank([y for _, y in pairs])))
+    return _pearson(ranked_pairs)
+
+
 def _load_validation(validation_path: Path) -> dict:
     validation = json.loads(Path(validation_path).read_text(encoding="utf-8"))
     if validation.get("status") != "blocked":
@@ -335,16 +358,46 @@ def _scenario_rows(
 
 
 def _comparison_rows(rows_a: list[dict[str, object]], rows_b: list[dict[str, object]]) -> list[dict[str, object]]:
-    rows = []
-    for row_a, row_b in zip(rows_a, rows_b):
+    def index_rows(rows: list[dict[str, object]], scenario: str) -> dict[str, dict[str, object]]:
+        indexed = {}
+        for row in rows:
+            candidate_id = row.get("sq_candidate")
+            if not isinstance(candidate_id, str) or not candidate_id:
+                raise ValueError(f"candidato sem sq_candidate no cenário {scenario}")
+            if candidate_id in indexed:
+                raise ValueError(f"chave de candidato duplicada no cenário {scenario}: {candidate_id}")
+            indexed[candidate_id] = row
+        return indexed
+
+    indexed_a = index_rows(rows_a, "A")
+    indexed_b = index_rows(rows_b, "B")
+    if len(rows_a) != len(rows_b):
+        raise ValueError(
+            f"comprimentos diferentes entre cenários A e B: {len(rows_a)} e {len(rows_b)}"
+        )
+    keys_a = set(indexed_a)
+    keys_b = set(indexed_b)
+    if keys_a != keys_b:
+        missing_from_b = sorted(keys_a - keys_b)
+        missing_from_a = sorted(keys_b - keys_a)
+        raise ValueError(
+            f"chaves de candidato diferentes entre cenários; faltam em B: {missing_from_b}; "
+            f"faltam em A: {missing_from_a}"
+        )
+
+    identity_fields = ("uf", "candidate_number", "candidate_name", "vote_observation", "valid_nominal_votes")
+    result = []
+    for row_a in rows_a:
+        candidate_id = row_a["sq_candidate"]
+        row_b = indexed_b[candidate_id]
+        if any(row_a.get(field) != row_b.get(field) for field in identity_fields):
+            raise ValueError(f"identidade divergente para o candidato {candidate_id} entre cenários A e B")
         amount_a = int(row_a["declared_expense_centavos"]) if row_a["declared_expense_centavos"] != "" else None
         amount_b = int(row_b["declared_expense_centavos"]) if row_b["declared_expense_centavos"] != "" else None
         delta = amount_a - amount_b if amount_a is not None and amount_b is not None else None
         relative = (delta / amount_a) if delta is not None and amount_a else None
-        cost_a = row_a["cost_per_vote_brl"]
-        cost_b = row_b["cost_per_vote_brl"]
-        rows.append({
-            "sq_candidate": row_a["sq_candidate"],
+        result.append({
+            "sq_candidate": candidate_id,
             "uf": row_a["uf"],
             "candidate_number": row_a["candidate_number"],
             "candidate_name": row_a["candidate_name"],
@@ -352,13 +405,13 @@ def _comparison_rows(rows_a: list[dict[str, object]], rows_b: list[dict[str, obj
             "expense_b_centavos": "" if amount_b is None else amount_b,
             "difference_centavos": "" if delta is None else delta,
             "difference_relative_to_a": "" if relative is None else f"{relative:.8f}",
-            "cost_per_vote_a_brl": cost_a,
-            "cost_per_vote_b_brl": cost_b,
+            "cost_per_vote_a_brl": row_a["cost_per_vote_brl"],
+            "cost_per_vote_b_brl": row_b["cost_per_vote_brl"],
             "exact_repeat_rows_a": row_a["exact_repeat_rows"],
             "vote_observation": row_a["vote_observation"],
             "valid_nominal_votes": row_a["valid_nominal_votes"],
         })
-    return rows
+    return result
 
 
 def _summary_rows(rows: list[dict[str, object]], scenario_name: str) -> list[dict[str, object]]:
@@ -420,6 +473,7 @@ def _uf_rows(rows: list[dict[str, object]], scenario_name: str) -> list[dict[str
             "expense_median_centavos": _quantile(expenses, 0.50),
             "votes_median": _quantile(votes, 0.50),
             "pearson_expense_votes": _pearson(pairs),
+            "spearman_expense_votes": _spearman(pairs),
         })
     return result
 
@@ -446,7 +500,6 @@ def _svg_scatter(rows: list[dict[str, object]], expense_field: str, path: Path, 
 
 
 def _svg_uf_totals(rows_a: list[dict[str, object]], rows_b: list[dict[str, object]], path: Path) -> None:
-    by_uf = {row["uf"]: {"a": int(row["expense_total_centavos"]), "b": int(row["expense_total_centavos"])} for row in []}
     totals_a = {row["uf"]: int(row["expense_total_centavos"]) for row in rows_a}
     totals_b = {row["uf"]: int(row["expense_total_centavos"]) for row in rows_b}
     ufs = sorted(set(totals_a) | set(totals_b))
@@ -462,6 +515,41 @@ def _svg_uf_totals(rows_a: list[dict[str, object]], rows_b: list[dict[str, objec
             elements.append(f'<rect x="{x + offset:.2f}" y="{top + plot_h - bar_h:.2f}" width="{group_w * 0.24:.2f}" height="{bar_h:.2f}" fill="{color}"><title>{html.escape(uf)}: {_money(value)}</title></rect>')
         elements.append(f'<text x="{x + group_w / 2:.2f}" y="{top + plot_h + 18}" text-anchor="middle" font-family="sans-serif" font-size="11">{uf}</text>')
     elements.extend([f'<line x1="{left}" y1="{top + plot_h}" x2="{left + plot_w}" y2="{top + plot_h}" stroke="black"/>', '<rect x="850" y="500" width="12" height="12" fill="#2563eb"/><text x="868" y="511" font-family="sans-serif">A — preservar</text>', '<rect x="980" y="500" width="12" height="12" fill="#f97316"/><text x="998" y="511" font-family="sans-serif">B — remover exatas</text></svg>'])
+    path.write_text("".join(elements), encoding="utf-8")
+
+
+def _svg_uf_spearman(rows_a: list[dict[str, object]], rows_b: list[dict[str, object]], path: Path) -> None:
+    by_scenario = (("A — preservar", rows_a, "#2563eb", -3), ("B — repetições exatas removidas", rows_b, "#f97316", 3))
+    ufs = sorted({str(row["uf"]) for _, rows, _, _ in by_scenario for row in rows})
+    width, height = 1100, 590
+    left, top, plot_w, plot_h = 70, 65, 990, 420
+    x_step = plot_w / max(len(ufs), 1)
+    y = lambda correlation: top + (1 - float(correlation)) * plot_h / 2
+    elements = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
+        f'<text x="{width / 2}" y="28" text-anchor="middle" font-family="sans-serif" font-size="18">Correlação de Spearman por UF — dois cenários</text>',
+        '<text x="70" y="48" font-family="sans-serif" font-size="12">Candidatos com despesa e votação observadas; zeros observados incluídos</text>',
+    ]
+    for correlation in (-1, -0.5, 0, 0.5, 1):
+        line_y = y(correlation)
+        elements.append(f'<line x1="{left}" y1="{line_y:.2f}" x2="{left + plot_w}" y2="{line_y:.2f}" stroke="{"#666" if correlation == 0 else "#ccc"}"/>')
+        elements.append(f'<text x="{left - 10}" y="{line_y + 4:.2f}" text-anchor="end" font-family="sans-serif" font-size="11">{correlation:g}</text>')
+    elements.append(f'<line x1="{left}" y1="{top}" x2="{left}" y2="{top + plot_h}" stroke="black"/>')
+    elements.append(f'<text x="18" y="{top + plot_h / 2}" text-anchor="middle" transform="rotate(-90 18 {top + plot_h / 2})" font-family="sans-serif" font-size="12">rho de Spearman</text>')
+    for index, uf in enumerate(ufs):
+        center = left + (index + 0.5) * x_step
+        elements.append(f'<text x="{center:.2f}" y="{top + plot_h + 18}" text-anchor="middle" font-family="sans-serif" font-size="10">{html.escape(uf)}</text>')
+        for scenario, rows, color, offset in by_scenario:
+            row = next((item for item in rows if item["uf"] == uf), None)
+            if row is None or row["spearman_expense_votes"] == "":
+                continue
+            point_y = y(row["spearman_expense_votes"])
+            elements.append(f'<circle cx="{center + offset:.2f}" cy="{point_y:.2f}" r="3.5" fill="{color}"><title>{scenario}, {uf}: rho={row["spearman_expense_votes"]}, n={row["complete_pairs"]}</title></circle>')
+    elements.extend([
+        '<rect x="340" y="550" width="12" height="12" fill="#2563eb"/><text x="358" y="561" font-family="sans-serif" font-size="12">A — preservar</text>',
+        '<rect x="510" y="550" width="12" height="12" fill="#f97316"/><text x="528" y="561" font-family="sans-serif" font-size="12">B — remover repetições exatas</text>',
+        '</svg>',
+    ])
     path.write_text("".join(elements), encoding="utf-8")
 
 
@@ -508,6 +596,26 @@ def _write_report(
     top_changes = sorted(changed, key=lambda row: int(row["difference_centavos"]), reverse=True)[:10]
     cost_a = next(row for row in cost_rows if row["scenario"] == SCENARIO_A)
     cost_b = next(row for row in cost_rows if row["scenario"] == SCENARIO_B)
+    uf_by_scenario = {
+        scenario: {str(row["uf"]): row for row in uf_rows if row["scenario"] == scenario}
+        for scenario in (SCENARIO_A, SCENARIO_B)
+    }
+    ufs = sorted(set(uf_by_scenario[SCENARIO_A]) | set(uf_by_scenario[SCENARIO_B]))
+    spearman_a = [row for row in uf_by_scenario[SCENARIO_A].values() if row["spearman_expense_votes"] != ""]
+    spearman_b = [row for row in uf_by_scenario[SCENARIO_B].values() if row["spearman_expense_votes"] != ""]
+    complete_pair_difference = (
+        int(cost_a["expense_total_centavos_complete_pairs"])
+        - int(cost_b["expense_total_centavos_complete_pairs"])
+    )
+    zero_vote_count = next(
+        row["count_zero"] for row in summary_rows
+        if row["measure"] == "votos_nominais_validos" and row["scenario"] == SCENARIO_A
+    )
+    absent_vote_count = next(
+        row["count_absent"] for row in summary_rows
+        if row["measure"] == "votos_nominais_validos" and row["scenario"] == SCENARIO_A
+    )
+    cost_candidate_count = f"{int(cost_a['candidate_count_with_cost']):,}".replace(",", ".")
     lines = [
         "# Relatório exploratório provisório — TSE 2022",
         "",
@@ -551,8 +659,9 @@ def _write_report(
         "",
         f"| Cenário | Candidatos | Despesa completa | Votos completos | Custo agregado | Mediana | P90 | P99 |",
         f"|---|---:|---:|---:|---:|---:|---:|---:|",
-        f"| A | {cost_a['candidate_count_with_cost']} | {_money(int(cost_a['expense_total_centavos_complete_pairs']))} | {cost_a['votes_total_complete_pairs']} | {_money(round(Decimal(cost_a['aggregate_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['median_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['p90_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['p99_cost_brl_per_vote']) * 100))} |",
-        f"| B | {cost_b['candidate_count_with_cost']} | {_money(int(cost_b['expense_total_centavos_complete_pairs']))} | {cost_b['votes_total_complete_pairs']} | {_money(round(Decimal(cost_b['aggregate_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['median_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['p90_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['p99_cost_brl_per_vote']) * 100))} |",
+        f"| A | {cost_candidate_count} | {_money(int(cost_a['expense_total_centavos_complete_pairs']))} | {cost_a['votes_total_complete_pairs']} | {_money(round(Decimal(cost_a['aggregate_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['median_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['p90_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['p99_cost_brl_per_vote']) * 100))} |",
+        f"| B | {cost_candidate_count} | {_money(int(cost_b['expense_total_centavos_complete_pairs']))} | {cost_b['votes_total_complete_pairs']} | {_money(round(Decimal(cost_b['aggregate_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['median_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['p90_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['p99_cost_brl_per_vote']) * 100))} |",
+        f"A diferença A−B das despesas observadas no recorte `Final`/`APTO` é {_money(total_a - total_b)}. Nos {cost_candidate_count} candidatos usados no custo por voto, a diferença é {_money(complete_pair_difference)}. Os {_money((total_a - total_b) - complete_pair_difference)} restantes correspondem à diferença de despesas dos candidatos com votação observada igual a zero, excluídos dos pares de custo ({zero_vote_count}); votos ausentes: {absent_vote_count}.",
         "",
         "",
         "| SQ_CANDIDATO | Candidato | UF | Diferença | Relativa a A | Repetições exatas |",
@@ -564,16 +673,40 @@ def _write_report(
         lines.append(f"| {row['sq_candidate']} | {row['candidate_name']} | {row['uf']} | {_money(int(row['difference_centavos']))} | {relative_text} | {row['exact_repeat_rows_a']} |")
     lines.extend([
         "",
+        "## Associação entre despesas e votação por UF",
+        "",
+        "Spearman é calculado dentro de cada UF entre candidatos com despesa e votação observadas. Zeros observados permanecem na amostra; apenas ausências são excluídas. O custo por voto não participa desta associação.",
+        "",
+        f"Cobertura: {len(spearman_a)} de {len(ufs)} UFs têm coeficiente definido no cenário A e {len(spearman_b)} de {len(ufs)} no cenário B. A tabela informa os pares completos de cada UF.",
+        "",
+        "| UF | Pares A | Spearman A | Pares B | Spearman B |",
+        "|---|---:|---:|---:|---:|",
+    ])
+    for uf in ufs:
+        row_a = uf_by_scenario[SCENARIO_A].get(uf)
+        row_b = uf_by_scenario[SCENARIO_B].get(uf)
+        rho_a = "—" if row_a is None or row_a["spearman_expense_votes"] == "" else row_a["spearman_expense_votes"]
+        rho_b = "—" if row_b is None or row_b["spearman_expense_votes"] == "" else row_b["spearman_expense_votes"]
+        pairs_a = 0 if row_a is None else row_a["complete_pairs"]
+        pairs_b = 0 if row_b is None else row_b["complete_pairs"]
+        lines.append(f"| {uf} | {pairs_a} | {rho_a} | {pairs_b} | {rho_b} |")
+    lines.extend([
+        "",
+        "Coeficiente indefinido significa menos de dois pares ou variância nula. As correlações são descritivas, não causais, e não selecionam cenário.",
+    ])
+    lines.extend([
+        "",
         "## Distribuições e associações",
         "",
         "Os gráficos usam transformação `log10(1 + x)` somente nos eixos para tornar valores muito diferentes visíveis; os arquivos CSV mantêm os valores originais, zeros e ausências. Pontos sem despesa ou voto não foram colocados no gráfico como zero.",
         "",
         "- [Despesas versus votos — cenário A](plots/exploratory_expense_vs_votes_a.svg)",
         "- [Despesas versus votos — cenário B](plots/exploratory_expense_vs_votes_b.svg)",
+        "- [Correlação de Spearman por UF — cenários A/B](plots/exploratory_uf_spearman_by_scenario.svg)",
         "- [Distribuições](plots/exploratory_distributions.svg)",
         "- [Totais por UF](plots/exploratory_uf_expense_totals.svg)",
         "- [Distribuições em CSV](exploratory_distributions.csv)",
-        "- [Associações descritivas por UF em CSV](exploratory_uf_associations.csv)",
+        "- [Associações por UF em CSV](exploratory_uf_associations.csv)",
         "- [Dados por candidato](exploratory_candidates.csv)",
         "- [Comparação A/B por candidato](exploratory_scenario_comparison.csv)",
         "- [Custo por voto por cenário](exploratory_cost_per_vote.csv)",
@@ -581,7 +714,7 @@ def _write_report(
         "Para análise exploratória, abra esses CSVs no Excel, LibreOffice Calc ou Google Sheets; importe com vírgula como separador de colunas e ponto decimal. As consultas também podem ser feitas em Python/pandas.",
 
         "",
-        "A associação por UF é descritiva: correlação de Pearson entre despesas observadas e votos observados, incluindo zeros observados e excluindo somente pares com ausência. Não é estimativa causal e não foi usada para escolher cenário.",
+        "A correlação de Spearman e a correlação de Pearson (também disponível no CSV por UF) são descritivas, preservam zeros observados e excluem apenas ausências. Coeficiente indefinido significa menos de dois pares ou variância nula. Nenhuma associação usa custo por voto.",
         "",
         "## Limitações",
         "",
@@ -661,4 +794,5 @@ def run_exploratory_scenarios(manifest_path: Path, validation_path: Path, output
     _svg_distributions(rows_a, rows_b, plots_dir / "exploratory_distributions.svg")
     _svg_uf_totals(uf_a, uf_b, plots_dir / "exploratory_uf_expense_totals.svg")
     _write_report(output_dir / "exploratory_report.md", metadata, summary, comparison, uf_summary, cost_rows)
+    _svg_uf_spearman(uf_a, uf_b, plots_dir / "exploratory_uf_spearman_by_scenario.svg")
     return metadata

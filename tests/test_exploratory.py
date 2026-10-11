@@ -6,7 +6,7 @@ import unittest
 import zipfile
 from pathlib import Path
 
-from tse_pilot.exploratory import run_exploratory_scenarios
+from tse_pilot.exploratory import _comparison_rows, _spearman, run_exploratory_scenarios
 
 
 class ExploratoryScenarioTests(unittest.TestCase):
@@ -149,6 +149,16 @@ class ExploratoryScenarioTests(unittest.TestCase):
             report_text = (output / "exploratory_report.md").read_text(encoding="utf-8")
             self.assertIn("R$ 8,33", report_text)
             self.assertIn("reais por voto", report_text)
+            with (output / "exploratory_uf_associations.csv").open(encoding="utf-8", newline="") as handle:
+                uf_rows = list(csv.DictReader(handle))
+            sp_a = next(row for row in uf_rows if row["cenario"] == "A_preservar_todas_as_linhas" and row["uf"] == "SP")
+            self.assertEqual(sp_a["pares_completos"], "3")
+            self.assertEqual(sp_a["despesas_iguais_a_zero"], "1")
+            self.assertEqual(sp_a["votacoes_iguais_a_zero"], "1")
+            self.assertEqual(sp_a["correlacao_spearman_despesa_votos"], "0.000000")
+            self.assertTrue((output / "plots" / "exploratory_uf_spearman_by_scenario.svg").exists())
+
+
 
     def test_exploration_refuses_approved_validation(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -169,3 +179,50 @@ class ExploratoryScenarioTests(unittest.TestCase):
 
             with self.assertRaisesRegex(ValueError, "diretório próprio"):
                 run_exploratory_scenarios(manifest, validation, Path(directory) / "derived" / "2022")
+
+
+class ScenarioComparisonTests(unittest.TestCase):
+    @staticmethod
+    def _row(candidate_id, expense, uf="SP"):
+        return {
+            "sq_candidate": candidate_id,
+            "uf": uf,
+            "candidate_number": candidate_id,
+            "candidate_name": f"candidate-{candidate_id}",
+            "declared_expense_centavos": str(expense),
+            "cost_per_vote_brl": "",
+            "exact_repeat_rows": 0,
+            "vote_observation": "observed",
+            "valid_nominal_votes": "10",
+        }
+
+    def test_comparison_joins_reordered_rows_by_candidate_key(self):
+        rows_a = [self._row("1", 500), self._row("2", 900)]
+        rows_b = [self._row("2", 800), self._row("1", 300)]
+
+        comparison = _comparison_rows(rows_a, rows_b)
+
+        self.assertEqual([row["sq_candidate"] for row in comparison], ["1", "2"])
+        self.assertEqual(comparison[0]["expense_b_centavos"], 300)
+        self.assertEqual(comparison[0]["difference_centavos"], 200)
+
+    def test_comparison_rejects_different_lengths(self):
+        with self.assertRaisesRegex(ValueError, "comprimentos"):
+            _comparison_rows([self._row("1", 500), self._row("2", 900)], [self._row("1", 300)])
+
+    def test_comparison_rejects_incompatible_candidate_keys(self):
+        with self.assertRaisesRegex(ValueError, "chaves"):
+            _comparison_rows([self._row("1", 500), self._row("2", 900)], [self._row("1", 300), self._row("3", 800)])
+
+    def test_comparison_rejects_duplicate_candidate_keys(self):
+        with self.assertRaisesRegex(ValueError, "duplicada"):
+            _comparison_rows([self._row("1", 500), self._row("1", 600)], [self._row("1", 300), self._row("2", 800)])
+
+    def test_comparison_rejects_divergent_candidate_identity(self):
+        with self.assertRaisesRegex(ValueError, "identidade"):
+            _comparison_rows([self._row("1", 500)], [self._row("1", 300, uf="RJ")])
+
+
+class SpearmanTests(unittest.TestCase):
+    def test_spearman_uses_average_ranks_for_ties(self):
+        self.assertEqual(_spearman([(1, 1), (1, 2), (2, 3)]), "0.866025")
