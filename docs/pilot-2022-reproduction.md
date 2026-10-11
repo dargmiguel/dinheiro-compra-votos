@@ -29,6 +29,16 @@ python -m tse_pilot explore --manifest data/manifests/manifest-<snapshot>.json -
 
 Os resultados do snapshot deste comando estão resumidos em `reports/tse-2022-exploratory-provisional.md`; os CSVs e SVGs completos permanecem em `data/exploratory/2022/` e são regeneráveis pelo comando.
 
+## Lendo os resultados exploratórios
+
+- Comece por `reports/tse-2022-exploratory-provisional.md` para o resumo metodológico e os números principais.
+- Abra `data/exploratory/2022/exploratory_report.md` para o relatório completo gerado pelo comando.
+- Os CSVs detalhados ficam em `data/exploratory/2022/`; os gráficos SVG ficam em `data/exploratory/2022/plots/`.
+- Os cabeçalhos dos CSVs são em português. CSVs mantêm ponto decimal para que os valores sejam numéricos; Excel/LibreOffice podem importar pelo assistente, com vírgula como separador de colunas e ponto decimal.
+- Para explorar sem código, use Excel, LibreOffice Calc ou Google Sheets. Para consultas reproduzíveis, use Python/pandas (`read_csv(..., decimal=".")`) ou consulte `data/derived/2022/pilot.sqlite` com SQLite/DBeaver.
+
+O custo por voto está em **reais por voto**. Exemplo: `29.79` significa R$ 29,79 por voto. Antes era emitido em centavos por voto (`2.979,07` centavos/voto), unidade que foi removida do CSV para evitar confusão. O custo agregado é `soma das despesas / soma dos votos` dos candidatos com despesa observada e votos maiores que zero; não é a média simples dos custos individuais.
+
 ## Seleção e granularidade
 
 - Candidaturas: membros por UF de `consulta_cand_2022_<UF>.csv`.
@@ -75,4 +85,4 @@ A base analítica somente é escrita quando não há erro crítico. Cada execuç
 python -m unittest discover -s tests -v
 ```
 
-Os testes cobrem o manifesto, detecção do leiaute TSE, separação de ausência e zero, bloqueio por duplicidade e não multiplicação da junção final. A validação real deve ser lida em `data/derived/2022/validation.json`; um relatório exploratório só deve ser gerado quando o status for `approved`.
+Os testes cobrem o manifesto, detecção do leiaute TSE, separação de ausência e zero, bloqueio por duplicidade e não multiplicação da junção final. A validação real deve ser lida em `data/derived/2022/validation.json`. O comando `report` exige estado `approved`; já `explore` aceita apenas o bloqueio exclusivo por `duplicate_expense_rows` e marca todos os artefatos como provisórios, sem aprovar a base.

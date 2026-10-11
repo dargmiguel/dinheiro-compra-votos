@@ -90,6 +90,22 @@ Maiores diferenças absolutas observadas:
 
 A estabilidade de 7.499 candidatos entre os cenários é apenas uma medida de sensibilidade. Não prova que preservar ou remover seja correto.
 
+## Custo exploratório por voto
+
+O custo por voto é calculado somente para candidatos com despesa observada e votos nominais válidos maiores que zero. Zero de despesa observado produz R$ 0,00 por voto; despesa ausente continua fora do quociente. O CSV por candidato apresenta `custo_por_voto_reais`, com custo em reais por voto.
+
+| Cenário | Candidatos com custo | Despesa dos pares completos | Votos dos pares completos | Custo agregado | Mediana | P90 | P99 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| A | 9.100 | R$ 3.092.766.046,77 | 103.816.598 | R$ 29,79 | R$ 43,11 | R$ 227,29 | R$ 1.042,57 |
+| B | 9.100 | R$ 3.064.276.239,94 | 103.816.598 | R$ 29,52 | R$ 42,88 | R$ 227,17 | R$ 1.042,57 |
+
+O custo agregado é `soma das despesas / soma dos votos` nos pares completos; não é a média simples do custo individual. Não há custo definido para candidato com despesa ausente ou com zero votos.
+O valor agregado do CSV é **R$ 29,79 por voto** no cenário A e **R$ 29,52 por voto** no cenário B. O campo antigo em centavos por voto (2.979,07 centavos = R$ 29,79) foi removido para evitar a leitura errada de escala.
+
+Para abrir os dados: `data/exploratory/2022/exploratory_report.md` traz o relatório completo; os CSVs estão em `data/exploratory/2022/` e os SVGs em `data/exploratory/2022/plots/`. Excel, LibreOffice Calc ou Google Sheets servem para inspeção; use a importação CSV com vírgula como separador e ponto como separador decimal. Os cabeçalhos agora estão em português.
+
+Para uma leitura puramente agregada usando todo o voto observado do universo `APTO`, inclusive despesas de candidatos com zero votos, os quocientes seriam R$ 29,66 no cenário A e R$ 29,39 no cenário B. Essa leitura tem outra população de denominador e não substitui a regra por pares completos.
+
 ## Associações descritivas por UF
 
 O comando gera `exploratory_uf_associations.csv` com duas linhas por UF, uma para cada cenário. Para cada UF são preservados:
@@ -109,7 +125,8 @@ Também são gerados:
 - `plots/exploratory_expense_vs_votes_b.svg`;
 - `plots/exploratory_distributions.svg`;
 - `plots/exploratory_uf_expense_totals.svg`;
-- `exploratory_scenario_comparison.csv`, com valores A/B por candidato;
+- `exploratory_scenario_comparison.csv`, com valores A/B e custo por voto por candidato;
+- `exploratory_cost_per_vote.csv`, com o custo agregado e percentis por cenário;
 - `exploratory_candidates.csv`, com população, situação, observações e votos;
 - `exploratory_scenario_a_preserve_all.csv`;
 - `exploratory_scenario_b_remove_exact_repeats.csv`.
@@ -130,7 +147,7 @@ A entrega `Final` foi reconhecida pelo campo textual `TP_PRESTACAO_CONTAS`. O co
 
 ## Testes
 
-A suíte tem **12 testes aprovados**, incluindo:
+O conjunto de testes tem **13 testes aprovados**, incluindo:
 
 - geração simultânea dos dois cenários;
 - preservação de zero observado;

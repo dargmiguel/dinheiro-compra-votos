@@ -36,6 +36,8 @@ class ExploratoryScenarioTests(unittest.TestCase):
                         {"ANO_ELEICAO": "2022", "NR_TURNO": "1", "SG_UF": "SP", "CD_CARGO": "6", "DS_CARGO": "Deputado Federal", "SQ_CANDIDATO": "1", "NR_CANDIDATO": "1001", "NM_CANDIDATO": "A", "CD_SITUACAO_CANDIDATURA": "12", "DS_SITUACAO_CANDIDATURA": "APTO", "CD_SIT_TOT_TURNO": "4", "DS_SIT_TOT_TURNO": "NÃO ELEITO"},
                         {"ANO_ELEICAO": "2022", "NR_TURNO": "1", "SG_UF": "SP", "CD_CARGO": "6", "DS_CARGO": "Deputado Federal", "SQ_CANDIDATO": "2", "NR_CANDIDATO": "1002", "NM_CANDIDATO": "B", "CD_SITUACAO_CANDIDATURA": "3", "DS_SITUACAO_CANDIDATURA": "INAPTO", "CD_SIT_TOT_TURNO": "-1", "DS_SIT_TOT_TURNO": "#NULO"},
                         {"ANO_ELEICAO": "2022", "NR_TURNO": "1", "SG_UF": "SP", "CD_CARGO": "6", "DS_CARGO": "Deputado Federal", "SQ_CANDIDATO": "3", "NR_CANDIDATO": "1003", "NM_CANDIDATO": "C", "CD_SITUACAO_CANDIDATURA": "12", "DS_SITUACAO_CANDIDATURA": "APTO", "CD_SIT_TOT_TURNO": "5", "DS_SIT_TOT_TURNO": "SUPLENTE"},
+                        {"ANO_ELEICAO": "2022", "NR_TURNO": "1", "SG_UF": "SP", "CD_CARGO": "6", "DS_CARGO": "Deputado Federal", "SQ_CANDIDATO": "4", "NR_CANDIDATO": "1004", "NM_CANDIDATO": "D", "CD_SITUACAO_CANDIDATURA": "12", "DS_SITUACAO_CANDIDATURA": "APTO", "CD_SIT_TOT_TURNO": "4", "DS_SIT_TOT_TURNO": "NÃO ELEITO"},
+                        {"ANO_ELEICAO": "2022", "NR_TURNO": "1", "SG_UF": "SP", "CD_CARGO": "6", "DS_CARGO": "Deputado Federal", "SQ_CANDIDATO": "5", "NR_CANDIDATO": "1005", "NM_CANDIDATO": "E", "CD_SITUACAO_CANDIDATURA": "12", "DS_SITUACAO_CANDIDATURA": "APTO", "CD_SIT_TOT_TURNO": "5", "DS_SIT_TOT_TURNO": "SUPLENTE"},
                     ],
                 )
             ],
@@ -48,7 +50,7 @@ class ExploratoryScenarioTests(unittest.TestCase):
                 (
                     "despesas_contratadas_candidatos_2022_SP.csv",
                     list(duplicate),
-                    [duplicate, duplicate, {**duplicate, "TP_PRESTACAO_CONTAS": "Parcial", "SQ_DESPESA": "101", "VR_DESPESA_CONTRATADA": "900,00"}, {**duplicate, "SQ_CANDIDATO": "3", "SQ_DESPESA": "300", "VR_DESPESA_CONTRATADA": "0,00"}],
+                    [duplicate, duplicate, {**duplicate, "TP_PRESTACAO_CONTAS": "Parcial", "SQ_DESPESA": "101", "VR_DESPESA_CONTRATADA": "900,00"}, {**duplicate, "SQ_CANDIDATO": "3", "SQ_DESPESA": "300", "VR_DESPESA_CONTRATADA": "0,00"}, {**duplicate, "SQ_CANDIDATO": "4", "SQ_DESPESA": "400", "VR_DESPESA_CONTRATADA": "100,00"}],
                 )
             ],
         )
@@ -57,7 +59,7 @@ class ExploratoryScenarioTests(unittest.TestCase):
         candidates_sqlite.parent.mkdir()
         connection = sqlite3.connect(candidates_sqlite)
         connection.execute("CREATE TABLE votes (sq_candidate TEXT, valid_votes INTEGER)")
-        connection.executemany("INSERT INTO votes VALUES (?, ?)", [("1", 7), ("3", 0)])
+        connection.executemany("INSERT INTO votes VALUES (?, ?)", [("1", 7), ("3", 5), ("4", 0)])
         connection.commit()
         connection.close()
         validation = {
@@ -101,7 +103,7 @@ class ExploratoryScenarioTests(unittest.TestCase):
 
             self.assertEqual(metadata["status"], "exploratory_only")
             self.assertTrue(metadata["not_approved"])
-            self.assertEqual(metadata["population_included"], 2)
+            self.assertEqual(metadata["population_included"], 4)
             self.assertEqual(metadata["population_excluded_by_reason"]["inapto"], 1)
             self.assertEqual(metadata["exact_repeat_rows_in_final_apto"], 1)
             self.assertTrue(sentinel.exists())
@@ -109,15 +111,44 @@ class ExploratoryScenarioTests(unittest.TestCase):
             self.assertTrue((output / "exploratory_report.md").exists())
 
             with (output / "exploratory_scenario_a_preserve_all.csv").open(encoding="utf-8", newline="") as handle:
-                scenario_a = {row["sq_candidate"]: row for row in csv.DictReader(handle)}
+                scenario_a_reader = csv.DictReader(handle)
+                self.assertIn("sq_candidato", scenario_a_reader.fieldnames)
+                self.assertIn("despesa_declarada_centavos", scenario_a_reader.fieldnames)
+                scenario_a = {row["sq_candidato"]: row for row in scenario_a_reader}
             with (output / "exploratory_scenario_b_remove_exact_repeats.csv").open(encoding="utf-8", newline="") as handle:
-                scenario_b = {row["sq_candidate"]: row for row in csv.DictReader(handle)}
+                scenario_b = {row["sq_candidato"]: row for row in csv.DictReader(handle)}
+            self.assertEqual(set(scenario_a), set(scenario_b))
+            self.assertEqual(set(scenario_a), {"1", "3", "4", "5"})
 
-            self.assertEqual(scenario_a["1"]["declared_expense_centavos"], "10000")
-            self.assertEqual(scenario_b["1"]["declared_expense_centavos"], "5000")
-            self.assertEqual(scenario_a["3"]["expense_observation"], "observed_zero")
-            self.assertEqual(scenario_a["3"]["valid_nominal_votes"], "0")
-            self.assertEqual(scenario_a["3"]["vote_observation"], "observed_zero")
+            self.assertEqual(scenario_a["1"]["despesa_declarada_centavos"], "10000")
+            self.assertEqual(scenario_b["1"]["despesa_declarada_centavos"], "5000")
+            self.assertEqual(scenario_a["3"]["observacao_despesa"], "zero_observado")
+            self.assertEqual(scenario_a["3"]["observacao_votacao"], "observado")
+            self.assertEqual(scenario_a["3"]["custo_por_voto_reais"], "0.000000")
+            self.assertEqual(scenario_a["4"]["despesa_declarada_centavos"], "10000")
+            self.assertEqual(scenario_a["4"]["observacao_votacao"], "zero_observado")
+            self.assertEqual(scenario_a["4"]["custo_por_voto_reais"], "")
+            self.assertEqual(scenario_a["5"]["observacao_despesa"], "ausente")
+            self.assertEqual(scenario_a["5"]["observacao_votacao"], "ausente")
+            self.assertEqual(scenario_a["5"]["custo_por_voto_reais"], "")
+            self.assertEqual(scenario_a["1"]["custo_por_voto_reais"], "14.285714")
+            self.assertEqual(scenario_b["1"]["custo_por_voto_reais"], "7.142857")
+            with (output / "exploratory_scenario_comparison.csv").open(encoding="utf-8", newline="") as handle:
+                comparison = {row["sq_candidato"]: row for row in csv.DictReader(handle)}
+            self.assertEqual(set(comparison), set(scenario_a))
+            self.assertEqual(comparison["1"]["custo_por_voto_reais_cenario_a"], "14.285714")
+            self.assertEqual(comparison["1"]["custo_por_voto_reais_cenario_b"], "7.142857")
+            self.assertEqual(comparison["5"]["diferenca_centavos"], "")
+
+            with (output / "exploratory_cost_per_vote.csv").open(encoding="utf-8", newline="") as handle:
+                costs = list(csv.DictReader(handle))
+            self.assertIn("custo_agregado_reais_por_voto", costs[0])
+            self.assertNotIn("custo_agregado_centavos_por_voto", costs[0])
+            self.assertEqual(costs[0]["custo_agregado_reais_por_voto"], "8.33")
+            self.assertEqual(costs[1]["custo_agregado_reais_por_voto"], "4.17")
+            report_text = (output / "exploratory_report.md").read_text(encoding="utf-8")
+            self.assertIn("R$ 8,33", report_text)
+            self.assertIn("reais por voto", report_text)
 
     def test_exploration_refuses_approved_validation(self):
         with tempfile.TemporaryDirectory() as directory:

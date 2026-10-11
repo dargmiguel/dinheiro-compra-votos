@@ -17,12 +17,87 @@ from .pipeline import FEDERAL_CARGO, UF_CODES
 
 SCENARIO_A = "A_preservar_todas_as_linhas"
 SCENARIO_B = "B_remover_repeticoes_completas_exatas"
+CSV_COLUMN_NAMES = {
+    "sq_candidate": "sq_candidato",
+    "uf": "uf",
+    "candidate_number": "numero_candidato",
+    "candidate_name": "nome_candidato",
+    "candidate_status_code": "codigo_situacao_candidatura",
+    "candidate_status": "situacao_candidatura",
+    "total_status_code": "codigo_resultado_turno",
+    "total_status": "resultado_turno",
+    "source_member": "arquivo_origem",
+    "source_row": "linha_origem",
+    "population": "populacao",
+    "scenario_status": "status_cenario",
+    "expense_row_count": "quantidade_linhas_despesa",
+    "declared_expense_centavos": "despesa_declarada_centavos",
+    "expense_observation": "observacao_despesa",
+    "exact_repeat_rows": "repeticoes_exatas",
+    "vote_row_count": "quantidade_registros_voto",
+    "valid_nominal_votes": "votos_nominais_validos",
+    "vote_observation": "observacao_votacao",
+    "cost_per_vote_brl": "custo_por_voto_reais",
+    "expense_a_centavos": "despesa_cenario_a_centavos",
+    "expense_b_centavos": "despesa_cenario_b_centavos",
+    "difference_centavos": "diferenca_centavos",
+    "difference_relative_to_a": "diferenca_relativa_ao_cenario_a",
+    "cost_per_vote_a_brl": "custo_por_voto_reais_cenario_a",
+    "cost_per_vote_b_brl": "custo_por_voto_reais_cenario_b",
+    "exact_repeat_rows_a": "repeticoes_exatas_cenario_a",
+    "scenario": "cenario",
+    "measure": "medida",
+    "count_observed": "quantidade_observada",
+    "count_zero": "quantidade_igual_a_zero",
+    "count_absent": "quantidade_ausente",
+    "total": "total",
+    "p50": "percentil_50",
+    "p90": "percentil_90",
+    "p99": "percentil_99",
+    "denominator_rule": "regra_do_denominador",
+    "candidate_count_with_cost": "candidatos_com_custo",
+    "expense_total_centavos_complete_pairs": "despesa_total_pares_completos_centavos",
+    "votes_total_complete_pairs": "votos_totais_pares_completos",
+    "aggregate_cost_brl_per_vote": "custo_agregado_reais_por_voto",
+    "median_cost_brl_per_vote": "mediana_reais_por_voto",
+    "p90_cost_brl_per_vote": "percentil_90_reais_por_voto",
+    "p99_cost_brl_per_vote": "percentil_99_reais_por_voto",
+    "mean_cost_brl_per_vote": "media_reais_por_voto",
+    "candidate_population": "candidatos_na_populacao",
+    "expense_observed": "despesas_observadas",
+    "expense_zero": "despesas_iguais_a_zero",
+    "expense_absent": "despesas_ausentes",
+    "vote_observed": "votacoes_observadas",
+    "vote_zero": "votacoes_iguais_a_zero",
+    "vote_absent": "votacoes_ausentes",
+    "complete_pairs": "pares_completos",
+    "expense_total_centavos": "despesa_total_centavos",
+    "votes_total": "votos_totais",
+    "expense_median_centavos": "mediana_despesa_centavos",
+    "votes_median": "mediana_votos",
+    "pearson_expense_votes": "correlacao_pearson_despesa_votos",
+}
+
+
+def _portuguese_value(field: str, value: object) -> object:
+    if field in {"expense_observation", "vote_observation"}:
+        return {
+            "absent": "ausente",
+            "observed": "observado",
+            "observed_zero": "zero_observado",
+        }.get(str(value), value)
+    if field == "scenario_status" and value == "exploratory_only":
+        return "somente_exploratorio"
+    return value
+
+
 GENERATED_FILES = (
     "exploratory_metadata.json",
     "exploratory_candidates.csv",
     "exploratory_scenario_a_preserve_all.csv",
     "exploratory_scenario_b_remove_exact_repeats.csv",
     "exploratory_scenario_comparison.csv",
+    "exploratory_cost_per_vote.csv",
     "exploratory_distributions.csv",
     "exploratory_uf_associations.csv",
     "exploratory_report.md",
@@ -84,10 +159,16 @@ def _row_signature(row: dict[str, str]) -> str:
 
 
 def _write_csv(path: Path, fieldnames: list[str], rows: Iterable[dict[str, object]]) -> None:
+    portuguese_fields = [CSV_COLUMN_NAMES[field] for field in fieldnames]
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer = csv.DictWriter(handle, fieldnames=portuguese_fields)
         writer.writeheader()
-        writer.writerows(rows)
+        for row in rows:
+            localized = {
+                CSV_COLUMN_NAMES[field]: _portuguese_value(field, value)
+                for field, value in row.items()
+            }
+            writer.writerow(localized)
 
 
 def _observation(row_count: int, amount_centavos: int) -> tuple[str, str]:
@@ -234,6 +315,9 @@ def _scenario_rows(
         expense_observation, expense_value = _observation(expense["expense_row_count"], expense["declared_expense_centavos"])
         vote_row_count, valid_votes = votes.get(candidate_id, (0, 0))
         vote_observation = "absent" if not vote_row_count else ("observed_zero" if valid_votes == 0 else "observed")
+        cost_per_vote = ""
+        if expense_observation != "absent" and vote_observation == "observed":
+            cost_per_vote = f"{(Decimal(expense_value) / Decimal(valid_votes) / Decimal(100)):.6f}"
         rows.append({
             **candidate,
             "population": "APTO",
@@ -245,6 +329,7 @@ def _scenario_rows(
             "vote_row_count": vote_row_count if vote_row_count else "",
             "valid_nominal_votes": valid_votes if vote_row_count else "",
             "vote_observation": vote_observation,
+            "cost_per_vote_brl": cost_per_vote,
         })
     return rows
 
@@ -256,6 +341,8 @@ def _comparison_rows(rows_a: list[dict[str, object]], rows_b: list[dict[str, obj
         amount_b = int(row_b["declared_expense_centavos"]) if row_b["declared_expense_centavos"] != "" else None
         delta = amount_a - amount_b if amount_a is not None and amount_b is not None else None
         relative = (delta / amount_a) if delta is not None and amount_a else None
+        cost_a = row_a["cost_per_vote_brl"]
+        cost_b = row_b["cost_per_vote_brl"]
         rows.append({
             "sq_candidate": row_a["sq_candidate"],
             "uf": row_a["uf"],
@@ -265,6 +352,8 @@ def _comparison_rows(rows_a: list[dict[str, object]], rows_b: list[dict[str, obj
             "expense_b_centavos": "" if amount_b is None else amount_b,
             "difference_centavos": "" if delta is None else delta,
             "difference_relative_to_a": "" if relative is None else f"{relative:.8f}",
+            "cost_per_vote_a_brl": cost_a,
+            "cost_per_vote_b_brl": cost_b,
             "exact_repeat_rows_a": row_a["exact_repeat_rows"],
             "vote_observation": row_a["vote_observation"],
             "valid_nominal_votes": row_a["valid_nominal_votes"],
@@ -279,6 +368,30 @@ def _summary_rows(rows: list[dict[str, object]], scenario_name: str) -> list[dic
         {"scenario": scenario_name, "measure": "despesas_contratadas_declaradas_centavos", "count_observed": len(expenses), "count_zero": sum(value == 0 for value in expenses), "count_absent": sum(row["expense_observation"] == "absent" for row in rows), "total": sum(expenses), "p50": _quantile(expenses, 0.50), "p90": _quantile(expenses, 0.90), "p99": _quantile(expenses, 0.99)},
         {"scenario": scenario_name, "measure": "votos_nominais_validos", "count_observed": len(votes), "count_zero": sum(value == 0 for value in votes), "count_absent": sum(row["vote_observation"] == "absent" for row in rows), "total": sum(votes), "p50": _quantile(votes, 0.50), "p90": _quantile(votes, 0.90), "p99": _quantile(votes, 0.99)},
     ]
+
+
+def _cost_rows(rows: list[dict[str, object]], scenario_name: str) -> list[dict[str, object]]:
+    pairs = [
+        (int(row["declared_expense_centavos"]), int(row["valid_nominal_votes"]))
+        for row in rows
+        if row["expense_observation"] != "absent" and row["vote_observation"] == "observed"
+    ]
+    costs = [Decimal(expense) / Decimal(votes) for expense, votes in pairs]
+    total_expense = sum(expense for expense, _ in pairs)
+    total_votes = sum(votes for _, votes in pairs)
+    aggregate = Decimal(total_expense) / Decimal(total_votes) if total_votes else None
+    return [{
+        "scenario": scenario_name,
+        "denominator_rule": "somente candidatos com despesa observada e votos > 0; zero de despesa preservado",
+        "candidate_count_with_cost": len(pairs),
+        "expense_total_centavos_complete_pairs": total_expense,
+        "votes_total_complete_pairs": total_votes,
+        "aggregate_cost_brl_per_vote": "" if aggregate is None else f"{aggregate / Decimal(100):.2f}",
+        "median_cost_brl_per_vote": "" if not costs else f"{Decimal(str(_quantile([float(value) for value in costs], 0.5))) / Decimal(100):.2f}",
+        "p90_cost_brl_per_vote": "" if not costs else f"{Decimal(str(_quantile([float(value) for value in costs], 0.9))) / Decimal(100):.2f}",
+        "p99_cost_brl_per_vote": "" if not costs else f"{Decimal(str(_quantile([float(value) for value in costs], 0.99))) / Decimal(100):.2f}",
+        "mean_cost_brl_per_vote": "" if not costs else f"{(sum(costs) / Decimal(len(costs))) / Decimal(100):.2f}",
+    }]
 
 
 def _uf_rows(rows: list[dict[str, object]], scenario_name: str) -> list[dict[str, object]]:
@@ -387,11 +500,14 @@ def _write_report(
     summary_rows: list[dict[str, object]],
     comparison_rows: list[dict[str, object]],
     uf_rows: list[dict[str, object]],
+    cost_rows: list[dict[str, object]],
 ) -> None:
     total_a = next(row["total"] for row in summary_rows if row["scenario"] == SCENARIO_A and row["measure"].startswith("despesas"))
     total_b = next(row["total"] for row in summary_rows if row["scenario"] == SCENARIO_B and row["measure"].startswith("despesas"))
     changed = [row for row in comparison_rows if row["difference_centavos"] not in ("", 0)]
     top_changes = sorted(changed, key=lambda row: int(row["difference_centavos"]), reverse=True)[:10]
+    cost_a = next(row for row in cost_rows if row["scenario"] == SCENARIO_A)
+    cost_b = next(row for row in cost_rows if row["scenario"] == SCENARIO_B)
     lines = [
         "# Relatório exploratório provisório — TSE 2022",
         "",
@@ -427,6 +543,18 @@ def _write_report(
         f"- diferença diagnóstica: **{_money(total_a - total_b)}**;",
         f"- candidatos com valor financeiro diferente: **{len(changed)}** de {metadata['population_included']}.",
         "",
+        "## Custo exploratório por voto",
+        "",
+        "O custo por voto é calculado somente para candidatos com despesa observada e votos válidos maiores que zero. Despesa zero observada produz custo R$ 0,00; despesa ausente continua fora do quociente.",
+        "No CSV, as colunas de custo estão em reais por voto e usam ponto decimal para manter valores numéricos legíveis por ferramentas. O valor anterior em centavos por voto foi removido: 2.979,07 centavos/voto ÷ 100 = R$ 29,79/voto. O custo agregado é a soma das despesas dividida pela soma dos votos nos pares completos, não a média simples do custo individual.",
+
+        "",
+        f"| Cenário | Candidatos | Despesa completa | Votos completos | Custo agregado | Mediana | P90 | P99 |",
+        f"|---|---:|---:|---:|---:|---:|---:|---:|",
+        f"| A | {cost_a['candidate_count_with_cost']} | {_money(int(cost_a['expense_total_centavos_complete_pairs']))} | {cost_a['votes_total_complete_pairs']} | {_money(round(Decimal(cost_a['aggregate_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['median_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['p90_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['p99_cost_brl_per_vote']) * 100))} |",
+        f"| B | {cost_b['candidate_count_with_cost']} | {_money(int(cost_b['expense_total_centavos_complete_pairs']))} | {cost_b['votes_total_complete_pairs']} | {_money(round(Decimal(cost_b['aggregate_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['median_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['p90_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['p99_cost_brl_per_vote']) * 100))} |",
+        "",
+        "",
         "| SQ_CANDIDATO | Candidato | UF | Diferença | Relativa a A | Repetições exatas |",
         "|---|---|---|---:|---:|---:|",
     ]
@@ -446,6 +574,12 @@ def _write_report(
         "- [Totais por UF](plots/exploratory_uf_expense_totals.svg)",
         "- [Distribuições em CSV](exploratory_distributions.csv)",
         "- [Associações descritivas por UF em CSV](exploratory_uf_associations.csv)",
+        "- [Dados por candidato](exploratory_candidates.csv)",
+        "- [Comparação A/B por candidato](exploratory_scenario_comparison.csv)",
+        "- [Custo por voto por cenário](exploratory_cost_per_vote.csv)",
+        "",
+        "Para análise exploratória, abra esses CSVs no Excel, LibreOffice Calc ou Google Sheets; importe com vírgula como separador de colunas e ponto decimal. As consultas também podem ser feitas em Python/pandas.",
+
         "",
         "A associação por UF é descritiva: correlação de Pearson entre despesas observadas e votos observados, incluindo zeros observados e excluindo somente pares com ausência. Não é estimativa causal e não foi usada para escolher cenário.",
         "",
@@ -490,6 +624,7 @@ def run_exploratory_scenarios(manifest_path: Path, validation_path: Path, output
     rows_b = _scenario_rows(candidates, remove, votes)
     comparison = _comparison_rows(rows_a, rows_b)
     summary = _summary_rows(rows_a, SCENARIO_A) + _summary_rows(rows_b, SCENARIO_B)
+    cost_rows = _cost_rows(rows_a, SCENARIO_A) + _cost_rows(rows_b, SCENARIO_B)
     uf_a = _uf_rows(rows_a, SCENARIO_A)
     uf_b = _uf_rows(rows_b, SCENARIO_B)
     uf_summary = uf_a + uf_b
@@ -517,6 +652,7 @@ def run_exploratory_scenarios(manifest_path: Path, validation_path: Path, output
     _write_csv(output_dir / "exploratory_scenario_a_preserve_all.csv", list(rows_a[0].keys()) if rows_a else [], rows_a)
     _write_csv(output_dir / "exploratory_scenario_b_remove_exact_repeats.csv", list(rows_b[0].keys()) if rows_b else [], rows_b)
     _write_csv(output_dir / "exploratory_scenario_comparison.csv", list(comparison[0].keys()) if comparison else [], comparison)
+    _write_csv(output_dir / "exploratory_cost_per_vote.csv", list(cost_rows[0].keys()) if cost_rows else [], cost_rows)
     _write_csv(output_dir / "exploratory_distributions.csv", list(summary[0].keys()) if summary else [], summary)
     _write_csv(output_dir / "exploratory_uf_associations.csv", list(uf_summary[0].keys()) if uf_summary else [], uf_summary)
     (output_dir / "exploratory_metadata.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -524,5 +660,5 @@ def run_exploratory_scenarios(manifest_path: Path, validation_path: Path, output
     _svg_scatter(rows_b, "declared_expense_centavos", plots_dir / "exploratory_expense_vs_votes_b.svg", "Cenário B — despesas declaradas versus votos")
     _svg_distributions(rows_a, rows_b, plots_dir / "exploratory_distributions.svg")
     _svg_uf_totals(uf_a, uf_b, plots_dir / "exploratory_uf_expense_totals.svg")
-    _write_report(output_dir / "exploratory_report.md", metadata, summary, comparison, uf_summary)
+    _write_report(output_dir / "exploratory_report.md", metadata, summary, comparison, uf_summary, cost_rows)
     return metadata
