@@ -1,6 +1,7 @@
 # Piloto TSE 2022: reprodução
 
 Este piloto consolida, em escopo Brasil / todas as UFs, candidaturas a deputado federal, despesas contratadas declaradas e votação nominal do primeiro turno de 2022. O escopo não inclui 2026, redes sociais, dashboard ou modelo preditivo.
+Disponibilidade de dados de redes sociais **não é requisito para concluir o piloto de financiamento TSE 2022**. O piloto fecha a viabilidade apenas para candidaturas, prestações de contas e votação no TSE; a camada de atenção é posterior e condicional à disponibilidade, permissão e comparabilidade temporal de cada fonte. A ausência dessa camada não impede a conclusão do piloto financeiro, nem autoriza preencher cobertura desconhecida como zero.
 
 ## Fontes congeladas
 

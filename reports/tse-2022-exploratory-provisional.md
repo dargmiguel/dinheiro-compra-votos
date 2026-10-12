@@ -112,37 +112,37 @@ Para uma leitura puramente agregada usando todo o voto observado do universo `AP
 
 Spearman foi calculado entre candidatos dentro de cada UF, separadamente nos cenários A e B. São usados pares com despesa e votação observadas; zeros observados permanecem incluídos e apenas ausências são excluídas. O custo por voto não é usado para explicar votos nem entra na associação.
 
-Cobertura: **9.204 pares completos em cada cenário**, distribuídos por **27 de 27 UFs** com coeficiente definido. Há 272 despesas ausentes, 791 despesas observadas iguais a zero e 107 candidatos com votação observada igual a zero; esses zeros permanecem na correlação. O coeficiente varia de **0,722880 a 0,856801** no cenário A e de **0,722059 a 0,857010** no cenário B. Todas as associações por UF deste recorte são positivas, mas descritivas; isso não identifica causalidade nem escolhe o tratamento correto das repetições.
+Cobertura: **9.204 pares completos em cada cenário**, distribuídos por **27 de 27 UFs** com coeficiente definido. Há 272 despesas ausentes, 791 despesas observadas iguais a zero e 107 candidatos com votação observada igual a zero; esses zeros permanecem na correlação. O coeficiente varia de **0,722880 a 0,856801** no cenário A e de **0,722059 a 0,857010** no cenário B. A variação de Spearman entre B e A (`B − A`) vai de **−0,002723 a +0,000209**; diminui em 23 UFs e aumenta em 4. O maior deslocamento absoluto é **0,002723** (AP). Todas as associações por UF deste recorte são positivas, mas descritivas; isso não identifica causalidade nem escolhe o tratamento correto das repetições.
 
-| UF | Pares A | Spearman A | Pares B | Spearman B |
+| UF | Pares A/B | Spearman A | Spearman B | Δ Spearman (B−A) |
 |---|---:|---:|---:|---:|
-| AC | 122 | 0,854004 | 122 | 0,853977 |
-| AL | 144 | 0,856801 | 144 | 0,857010 |
-| AM | 137 | 0,745740 | 137 | 0,744649 |
-| AP | 122 | 0,758030 | 122 | 0,755307 |
-| BA | 651 | 0,745040 | 651 | 0,744293 |
-| CE | 325 | 0,807492 | 325 | 0,807562 |
-| DF | 193 | 0,793193 | 193 | 0,792530 |
-| ES | 180 | 0,826587 | 180 | 0,824303 |
-| GO | 334 | 0,763749 | 334 | 0,763615 |
-| MA | 311 | 0,788846 | 311 | 0,788648 |
-| MG | 993 | 0,792175 | 993 | 0,792232 |
-| MS | 147 | 0,778547 | 147 | 0,778184 |
-| MT | 147 | 0,853917 | 147 | 0,853715 |
-| PA | 281 | 0,784209 | 281 | 0,783526 |
-| PB | 175 | 0,783294 | 175 | 0,783090 |
-| PE | 399 | 0,777498 | 399 | 0,777636 |
-| PI | 142 | 0,804026 | 142 | 0,802331 |
-| PR | 573 | 0,792704 | 573 | 0,792257 |
-| RJ | 977 | 0,722880 | 977 | 0,722059 |
-| RN | 164 | 0,808563 | 164 | 0,807921 |
-| RO | 139 | 0,815481 | 139 | 0,815121 |
-| RR | 135 | 0,824214 | 135 | 0,822871 |
-| RS | 498 | 0,732349 | 498 | 0,732136 |
-| SC | 284 | 0,737360 | 284 | 0,736419 |
-| SE | 142 | 0,761607 | 142 | 0,760969 |
-| SP | 1.346 | 0,788043 | 1.346 | 0,787376 |
-| TO | 143 | 0,796510 | 143 | 0,795796 |
+| AC | 122 | 0,854004 | 0,853977 | −0,000027 |
+| AL | 144 | 0,856801 | 0,857010 | +0,000209 |
+| AM | 137 | 0,745740 | 0,744649 | −0,001091 |
+| AP | 122 | 0,758030 | 0,755307 | −0,002723 |
+| BA | 651 | 0,745040 | 0,744293 | −0,000747 |
+| CE | 325 | 0,807492 | 0,807562 | +0,000070 |
+| DF | 193 | 0,793193 | 0,792530 | −0,000663 |
+| ES | 180 | 0,826587 | 0,824303 | −0,002284 |
+| GO | 334 | 0,763749 | 0,763615 | −0,000134 |
+| MA | 311 | 0,788846 | 0,788648 | −0,000198 |
+| MG | 993 | 0,792175 | 0,792232 | +0,000057 |
+| MS | 147 | 0,778547 | 0,778184 | −0,000363 |
+| MT | 147 | 0,853917 | 0,853715 | −0,000202 |
+| PA | 281 | 0,784209 | 0,783526 | −0,000683 |
+| PB | 175 | 0,783294 | 0,783090 | −0,000204 |
+| PE | 399 | 0,777498 | 0,777636 | +0,000138 |
+| PI | 142 | 0,804026 | 0,802331 | −0,001695 |
+| PR | 573 | 0,792704 | 0,792257 | −0,000447 |
+| RJ | 977 | 0,722880 | 0,722059 | −0,000821 |
+| RN | 164 | 0,808563 | 0,807921 | −0,000642 |
+| RO | 139 | 0,815481 | 0,815121 | −0,000360 |
+| RR | 135 | 0,824214 | 0,822871 | −0,001343 |
+| RS | 498 | 0,732349 | 0,732136 | −0,000213 |
+| SC | 284 | 0,737360 | 0,736419 | −0,000941 |
+| SE | 142 | 0,761607 | 0,760969 | −0,000638 |
+| SP | 1.346 | 0,788043 | 0,787376 | −0,000667 |
+| TO | 143 | 0,796510 | 0,795796 | −0,000714 |
 
 `exploratory_uf_associations.csv` mantém também a correlação de Pearson como medida descritiva complementar, além das contagens, zeros, ausências, totais e medianas. O gráfico `plots/exploratory_uf_spearman_by_scenario.svg` compara Spearman por UF e mostra o número de pares completos nas dicas dos pontos. Coeficientes indefinidos seriam deixados em branco quando houvesse menos de dois pares ou variância nula.
 
