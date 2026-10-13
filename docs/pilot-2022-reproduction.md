@@ -29,15 +29,16 @@ python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --outpu
 
 `run` lê os ZIPs por streaming, preserva cada ocorrência original em `expense_occurrences` e materializa a base principal com deduplicação de linhas iguais nos 53 campos originais, dentro do mesmo snapshot e membro. `duplicates` mede exclusões, candidatos afetados e diferenças financeiras sem classificá-las como desperdício ou gasto indevido; também exporta cada ocorrência excluída e a referência mantida para `reports/tse-2022-dedup-exclusions.csv`.
 
-`analyze` exige validação aprovada e denominadores reconciliados nas 27 UFs. Executa o GLM fracionário principal e sensibilidades; emite o relatório final, denominadores oficiais por UF, coeficientes e levantamento de INAPTO em `reports/`.
+`analyze` exige validação aprovada e denominadores reconciliados nas 27 UFs. Executa o GLM fracionário principal e sensibilidades; emite relatório com previsões padronizadas e diagnósticos, denominadores por UF, coeficientes, comparação por sexo, arquivos de influência/calibração e levantamento de INAPTO em `reports/`.
 `explore` permanece como diagnóstico exploratório anterior, separado da análise principal. Os resultados definitivos são gerados por `analyze` e não dependem dos gráficos exploratórios.
 
 ## Lendo os resultados
 
-- Comece por `reports/tse-2022-financial-analysis.md` para população, totais, modelos, sexo, INAPTO e limitações.
+- Comece por `reports/tse-2022-financial-analysis.md` para população, totais, previsões interpretáveis, interação por sexo, diagnósticos, INAPTO e limitações.
 - `reports/tse-2022-vote-denominator-by-uf.csv` expõe os 27 totais oficiais por UF, valores nominais e de legenda e a referência do membro de origem.
-- `reports/tse-2022-financial-model-estimates.csv` contém coeficientes e intervalos robustos; `reports/tse-2022-inapto-expenses-by-type.csv` contém o levantamento separado.
-- `reports/tse-2022-apto-expenses-by-type.csv` contém a discriminação da população APTO por tipo de prestação; o JSON completo consolida as métricas e metadados da execução.
+- `reports/tse-2022-financial-model-estimates.csv` contém coeficientes e intervalos robustos; `reports/tse-2022-predicted-expense-scenarios.csv` mostra previsões por quartis de despesa comparáveis nos dois cenários.
+- `reports/tse-2022-sex-interaction-curve.csv` contém curvas e ICs pontuais apenas na interseção das faixas P5–P95 de despesas de mulheres e homens.
+- `reports/tse-2022-model-calibration-deciles.csv`, `reports/tse-2022-model-influence-top-candidates.csv` e `reports/tse-2022-top-one-percent-expense-sensitivity.csv` registram calibração em amostra, casos influentes e sensibilidade ao topo da distribuição.
 - `reports/tse-2022-duplicate-diagnostics.json` registra ocorrências excluídas, candidatos afetados e impacto financeiro no universo completo.
 - `reports/tse-2022-dedup-exclusions.csv` lista todas as ocorrências excluídas, membro/linha de origem, referência à ocorrência mantida, candidatura, despesa e valor em centavos.
 - A exploração anterior está em `reports/tse-2022-exploratory-provisional.md`; não deve ser interpretada como o resultado ajustado do protocolo.

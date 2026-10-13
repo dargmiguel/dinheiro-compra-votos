@@ -243,7 +243,7 @@ def _fit_model(
     include_demographics: bool,
     interaction: bool,
     include_age: bool = True,
-) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+) -> tuple[dict[str, Any], list[dict[str, Any]], Any, pd.DataFrame]:
     model_frame = frame
     if interaction:
         model_frame = frame[frame["gender"].isin(["FEMININO", "MASCULINO"])].copy()
@@ -283,13 +283,13 @@ def _fit_model(
         "n": int(fitted.nobs),
         "converged": bool(fitted.converged),
         "covariance": "HC1 robusta",
-        "family": "quasi-binomial/logit para resposta fracionária",
+        "family": "logit fracionário (GLM Binomial)",
         "controls": controls,
         "interaction": interaction,
         "deviance": float(fitted.deviance),
         "aic": float(fitted.aic),
         "categorical_controls": categorical,
-    }, coefficient_rows
+    }, coefficient_rows, fitted, model_frame
 
 
 def _fit_ols_sensitivity(name: str, frame: pd.DataFrame, response: str) -> tuple[dict[str, Any], list[dict[str, Any]]]:
@@ -323,6 +323,285 @@ def _fit_ols_sensitivity(name: str, frame: pd.DataFrame, response: str) -> tuple
         "rmse": float(math.sqrt(fitted.mse_resid)),
         "categorical_controls": categorical,
     }, coefficients
+
+def _marginal_prediction(
+    fitted: Any,
+    standardization_frame: pd.DataFrame,
+    expense_centavos: float,
+    *,
+    interaction: bool = False,
+    gender: str | None = None,
+) -> dict[str, float]:
+    prediction_frame = standardization_frame.copy()
+    prediction_frame["log1p_expense_brl"] = math.log1p(float(expense_centavos) / 100)
+    if gender is not None:
+        prediction_frame["gender"] = gender
+    design, _ = _design_matrix(
+        prediction_frame,
+        include_demographics=True,
+        interaction=interaction,
+        include_age=True,
+    )
+    design = design.reindex(columns=fitted.model.exog_names, fill_value=0.0)
+    matrix = design.to_numpy(dtype=float)
+    linear_predictor = matrix @ fitted.params.to_numpy(dtype=float)
+    probability = 1 / (1 + np.exp(-np.clip(linear_predictor, -40, 40)))
+    mean_prediction = float(probability.mean())
+    gradient = (matrix * (probability * (1 - probability))[:, None]).mean(axis=0)
+    covariance = np.asarray(fitted.cov_params(), dtype=float)
+    variance = max(0.0, float(gradient @ covariance @ gradient))
+    standard_error = math.sqrt(variance)
+    margin = 1.959963984540054 * standard_error
+    return {
+        "prediction": mean_prediction,
+        "ci95_lower": max(0.0, mean_prediction - margin),
+        "ci95_upper": min(1.0, mean_prediction + margin),
+        "standard_error": standard_error,
+    }
+
+
+def _fit_diagnostics(fitted: Any, frame: pd.DataFrame) -> dict[str, Any]:
+    observed = frame["vote_share"].to_numpy(dtype=float)
+    predicted = np.asarray(fitted.fittedvalues, dtype=float)
+    residual = observed - predicted
+    calibration_frame = pd.DataFrame(
+        {"observed": observed, "predicted": predicted},
+        index=frame.index,
+    )
+    calibration_frame["decile"] = pd.qcut(
+        calibration_frame["predicted"],
+        q=10,
+        labels=False,
+        duplicates="drop",
+    )
+    calibration_deciles = []
+    for decile, group in calibration_frame.groupby("decile", observed=True):
+        mean_observed = float(group["observed"].mean())
+        mean_predicted = float(group["predicted"].mean())
+        calibration_deciles.append({
+            "decile": int(decile) + 1,
+            "n": int(len(group)),
+            "mean_observed_vote_share": mean_observed,
+            "mean_predicted_vote_share": mean_predicted,
+            "calibration_gap": mean_observed - mean_predicted,
+        })
+    return {
+        "n": int(len(frame)),
+        "mean_observed_vote_share": float(observed.mean()),
+        "mean_predicted_vote_share": float(predicted.mean()),
+        "rmse": float(np.sqrt(np.mean(residual ** 2))),
+        "mae": float(np.mean(np.abs(residual))),
+        "max_absolute_decile_calibration_gap": max(abs(row["calibration_gap"]) for row in calibration_deciles),
+        "calibration_deciles": calibration_deciles,
+        "evaluation": "calibração na própria amostra; não é validação externa",
+    }
+
+
+def _influence_diagnostics(
+    fitted: Any,
+    frame: pd.DataFrame,
+    expense_column: str,
+) -> dict[str, Any]:
+    influence = fitted.get_influence(observed=True)
+    cooks_distance = np.asarray(influence.cooks_distance[0], dtype=float)
+    leverage = np.asarray(influence.hat_matrix_diag, dtype=float)
+    fitted_values = np.asarray(fitted.fittedvalues, dtype=float)
+    expense_index = fitted.model.exog_names.index("log1p_expense_brl")
+    expense_dfbetas = np.asarray(influence.dfbetas[:, expense_index], dtype=float)
+    n = len(frame)
+    threshold = 4 / n
+    finite_cooks = np.isfinite(cooks_distance)
+    finite_dfbeta = np.isfinite(expense_dfbetas)
+    top_indices = np.argsort(np.where(finite_cooks, cooks_distance, -np.inf))[::-1][:10]
+    max_cook = float(np.max(cooks_distance[finite_cooks])) if finite_cooks.any() else None
+    max_abs_dfbeta = float(np.max(np.abs(expense_dfbetas[finite_dfbeta]))) if finite_dfbeta.any() else None
+    top_candidates = []
+    for rank, position in enumerate(top_indices, start=1):
+        candidate = frame.iloc[int(position)]
+        top_candidates.append({
+            "rank": rank,
+            "sq_candidate": candidate["sq_candidate"],
+            "expense_brl": float(candidate[expense_column]) / 100,
+            "observed_vote_share": float(candidate["vote_share"]),
+            "fitted_vote_share": float(fitted_values[int(position)]),
+            "cooks_distance": float(cooks_distance[position]) if finite_cooks[position] else None,
+            "leverage": float(leverage[position]),
+            "dfbeta_log1p_expense": float(expense_dfbetas[position]) if finite_dfbeta[position] else None,
+        })
+    return {
+        "n": n,
+        "screening_rule": "Distância de Cook > 4/N; triagem heurística, sem exclusão automática de candidaturas",
+        "cook_distance_screen_threshold": threshold,
+        "candidates_above_cook_screen": int(np.count_nonzero(cooks_distance > threshold)),
+        "maximum_cook_distance": max_cook,
+        "maximum_leverage": float(leverage.max()),
+        "maximum_absolute_expense_dfbeta": max_abs_dfbeta,
+        "top_influential_candidates": top_candidates,
+    }
+
+
+def _build_prediction_and_diagnostic_tables(
+    fitted_models: dict[str, tuple[Any, pd.DataFrame, str]],
+    complete_case_frame: pd.DataFrame,
+) -> tuple[dict[str, Any], dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
+    spending_quantiles = (("Q25", 0.25), ("Mediana", 0.5), ("Q75", 0.75))
+    spending_values = [
+        int(np.quantile(
+            complete_case_frame["expense_deduplicated_centavos"].to_numpy(dtype=float),
+            quantile,
+            method="nearest",
+        ))
+        for _, quantile in spending_quantiles
+    ]
+    scenario_comparison = []
+    for (label, quantile), expense_centavos in zip(spending_quantiles, spending_values):
+        dedup_fit, dedup_frame, _ = fitted_models["deduplicado_completo"]
+        all_rows_fit, all_rows_frame, _ = fitted_models["todas_as_linhas_completo"]
+        dedup_prediction = _marginal_prediction(dedup_fit, dedup_frame, expense_centavos)
+        all_rows_prediction = _marginal_prediction(all_rows_fit, all_rows_frame, expense_centavos)
+        scenario_comparison.append({
+            "expense_level": label,
+            "expense_quantile": quantile,
+            "expense_brl": expense_centavos / 100,
+            "deduplicated_prediction": dedup_prediction["prediction"],
+            "deduplicated_ci95_lower": dedup_prediction["ci95_lower"],
+            "deduplicated_ci95_upper": dedup_prediction["ci95_upper"],
+            "all_rows_prediction": all_rows_prediction["prediction"],
+            "all_rows_ci95_lower": all_rows_prediction["ci95_lower"],
+            "all_rows_ci95_upper": all_rows_prediction["ci95_upper"],
+            "difference_percentage_points": (
+                all_rows_prediction["prediction"] - dedup_prediction["prediction"]
+            ) * 100,
+            "standardization_n": len(dedup_frame),
+        })
+
+    interaction_fit, interaction_frame, _ = fitted_models["deduplicado_interacao_sexo"]
+    female_expenses = interaction_frame.loc[
+        interaction_frame["gender"] == "FEMININO", "expense_deduplicated_centavos"
+    ].to_numpy(dtype=float)
+    male_expenses = interaction_frame.loc[
+        interaction_frame["gender"] == "MASCULINO", "expense_deduplicated_centavos"
+    ].to_numpy(dtype=float)
+    female_lower, female_upper = np.quantile(female_expenses, (0.05, 0.95), method="nearest")
+    male_lower, male_upper = np.quantile(male_expenses, (0.05, 0.95), method="nearest")
+    common_lower = max(float(female_lower), float(male_lower))
+    common_upper = min(float(female_upper), float(male_upper))
+    if common_lower >= common_upper:
+        raise ValueError("faixa central de despesas de mulheres e homens não tem suporte comum")
+    curve_expenses = np.unique(np.rint(np.linspace(common_lower, common_upper, 21)).astype(int))
+    sex_curve_points = []
+    for expense_centavos in curve_expenses:
+        male_prediction = _marginal_prediction(
+            interaction_fit,
+            interaction_frame,
+            int(expense_centavos),
+            interaction=True,
+            gender="MASCULINO",
+        )
+        female_prediction = _marginal_prediction(
+            interaction_fit,
+            interaction_frame,
+            int(expense_centavos),
+            interaction=True,
+            gender="FEMININO",
+        )
+        sex_curve_points.append({
+            "expense_brl": int(expense_centavos) / 100,
+            "male_prediction": male_prediction["prediction"],
+            "male_ci95_lower": male_prediction["ci95_lower"],
+            "male_ci95_upper": male_prediction["ci95_upper"],
+            "female_prediction": female_prediction["prediction"],
+            "female_ci95_lower": female_prediction["ci95_lower"],
+            "female_ci95_upper": female_prediction["ci95_upper"],
+            "female_minus_male_percentage_points": (
+                female_prediction["prediction"] - male_prediction["prediction"]
+            ) * 100,
+        })
+    prediction_tables = {
+        "scenario_comparison": scenario_comparison,
+        "sex_interaction_curve": {
+            "support_definition": "interseção dos intervalos P5–P95 das despesas Final deduplicadas de mulheres e homens",
+            "common_support": {
+                "female_p05_brl": float(female_lower) / 100,
+                "female_p95_brl": float(female_upper) / 100,
+                "male_p05_brl": float(male_lower) / 100,
+                "male_p95_brl": float(male_upper) / 100,
+                "lower_brl": common_lower / 100,
+                "upper_brl": common_upper / 100,
+            },
+            "standardization_n": len(interaction_frame),
+            "points": sex_curve_points,
+        },
+        "standardization": "média de previsões na escala de participação sobre a mesma distribuição de controles completos; fixa-se a despesa e, nas curvas de interação, o sexo",
+        "uncertainty_method": "ICs pontuais de 95% pelo método delta para médias padronizadas, usando a covariância sanduíche HC1 do modelo; não são intervalos individuais. Diferenças entre cenários são estimativas pontuais sem IC próprio.",
+    }
+
+    model_diagnostics: dict[str, Any] = {}
+    calibration_rows = []
+    influence_rows = []
+    for model_name in ("deduplicado_completo", "todas_as_linhas_completo"):
+        fitted, fitted_frame, expense_column = fitted_models[model_name]
+        fit = _fit_diagnostics(fitted, fitted_frame)
+        influence = _influence_diagnostics(fitted, fitted_frame, expense_column)
+        model_diagnostics[model_name] = {"fit": fit, "influence": influence}
+        calibration_rows.extend(
+            {"model": model_name, **row}
+            for row in fit["calibration_deciles"]
+        )
+        influence_rows.extend(
+            {"model": model_name, **row}
+            for row in influence["top_influential_candidates"]
+        )
+
+    cutoff_centavos = float(np.quantile(
+        complete_case_frame["expense_deduplicated_centavos"].to_numpy(dtype=float),
+        0.99,
+        method="nearest",
+    ))
+    tail_frame = complete_case_frame.loc[
+        complete_case_frame["expense_deduplicated_centavos"] <= cutoff_centavos
+    ].copy()
+    excluded_tail_count = len(complete_case_frame) - len(tail_frame)
+    tail_sensitivity = []
+    for scenario, source_model, expense_column in (
+        ("deduplicado", "deduplicado_completo", "expense_deduplicated_centavos"),
+        ("todas_as_linhas", "todas_as_linhas_completo", "expense_all_lines_centavos"),
+    ):
+        full_fitted = fitted_models[source_model][0]
+        trimmed_frame = tail_frame.copy()
+        trimmed_frame["log1p_expense_brl"] = (
+            trimmed_frame[expense_column].astype(float).div(100).map(math.log1p)
+        )
+        _, _, trimmed_fit, _ = _fit_model(
+            f"{source_model}_sem_top_1pct",
+            trimmed_frame,
+            include_demographics=True,
+            interaction=False,
+            include_age=True,
+        )
+        full_interval = full_fitted.conf_int().loc["log1p_expense_brl"]
+        trimmed_interval = trimmed_fit.conf_int().loc["log1p_expense_brl"]
+        tail_sensitivity.append({
+            "scenario": scenario,
+            "cutoff_rule": "1% superior da distribuição de despesas deduplicadas (P99; candidaturas acima do limite removidas apenas neste diagnóstico)",
+            "cutoff_brl": cutoff_centavos / 100,
+            "excluded_candidates": excluded_tail_count,
+            "n_after_exclusion": int(trimmed_fit.nobs),
+            "full_coefficient": float(full_fitted.params["log1p_expense_brl"]),
+            "trimmed_coefficient": float(trimmed_fit.params["log1p_expense_brl"]),
+            "trimmed_ci95_lower": float(trimmed_interval.iloc[0]),
+            "trimmed_ci95_upper": float(trimmed_interval.iloc[1]),
+            "coefficient_change": float(
+                trimmed_fit.params["log1p_expense_brl"] - full_fitted.params["log1p_expense_brl"]
+            ),
+            "full_ci95_lower": float(full_interval.iloc[0]),
+            "full_ci95_upper": float(full_interval.iloc[1]),
+        })
+    model_diagnostics["top_one_percent_expense_sensitivity"] = tail_sensitivity
+    return prediction_tables, model_diagnostics, calibration_rows, influence_rows
+
+
+
 
 def run_financial_analysis(database_path: Path, validation_path: Path, output_dir: Path) -> dict[str, Any]:
     validation = _read_validation(Path(validation_path))
@@ -426,6 +705,7 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
             raise ValueError("nenhuma candidatura completa para os modelos definidos no protocolo")
         coefficients: list[dict[str, Any]] = []
         models: list[dict[str, Any]] = []
+        fitted_models: dict[str, tuple[Any, pd.DataFrame, str]] = {}
         model_specs = (
             ("deduplicado_completo", "expense_deduplicated_centavos", True, False, True),
             ("todas_as_linhas_completo", "expense_all_lines_centavos", True, False, True),
@@ -441,10 +721,11 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
                 required_columns.extend(["gender", "race", "schooling"])
             selected = frame.loc[frame[required_columns].notna().all(axis=1)].copy()
             selected["log1p_expense_brl"] = selected[expense_column].astype(float).div(100).map(math.log1p)
-            model, estimates = _fit_model(name, selected, full_controls, interaction, include_age)
+            model, estimates, fitted, fitted_frame = _fit_model(name, selected, full_controls, interaction, include_age)
             model["expense_scenario"] = "deduplicado" if "deduplicado" in name else "todas as linhas"
             models.append(model)
             coefficients.extend(estimates)
+            fitted_models[name] = (fitted, fitted_frame, expense_column)
         ols_frame = model_frame.copy()
         ols_frame["log1p_expense_brl"] = ols_frame["expense_deduplicated_centavos"].astype(float).div(100).map(math.log1p)
         ols_frame["log1p_nominal_votes"] = ols_frame["valid_nominal_votes"].astype(float).map(math.log1p)
@@ -456,6 +737,9 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
             model["expense_scenario"] = "deduplicado"
             models.append(model)
             coefficients.extend(estimates)
+        prediction_tables, model_diagnostics, calibration_rows, influence_rows = (
+            _build_prediction_and_diagnostic_tables(fitted_models, model_frame)
+        )
         interaction_model = next(model for model in models if model["name"] == "deduplicado_interacao_sexo")
         gender_counts = model_frame["gender"].value_counts(dropna=False).to_dict()
         gender_analysis_n = int(model_frame["gender"].isin(["FEMININO", "MASCULINO"]).sum())
@@ -547,8 +831,12 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
                 "other_or_missing_gender_excluded_from_interaction": len(model_frame) - gender_analysis_n,
                 "counts_in_main_complete_case": {str(key): int(value) for key, value in gender_counts.items()},
                 "interaction_model": interaction_model["name"],
-                "interpretation": "associação não causal; interaction allows slope to differ for women and men",
+                "interpretation": "associação não causal; a inclinação pode variar entre mulheres e homens",
             },
+            "prediction_tables": prediction_tables,
+            "model_diagnostics": model_diagnostics,
+            "calibration_deciles": calibration_rows,
+            "influence_top_candidates": influence_rows,
             "models": models,
             "coefficients": coefficients,
             "apto_expenses_by_type": apto_rows,
@@ -592,6 +880,31 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
         output_dir / "tse-2022-financial-model-estimates.csv",
         result["coefficients"],
         ["model", "term", "coefficient", "robust_se_hc1", "ci95_low", "ci95_high", "p_value"],
+    )
+    _write_csv(
+        output_dir / "tse-2022-predicted-expense-scenarios.csv",
+        result["prediction_tables"]["scenario_comparison"],
+        ["expense_level", "expense_quantile", "expense_brl", "deduplicated_prediction", "deduplicated_ci95_lower", "deduplicated_ci95_upper", "all_rows_prediction", "all_rows_ci95_lower", "all_rows_ci95_upper", "difference_percentage_points", "standardization_n"],
+    )
+    _write_csv(
+        output_dir / "tse-2022-sex-interaction-curve.csv",
+        result["prediction_tables"]["sex_interaction_curve"]["points"],
+        ["expense_brl", "male_prediction", "male_ci95_lower", "male_ci95_upper", "female_prediction", "female_ci95_lower", "female_ci95_upper", "female_minus_male_percentage_points"],
+    )
+    _write_csv(
+        output_dir / "tse-2022-model-calibration-deciles.csv",
+        result["calibration_deciles"],
+        ["model", "decile", "n", "mean_observed_vote_share", "mean_predicted_vote_share", "calibration_gap"],
+    )
+    _write_csv(
+        output_dir / "tse-2022-model-influence-top-candidates.csv",
+        result["influence_top_candidates"],
+        ["model", "rank", "sq_candidate", "expense_brl", "observed_vote_share", "fitted_vote_share", "cooks_distance", "leverage", "dfbeta_log1p_expense"],
+    )
+    _write_csv(
+        output_dir / "tse-2022-top-one-percent-expense-sensitivity.csv",
+        result["model_diagnostics"]["top_one_percent_expense_sensitivity"],
+        ["scenario", "cutoff_rule", "cutoff_brl", "excluded_candidates", "n_after_exclusion", "full_coefficient", "trimmed_coefficient", "trimmed_ci95_lower", "trimmed_ci95_upper", "coefficient_change", "full_ci95_lower", "full_ci95_upper"],
     )
     submission_fields = [
         "tp_prestacao_contas", "candidate_status_code", "candidate_count",
@@ -684,7 +997,7 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
     for model in models:
         report_lines.append(f"| {model['name']} | {_pt_int(model['n'])} | {model['family']} | {model.get('outcome', 'participação de votos fracionária')} | {', '.join(model['controls'])}{'; interação despesa×mulher' if model['interaction'] else ''} |")
     report_lines.append(
-        f"Diagnóstico dos modelos: {_pt_int(sum(bool(model['converged']) for model in models))}/{_pt_int(len(models))} convergiram; verificações de posto completo passaram. Deviance/AIC dos GLMs e R²/RMSE das sensibilidades OLS estão no JSON."
+        f"Diagnósticos: {_pt_int(sum(bool(model['converged']) for model in models))}/{_pt_int(len(models))} convergiram e todas as matrizes passaram a verificação de posto. Adequação, calibração e influência estão detalhadas abaixo; não há validação externa."
     )
     report_lines.extend([
         "",
@@ -694,6 +1007,76 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
         f"Na interação planejada, a diferença de inclinação mulheres–homens foi {_pt_decimal(female_slope_difference['coefficient'], 3)} na escala logit (IC 95% HC1 {_pt_decimal(female_slope_difference['ci95_low'], 3)} a {_pt_decimal(female_slope_difference['ci95_high'], 3)}). É uma diferença associativa, não causal.",
         "Consulte `tse-2022-financial-model-estimates.csv` para todos os coeficientes e valores-p. GLM está em escala logit; OLS está em escala linear do desfecho informado. As estimativas são associativas, não causais.",
         "",
+    ])
+    report_lines.extend([
+        "",
+        "## Participação prevista em níveis comparáveis de despesa",
+        "",
+        "As previsões são médias padronizadas: fixa-se a despesa no nível indicado e calcula-se a participação de votos prevista para cada candidatura da distribuição comum de controles completos, depois se tira a média. São associações ajustadas, não previsões causais nem resultados eleitorais individuais. ICs de 95% pontuais pelo método delta, usando a covariância sanduíche HC1; não são intervalos para candidaturas individuais. A diferença entre cenários é apresentada em pontos percentuais como diferença de estimativas pontuais, sem IC próprio.",
+        "",
+        "| Despesa contratada | Deduplicado: participação prevista (IC 95%) | Todas as linhas: participação prevista (IC 95%) | Diferença todas − deduplicado (p.p.) |",
+        "|---|---:|---:|---:|",
+    ])
+    for row in prediction_tables["scenario_comparison"]:
+        expense = f"R$ {_pt_decimal(row['expense_brl'], 2)} ({row['expense_level']})"
+        dedup = f"{_pt_decimal(row['deduplicated_prediction'] * 100, 4)}% ({_pt_decimal(row['deduplicated_ci95_lower'] * 100, 4)}–{_pt_decimal(row['deduplicated_ci95_upper'] * 100, 4)}%)"
+        all_lines = f"{_pt_decimal(row['all_rows_prediction'] * 100, 4)}% ({_pt_decimal(row['all_rows_ci95_lower'] * 100, 4)}–{_pt_decimal(row['all_rows_ci95_upper'] * 100, 4)}%)"
+        report_lines.append(
+            f"| {expense} | {dedup} | {all_lines} | {_pt_decimal(row['difference_percentage_points'], 5)} |"
+        )
+    curve = prediction_tables["sex_interaction_curve"]
+    support = curve["common_support"]
+    report_lines.extend([
+        "",
+        "## Comparação mulheres–homens dentro do suporte comum",
+        "",
+        f"A curva usa apenas despesas dentro da interseção das faixas P5–P95 dos dois grupos: R$ {_pt_decimal(support['lower_brl'], 2)} a R$ {_pt_decimal(support['upper_brl'], 2)}. Em cada nível, fixa-se a despesa e alterna-se o sexo na mesma distribuição de controles; os ICs de 95% são pontuais e pelo método delta/HC1.",
+        "Na codificação, homens são a referência (indicador `female=0`); `log1p(despesa)` é a inclinação associativa masculina e `expense_x_female` acrescenta a diferença de inclinação para mulheres na escala logit. A inclinação feminina é a soma dos dois coeficientes. Como o logit inverso é não linear, o coeficiente de interação não equivale a uma porcentagem de gasto necessária; compare as curvas previstas.",
+        "",
+        "| Despesa (R$) | Homens: participação prevista (IC 95%) | Mulheres: participação prevista (IC 95%) | Diferença mulheres − homens (p.p.) |",
+        "|---:|---:|---:|---:|",
+    ])
+    for row in curve["points"]:
+        male = f"{_pt_decimal(row['male_prediction'] * 100, 2)}% ({_pt_decimal(row['male_ci95_lower'] * 100, 2)}–{_pt_decimal(row['male_ci95_upper'] * 100, 2)}%)"
+        female = f"{_pt_decimal(row['female_prediction'] * 100, 2)}% ({_pt_decimal(row['female_ci95_lower'] * 100, 2)}–{_pt_decimal(row['female_ci95_upper'] * 100, 2)}%)"
+        report_lines.append(
+            f"| {_pt_decimal(row['expense_brl'], 2)} | {male} | {female} | {_pt_decimal(row['female_minus_male_percentage_points'], 2)} |"
+        )
+    report_lines.extend([
+        "",
+        "## Adequação do ajuste e influência",
+        "",
+        "RMSE e MAE medem o erro médio entre participação observada e ajustada, em pontos percentuais; a calibração agrupa as previsões em decis e compara médias observadas e previstas. São verificações dentro da própria amostra, não validação fora da amostra. Influência: distância de Cook, alavancagem e DFBETA do coeficiente de despesa. O limite Cook > 4/N é apenas uma triagem heurística; nenhum caso foi excluído automaticamente.",
+        "",
+        "| Cenário | RMSE (p.p.) | MAE (p.p.) | Maior diferença de calibração por decil (p.p.) | Cook > 4/N | Maior Cook | Maior alavancagem | Maior valor absoluto de DFBETA da despesa |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|",
+    ])
+    for model_name in ("deduplicado_completo", "todas_as_linhas_completo"):
+        diagnostic = model_diagnostics[model_name]
+        fit = diagnostic["fit"]
+        influence = diagnostic["influence"]
+        max_dfbeta = influence["maximum_absolute_expense_dfbeta"]
+        report_lines.append(
+            f"| {model_name} | {_pt_decimal(fit['rmse'] * 100, 2)} | {_pt_decimal(fit['mae'] * 100, 2)} | {_pt_decimal(fit['max_absolute_decile_calibration_gap'] * 100, 2)} | {_pt_int(influence['candidates_above_cook_screen'])} (limite {_pt_decimal(influence['cook_distance_screen_threshold'], 4)}) | {_pt_decimal(influence['maximum_cook_distance'], 4)} | {_pt_decimal(influence['maximum_leverage'], 4)} | {_pt_decimal(max_dfbeta, 4)} |"
+        )
+    report_lines.extend([
+        "",
+        "A sensibilidade abaixo remove somente candidaturas acima do P99 da despesa deduplicada, para verificar a estabilidade da inclinação de despesa. A amostra principal permanece intacta; a regra não identifica erro nem gasto indevido. As listas de calibração por decil e os 10 casos de maior Cook por cenário estão nos CSVs de diagnóstico.",
+        "",
+        "| Cenário | Corte P99 (R$) | Excluídos na sensibilidade | N após corte | Coeficiente principal | Coeficiente sem cauda (IC 95% HC1) | Mudança |",
+        "|---|---:|---:|---:|---:|---:|---:|",
+    ])
+    for row in model_diagnostics["top_one_percent_expense_sensitivity"]:
+        trimmed_ci = f"{_pt_decimal(row['trimmed_coefficient'], 3)} ({_pt_decimal(row['trimmed_ci95_lower'], 3)}–{_pt_decimal(row['trimmed_ci95_upper'], 3)})"
+        report_lines.append(
+            f"| {row['scenario']} | {_pt_decimal(row['cutoff_brl'], 2)} | {_pt_int(row['excluded_candidates'])} | {_pt_int(row['n_after_exclusion'])} | {_pt_decimal(row['full_coefficient'], 3)} | {trimmed_ci} | {_pt_decimal(row['coefficient_change'], 3)} |"
+        )
+    report_lines.extend([
+        "",
+        "Arquivos: `tse-2022-predicted-expense-scenarios.csv`, `tse-2022-sex-interaction-curve.csv`, `tse-2022-model-calibration-deciles.csv`, `tse-2022-model-influence-top-candidates.csv` e `tse-2022-top-one-percent-expense-sensitivity.csv`. As curvas mostram médias previstas ajustadas; toda interpretação é associativa.",
+        "",
+    ])
+    report_lines.extend([
         "## INAPTO — levantamento separado por tipo de prestação",
         "",
         f"Entre {_pt_int(inapto_summary['candidate_count'])} candidaturas INAPTO, {_pt_int(inapto_summary['candidates_with_any_expense_rows'])} têm ao menos uma ocorrência e {_pt_int(inapto_summary['candidates_without_any_expense_rows'])} não têm linha de despesa na base. A tabela usa ocorrências intactas e também mostra o cenário deduplicado; não mistura INAPTO à regressão APTO.",

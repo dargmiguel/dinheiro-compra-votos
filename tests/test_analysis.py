@@ -173,6 +173,33 @@ class FinancialAnalysisTests(unittest.TestCase):
         self.assertFalse(result["payment_integration"]["integrated_in_analysis_database"])
         self.assertIn("despesas_pagas_candidatos_2022_SP.csv", result["payment_integration"]["frozen_archive_payment_members"])
         self.assertIn("não bloqueia", result["payment_integration"]["status"])
+        predictions = result["prediction_tables"]
+        scenario_points = predictions["scenario_comparison"]
+        self.assertEqual(len(scenario_points), 3)
+        for point in scenario_points:
+            self.assertLessEqual(point["deduplicated_ci95_lower"], point["deduplicated_prediction"])
+            self.assertLessEqual(point["deduplicated_prediction"], point["deduplicated_ci95_upper"])
+            self.assertLessEqual(point["all_rows_ci95_lower"], point["all_rows_prediction"])
+            self.assertLessEqual(point["all_rows_prediction"], point["all_rows_ci95_upper"])
+            self.assertAlmostEqual(
+                point["difference_percentage_points"],
+                (point["all_rows_prediction"] - point["deduplicated_prediction"]) * 100,
+            )
+        sex_curve = predictions["sex_interaction_curve"]
+        curve_points = sex_curve["points"]
+        self.assertEqual(len(curve_points), 21)
+        self.assertEqual(curve_points[0]["expense_brl"], sex_curve["common_support"]["lower_brl"])
+        self.assertEqual(curve_points[-1]["expense_brl"], sex_curve["common_support"]["upper_brl"])
+        self.assertTrue(all(point["male_ci95_lower"] <= point["male_prediction"] <= point["male_ci95_upper"] for point in curve_points))
+        self.assertTrue(all(point["female_ci95_lower"] <= point["female_prediction"] <= point["female_ci95_upper"] for point in curve_points))
+        diagnostics = result["model_diagnostics"]
+        fit = diagnostics["deduplicado_completo"]["fit"]
+        self.assertEqual(sum(row["n"] for row in fit["calibration_deciles"]), 46)
+        influence = diagnostics["deduplicado_completo"]["influence"]
+        self.assertEqual(influence["cook_distance_screen_threshold"], 4 / 46)
+        self.assertEqual(len(influence["top_influential_candidates"]), 10)
+        self.assertEqual(len(diagnostics["top_one_percent_expense_sensitivity"]), 2)
+        self.assertIn("HC1", predictions["uncertainty_method"])
 
         with (self.output / "tse-2022-apto-expenses-by-type.csv").open(encoding="utf-8", newline="") as handle:
             apto_rows = list(csv.DictReader(handle))

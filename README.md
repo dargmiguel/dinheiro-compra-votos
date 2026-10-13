@@ -8,7 +8,7 @@ O denominador oficial de votos válidos por UF inclui votos nominais e de legend
 
 O tratamento principal deduplica apenas registros iguais nos 53 campos originais do TSE, dentro do mesmo snapshot e membro de origem. A base preserva todas as ocorrências e suas referências; “todas as linhas” é a sensibilidade. Essa é uma escolha metodológica e não confirma identidade econômica oficial das repetições.
 
-O relatório final executado, coeficientes, tabela de denominadores e levantamento INAPTO estão em `reports/tse-2022-financial-analysis.md` e arquivos associados. O relatório exploratório anterior não substitui essa análise. 2026, redes sociais, PJe e backtests são etapas posteriores e não bloqueiam esta entrega.
+O relatório explica participações previstas em níveis comparáveis de despesa, curvas por sexo no suporte comum, diagnósticos de ajuste e influência, e compara as previsões dos dois cenários. Todas as estimativas são associativas. O relatório exploratório anterior não substitui essa análise. 2026, redes sociais, PJe e backtests são etapas posteriores e não bloqueiam esta entrega.
 
 ## Reproduzir o snapshot atual
 
@@ -33,6 +33,11 @@ Para baixar um snapshot novo, execute também `python -m tse_pilot inventory --d
 - [Relatório final de análise financeira](reports/tse-2022-financial-analysis.md)
 - [Denominador oficial de votos válidos por UF](reports/tse-2022-vote-denominator-by-uf.csv)
 - [Estimativas dos modelos](reports/tse-2022-financial-model-estimates.csv)
+- [Participações previstas por nível de despesa](reports/tse-2022-predicted-expense-scenarios.csv)
+- [Curva prevista de mulheres e homens no suporte comum](reports/tse-2022-sex-interaction-curve.csv)
+- [Calibração por decis dos modelos completos](reports/tse-2022-model-calibration-deciles.csv)
+- [Casos de maior influência nos modelos](reports/tse-2022-model-influence-top-candidates.csv)
+- [Sensibilidade ao 1% de maior despesa](reports/tse-2022-top-one-percent-expense-sensitivity.csv)
 - [Despesas de candidaturas INAPTO por prestação](reports/tse-2022-inapto-expenses-by-type.csv)
 - [Resumo detalhado em JSON](reports/tse-2022-financial-analysis.json)
 - [Despesas APTO por tipo de prestação](reports/tse-2022-apto-expenses-by-type.csv)
