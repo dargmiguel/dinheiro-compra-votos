@@ -84,7 +84,7 @@ class FinancialAnalysisTests(unittest.TestCase):
             if index == 3:
                 gender = "NÃO INFORMADO"
             party = f"P{index % 4}"
-            birth = f"{1 + index % 12:02d}/01/{1970 + index % 20}"
+            birth = None if index == 4 else f"{1 + index % 12:02d}/01/{1970 + index % 20}"
             race = ("BRANCA", "PARDA", "PRETA")[index % 3]
             schooling = ("MÉDIO", "SUPERIOR", "FUNDAMENTAL")[(index // 3) % 3]
             connection.execute(
@@ -137,8 +137,9 @@ class FinancialAnalysisTests(unittest.TestCase):
         self.assertEqual(result["expense_scenarios"]["deduplicado"]["observed_zero_candidates"], 1)
         self.assertEqual(result["expense_sensitivity_difference_centavos"], 10250)
         self.assertEqual(result["model_exclusion_reasons"]["apto_without_final_expense"], 1)
-        self.assertEqual(result["model_exclusion_reasons"]["apto_with_missing_controls"], 0)
-        self.assertEqual(sum(result["missing_controls_by_field"].values()), 0)
+        self.assertEqual(result["model_exclusion_reasons"]["apto_with_missing_controls"], 1)
+        self.assertEqual(sum(result["missing_controls_by_field"].values()), 1)
+        self.assertEqual(result["missing_controls_by_field"]["age_at_election"], 1)
         self.assertEqual(result["inapto_expense_survey"]["candidate_count"], 2)
         self.assertEqual(result["expense_scenarios"]["deduplicado"]["absent_candidates"], 1)
         self.assertEqual(result["official_nominal_votes_national_total"], 2430000)
@@ -162,6 +163,11 @@ class FinancialAnalysisTests(unittest.TestCase):
                 "deduplicado_votos_brutos_log1p",
             },
         )
+        reduced_model = next(model for model in result["models"] if model["name"] == "deduplicado_uf_partido")
+        self.assertEqual(reduced_model["controls"], ["UF", "partido"])
+        full_model = next(model for model in result["models"] if model["name"] == "deduplicado_completo")
+        self.assertEqual(full_model["n"], 46)
+        self.assertEqual(reduced_model["n"], 47)
         self.assertTrue(all(model["converged"] for model in result["models"]))
         self.assertIn("expense_x_female", {row["term"] for row in result["coefficients"]})
         self.assertFalse(result["payment_integration"]["integrated_in_analysis_database"])
@@ -190,6 +196,8 @@ class FinancialAnalysisTests(unittest.TestCase):
         self.assertIn("pagamentos", report)
         self.assertIn("48/48 com denominador e votos observados", report)
         self.assertIn("primeiro turno de 2022", report)
+        self.assertIn("modelo de comparação com ajuste apenas por UF/partido, sem idade, usa N=47", report)
+        self.assertIn("Com ajuste somente por UF/partido, sem idade (N=47)", report)
 
     def test_refuses_unapproved_pipeline_validation(self) -> None:
         self.validation.write_text(json.dumps({"status": "blocked"}), encoding="utf-8")

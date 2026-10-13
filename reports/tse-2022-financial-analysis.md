@@ -32,7 +32,8 @@ Os outros tipos são apresentados separados de `Final`; o critério não infere 
 | Regularização da Omissão | 83 | 9.393 | 3.088 | 9.322.087,49 | 3.060 | 9.217.902,19 | 28 | 7 |
 | Relatório Financeiro | 50 | 9.426 | 505 | 1.182.886,44 | 501 | 1.181.586,44 | 4 | 2 |
 
-A regressão usa 9.202 candidaturas com despesas Final observadas, votos e controles completos; 274 APTO ficam fora: 272 sem linha Final, 2 com algum controle ausente (sobreposição 0; campos: age_at_election=2). Zero de despesa e 107 votos nominais iguais a zero são mantidos; ausência de linha não vira zero.
+Modelos completos, interações e sensibilidades OLS usam 9.202 candidaturas com despesas Final, votos e controles completos; 274 APTO ficam fora desses modelos: 272 sem linha Final, 2 com algum controle ausente (sobreposição 0; campos: age_at_election=2). Zero de despesa e 107 votos nominais iguais a zero são mantidos; ausência de linha não vira zero.
+O modelo de comparação com ajuste apenas por UF/partido, sem idade, usa N=9.204.
 Entre APTO, preservar todas as ocorrências soma R$ 3.104.677.701,68; a base principal deduplicada soma R$ 3.076.142.628,75. Diferença: R$ 28.535.072,93; não é classificação de gasto indevido.
 
 ## Modelos estimados
@@ -41,7 +42,7 @@ Entre APTO, preservar todas as ocorrências soma R$ 3.104.677.701,68; a base pri
 |---|---:|---|---|---|
 | deduplicado_completo | 9.202 | quasi-binomial/logit para resposta fracionária | participação de votos fracionária | UF, partido, idade na data da eleição, sexo, raça, escolaridade |
 | todas_as_linhas_completo | 9.202 | quasi-binomial/logit para resposta fracionária | participação de votos fracionária | UF, partido, idade na data da eleição, sexo, raça, escolaridade |
-| deduplicado_uf_partido | 9.202 | quasi-binomial/logit para resposta fracionária | participação de votos fracionária | UF, partido, idade na data da eleição |
+| deduplicado_uf_partido | 9.204 | quasi-binomial/logit para resposta fracionária | participação de votos fracionária | UF, partido |
 | deduplicado_interacao_sexo | 9.202 | quasi-binomial/logit para resposta fracionária | participação de votos fracionária | UF, partido, idade na data da eleição, sexo, raça, escolaridade; interação despesa×mulher |
 | todas_as_linhas_interacao_sexo | 9.202 | quasi-binomial/logit para resposta fracionária | participação de votos fracionária | UF, partido, idade na data da eleição, sexo, raça, escolaridade; interação despesa×mulher |
 | deduplicado_ols_participacao | 9.202 | OLS de sensibilidade | vote_share | UF, partido, idade na data da eleição, sexo, raça, escolaridade |
@@ -50,6 +51,7 @@ Diagnóstico dos modelos: 7/7 convergiram; verificações de posto completo pass
 
 Na amostra completa, 9.202 candidaturas com sexo informado como feminino/masculino entram na interação; 0 com outra categoria/ausente ficam fora apenas dessa comparação.
 No GLM completo, o coeficiente de `log1p(despesa)` foi 0,948 (IC 95% HC1 0,910 a 0,985) no cenário deduplicado e 0,949 (0,912 a 0,986) com todas as linhas. Ambos indicam associação positiva ajustada na escala logit; isso não demonstra que mais despesa cause mais votos.
+Com ajuste somente por UF/partido, sem idade (N=9.204), o coeficiente de `log1p(despesa)` foi 0,972 (IC 95% HC1 0,935 a 1,008).
 Na interação planejada, a diferença de inclinação mulheres–homens foi 0,195 na escala logit (IC 95% HC1 0,120 a 0,269). É uma diferença associativa, não causal.
 Consulte `tse-2022-financial-model-estimates.csv` para todos os coeficientes e valores-p. GLM está em escala logit; OLS está em escala linear do desfecho informado. As estimativas são associativas, não causais.
 

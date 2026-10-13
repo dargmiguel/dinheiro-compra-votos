@@ -211,11 +211,17 @@ def _expense_survey_by_type(
     }
 
 
-def _design_matrix(frame: pd.DataFrame, include_demographics: bool, interaction: bool) -> tuple[pd.DataFrame, list[str]]:
+def _design_matrix(
+    frame: pd.DataFrame,
+    include_demographics: bool,
+    interaction: bool,
+    include_age: bool = True,
+) -> tuple[pd.DataFrame, list[str]]:
     design = pd.DataFrame(index=frame.index)
     design["intercept"] = 1.0
     design["log1p_expense_brl"] = frame["log1p_expense_brl"].astype(float)
-    design["age_at_election"] = frame["age_at_election"].astype(float)
+    if include_age:
+        design["age_at_election"] = frame["age_at_election"].astype(float)
     categorical = ["uf", "party_code"]
     if include_demographics:
         categorical += ["gender", "race", "schooling"]
@@ -236,15 +242,20 @@ def _fit_model(
     frame: pd.DataFrame,
     include_demographics: bool,
     interaction: bool,
+    include_age: bool = True,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     model_frame = frame
     if interaction:
         model_frame = frame[frame["gender"].isin(["FEMININO", "MASCULINO"])].copy()
-    design, categorical = _design_matrix(model_frame, include_demographics, interaction)
+    design, categorical = _design_matrix(model_frame, include_demographics, interaction, include_age)
+    required_controls = ["uf", "party_code"]
+    if include_age:
+        required_controls.append("age_at_election")
     if include_demographics:
-        missing_columns = [column for column in ("uf", "party_code", "age_at_election", "gender", "race", "schooling") if model_frame[column].isna().any()]
-        if missing_columns:
-            raise ValueError(f"amostra do modelo contém controles ausentes: {', '.join(missing_columns)}")
+        required_controls.extend(["gender", "race", "schooling"])
+    missing_columns = [column for column in required_controls if model_frame[column].isna().any()]
+    if missing_columns:
+        raise ValueError(f"amostra do modelo contém controles ausentes: {', '.join(missing_columns)}")
     if np.linalg.matrix_rank(design.to_numpy()) != design.shape[1]:
         raise ValueError(f"matriz do modelo {name} tem colinearidade exata; estimativa não foi publicada")
     fitted = sm.GLM(model_frame["vote_share"], design, family=sm.families.Binomial()).fit(maxiter=100, cov_type="HC1")
@@ -262,13 +273,18 @@ def _fit_model(
             "ci95_high": float(conf.loc[term, 1]),
             "p_value": float(fitted.pvalues[term]),
         })
+    controls = ["UF", "partido"]
+    if include_age:
+        controls.append("idade na data da eleição")
+    if include_demographics:
+        controls.extend(["sexo", "raça", "escolaridade"])
     return {
         "name": name,
         "n": int(fitted.nobs),
         "converged": bool(fitted.converged),
         "covariance": "HC1 robusta",
         "family": "quasi-binomial/logit para resposta fracionária",
-        "controls": ["UF", "partido", "idade na data da eleição"] + (["sexo", "raça", "escolaridade"] if include_demographics else []),
+        "controls": controls,
         "interaction": interaction,
         "deviance": float(fitted.deviance),
         "aic": float(fitted.aic),
@@ -411,16 +427,21 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
         coefficients: list[dict[str, Any]] = []
         models: list[dict[str, Any]] = []
         model_specs = (
-            ("deduplicado_completo", "expense_deduplicated_centavos", True, False),
-            ("todas_as_linhas_completo", "expense_all_lines_centavos", True, False),
-            ("deduplicado_uf_partido", "expense_deduplicated_centavos", False, False),
-            ("deduplicado_interacao_sexo", "expense_deduplicated_centavos", True, True),
-            ("todas_as_linhas_interacao_sexo", "expense_all_lines_centavos", True, True),
+            ("deduplicado_completo", "expense_deduplicated_centavos", True, False, True),
+            ("todas_as_linhas_completo", "expense_all_lines_centavos", True, False, True),
+            ("deduplicado_uf_partido", "expense_deduplicated_centavos", False, False, False),
+            ("deduplicado_interacao_sexo", "expense_deduplicated_centavos", True, True, True),
+            ("todas_as_linhas_interacao_sexo", "expense_all_lines_centavos", True, True, True),
         )
-        for name, expense_column, full_controls, interaction in model_specs:
-            selected = model_frame.copy()
+        for name, expense_column, full_controls, interaction, include_age in model_specs:
+            required_columns = [expense_column, "uf", "party_code"]
+            if include_age:
+                required_columns.append("age_at_election")
+            if full_controls:
+                required_columns.extend(["gender", "race", "schooling"])
+            selected = frame.loc[frame[required_columns].notna().all(axis=1)].copy()
             selected["log1p_expense_brl"] = selected[expense_column].astype(float).div(100).map(math.log1p)
-            model, estimates = _fit_model(name, selected, full_controls, interaction)
+            model, estimates = _fit_model(name, selected, full_controls, interaction, include_age)
             model["expense_scenario"] = "deduplicado" if "deduplicado" in name else "todas as linhas"
             models.append(model)
             coefficients.extend(estimates)
@@ -595,6 +616,11 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
         estimate for estimate in result["coefficients"]
         if estimate["model"] == "todas_as_linhas_completo" and estimate["term"] == "log1p_expense_brl"
     )
+    reduced_expense_estimate = next(
+        estimate for estimate in result["coefficients"]
+        if estimate["model"] == "deduplicado_uf_partido" and estimate["term"] == "log1p_expense_brl"
+    )
+    reduced_model_n = next(model["n"] for model in models if model["name"] == "deduplicado_uf_partido")
     female_slope_difference = next(
         estimate for estimate in result["coefficients"]
         if estimate["model"] == "deduplicado_interacao_sexo" and estimate["term"] == "expense_x_female"
@@ -646,7 +672,8 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
         )
     report_lines.extend([
         "",
-        f"A regressão usa {_pt_int(len(model_frame))} candidaturas com despesas Final observadas, votos e controles completos; {_pt_int(len(apto) - len(model_frame))} APTO ficam fora: {_pt_int(int(missing_final_expense.sum()))} sem linha Final, {_pt_int(int(missing_controls.sum()))} com algum controle ausente (sobreposição {_pt_int(exclusion_overlap)}; campos: {missing_control_summary}). Zero de despesa e {_pt_int(zero_nominal_votes_apto)} votos nominais iguais a zero são mantidos; ausência de linha não vira zero.",
+        f"Modelos completos, interações e sensibilidades OLS usam {_pt_int(len(model_frame))} candidaturas com despesas Final, votos e controles completos; {_pt_int(len(apto) - len(model_frame))} APTO ficam fora desses modelos: {_pt_int(int(missing_final_expense.sum()))} sem linha Final, {_pt_int(int(missing_controls.sum()))} com algum controle ausente (sobreposição {_pt_int(exclusion_overlap)}; campos: {missing_control_summary}). Zero de despesa e {_pt_int(zero_nominal_votes_apto)} votos nominais iguais a zero são mantidos; ausência de linha não vira zero.",
+        f"O modelo de comparação com ajuste apenas por UF/partido, sem idade, usa N={_pt_int(next(model['n'] for model in models if model['name'] == 'deduplicado_uf_partido'))}.",
         f"Entre APTO, preservar todas as ocorrências soma R$ {_pt_brl_centavos(expense_scenarios['todas_as_linhas']['total_centavos'])}; a base principal deduplicada soma R$ {_pt_brl_centavos(expense_scenarios['deduplicado']['total_centavos'])}. Diferença: R$ {_pt_brl_centavos(expense_sensitivity_difference_centavos)}; não é classificação de gasto indevido.",
         "",
         "## Modelos estimados",
@@ -663,6 +690,7 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
         "",
         f"Na amostra completa, {_pt_int(gender_analysis_n)} candidaturas com sexo informado como feminino/masculino entram na interação; {_pt_int(len(model_frame) - gender_analysis_n)} com outra categoria/ausente ficam fora apenas dessa comparação.",
         f"No GLM completo, o coeficiente de `log1p(despesa)` foi {_pt_decimal(main_expense_estimate['coefficient'], 3)} (IC 95% HC1 {_pt_decimal(main_expense_estimate['ci95_low'], 3)} a {_pt_decimal(main_expense_estimate['ci95_high'], 3)}) no cenário deduplicado e {_pt_decimal(all_rows_expense_estimate['coefficient'], 3)} ({_pt_decimal(all_rows_expense_estimate['ci95_low'], 3)} a {_pt_decimal(all_rows_expense_estimate['ci95_high'], 3)}) com todas as linhas. Ambos indicam associação positiva ajustada na escala logit; isso não demonstra que mais despesa cause mais votos.",
+        f"Com ajuste somente por UF/partido, sem idade (N={_pt_int(reduced_model_n)}), o coeficiente de `log1p(despesa)` foi {_pt_decimal(reduced_expense_estimate['coefficient'], 3)} (IC 95% HC1 {_pt_decimal(reduced_expense_estimate['ci95_low'], 3)} a {_pt_decimal(reduced_expense_estimate['ci95_high'], 3)}).",
         f"Na interação planejada, a diferença de inclinação mulheres–homens foi {_pt_decimal(female_slope_difference['coefficient'], 3)} na escala logit (IC 95% HC1 {_pt_decimal(female_slope_difference['ci95_low'], 3)} a {_pt_decimal(female_slope_difference['ci95_high'], 3)}). É uma diferença associativa, não causal.",
         "Consulte `tse-2022-financial-model-estimates.csv` para todos os coeficientes e valores-p. GLM está em escala logit; OLS está em escala linear do desfecho informado. As estimativas são associativas, não causais.",
         "",
