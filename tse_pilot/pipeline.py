@@ -9,7 +9,11 @@ import sqlite3
 import zipfile
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
+
+from .acquisition import sha256_matches
 from typing import Iterable
+
+from .acquisition import sha256_matches
 
 
 UF_CODES = {
@@ -480,8 +484,26 @@ def _load_manifest(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _verify_frozen_sources(manifest: dict) -> None:
+    resources = {
+        resource.get("resource_key"): resource
+        for resource in manifest.get("resources", [])
+    }
+    for resource_key in (*SOURCE_PREFIXES, "vote_totals_2022"):
+        resource = resources.get(resource_key)
+        if resource is None:
+            raise PipelineError(f"arquivo congelado ausente no manifesto: {resource_key}")
+        path = Path(resource.get("local_path", ""))
+        expected_hash = resource.get("file", {}).get("sha256")
+        if not sha256_matches(path, expected_hash):
+            raise PipelineError(
+                f"arquivo ZIP congelado ausente ou SHA-256 divergente: {resource_key} ({path})"
+            )
+
+
 def run_pipeline(manifest_path: Path, output_dir: Path) -> dict:
     manifest = _load_manifest(Path(manifest_path))
+    _verify_frozen_sources(manifest)
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     approved_artifacts = (

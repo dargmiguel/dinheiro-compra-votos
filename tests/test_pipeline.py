@@ -1,4 +1,5 @@
 import csv
+import hashlib
 import json
 import sqlite3
 import tempfile
@@ -7,7 +8,7 @@ import zipfile
 from pathlib import Path
 
 from tse_pilot.duplicates import analyze_duplicate_expenses
-from tse_pilot.pipeline import materialize_deduplicated_expenses, run_pipeline
+from tse_pilot.pipeline import PipelineError, materialize_deduplicated_expenses, run_pipeline
 
 
 class PilotPipelineTests(unittest.TestCase):
@@ -29,7 +30,14 @@ class PilotPipelineTests(unittest.TestCase):
             ("votes_2022", votes),
             ("vote_totals_2022", party_votes),
         ):
-            resources.append({"resource_key": key, "local_path": str(path)})
+            resources.append({
+                "resource_key": key,
+                "local_path": str(path),
+                "file": {
+                    "size_bytes": path.stat().st_size,
+                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                },
+            })
         manifest = {"manifest_id": "fixture", "election": 2022, "resources": resources}
         path = Path(directory) / "manifest.json"
         path.write_text(json.dumps(manifest), encoding="utf-8")
@@ -110,6 +118,24 @@ class PilotPipelineTests(unittest.TestCase):
             self.assertEqual(by_candidate["2"]["expense_observation"], "absent")
             self.assertEqual(by_candidate["2"]["valid_nominal_votes"], "0")
             self.assertEqual(by_candidate["2"]["vote_observation"], "observed_zero")
+
+
+    def test_rejects_source_archive_changed_since_manifest_was_frozen(self):
+        with tempfile.TemporaryDirectory() as directory:
+            manifest_path = self._fixture(directory)
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            accounts = next(
+                resource for resource in manifest["resources"]
+                if resource["resource_key"] == "accounts_2022"
+            )
+            archive_path = Path(accounts["local_path"])
+            archive_path.write_bytes(archive_path.read_bytes() + b"modified")
+            output_dir = Path(directory) / "derived"
+
+            with self.assertRaisesRegex(PipelineError, "SHA-256"):
+                run_pipeline(manifest_path, output_dir)
+
+            self.assertFalse(output_dir.exists())
 
     def test_raw_expense_occurrences_keep_full_rows_and_source_references(self):
         with tempfile.TemporaryDirectory() as directory:

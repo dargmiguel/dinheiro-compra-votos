@@ -81,7 +81,7 @@ def freeze_vote_totals_2022(
     if existing is not None:
         frozen_path = Path(existing["local_path"])
         expected_hash = existing.get("file", {}).get("sha256")
-        if frozen_path.is_file() and expected_hash and _sha256(frozen_path) == expected_hash:
+        if sha256_matches(frozen_path, expected_hash):
             return manifest_path
         raise AcquisitionError("recurso de votos já está no manifesto, mas o arquivo congelado não confere")
 
@@ -142,6 +142,10 @@ def _sha256(path: Path, chunk_size: int = 1024 * 1024) -> str:
         for chunk in iter(lambda: handle.read(chunk_size), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+def sha256_matches(path: Path, expected_hash: str | None) -> bool:
+    path = Path(path)
+    return bool(expected_hash) and path.is_file() and _sha256(path) == expected_hash
 
 
 def build_manifest_entry(
