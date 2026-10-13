@@ -1,0 +1,5 @@
+tp_prestacao_contas,candidate_status_code,candidate_count,candidates_with_rows,candidates_without_rows,candidates_with_zero_total,all_lines_occurrence_rows,all_lines_zero_amount_rows,all_lines_declared_expense_centavos,deduplicated_occurrence_rows,deduplicated_candidates_with_rows,deduplicated_declared_expense_centavos,excluded_occurrence_rows,excluded_amount_centavos,excluded_affected_candidates
+Final,3,1154,942,212,687,14515,687,3826127482,14356,942,3799801202,159,26326280,34
+Parcial,3,1154,19,1135,15,40,15,12685850,40,19,12685850,0,0,0
+Regularização da Omissão,3,1154,20,1134,18,289,18,30222569,289,20,30222569,0,0,0
+Relatório Financeiro,3,1154,11,1143,10,19,10,2941000,19,11,2941000,0,0,0

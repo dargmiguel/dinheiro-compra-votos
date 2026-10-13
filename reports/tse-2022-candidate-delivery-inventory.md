@@ -106,7 +106,7 @@ Com os campos e o snapshot atual, o projeto consegue calcular, separadamente:
 
 1. **Soma bruta de `VR_DESPESA_CONTRATADA` por candidato e entrega**, sem afirmar que é `Gastos Financeiros`.
 2. **Soma por tipo de entrega**, separando `Final`, `Parcial`, `Regularização da Omissão` e `Relatório Financeiro`.
-3. **Cenário preservando todas as linhas** e **cenário removendo somente repetições exatas**, ambos apenas diagnósticos.
+3. **Tratamento principal com deduplicação exata** e **sensibilidade preservando todas as linhas**, ambos medidos e documentados.
 4. **Número de linhas, documentos, assinaturas repetidas e impacto absoluto/relativo** por candidato.
 5. **Ausência versus zero**, mantendo candidato sem linha como `absent` e linha com valor zero como `observed_zero`.
 6. **Soma de votos nominais válidos** na granularidade município/zona, sem converter ausência em zero.
@@ -134,9 +134,9 @@ A definição segura neste estágio é: **despesa contratada declarada observada
    python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --output reports/tse-2022-duplicate-diagnostics.json
    ```
 
-6. Leia `data/derived/2022/validation.json`: o status deve continuar `blocked` por `duplicate_expense_rows = 21874`; as demais regras críticas do snapshot não apresentaram falha fatal.
-7. Confirme que não existem `analytical_base.csv`, `expense_aggregate.csv` ou `vote_aggregate.csv` no diretório derivado bloqueado.
+6. Leia `data/derived/2022/validation.json`: repetições de 53 campos idênticos no mesmo snapshot/membro são excluídas da base principal e registradas em `expense_dedup_exclusions`; sozinhas, não bloqueiam a validação.
+7. Confirme `expense_occurrences` preserva todas as linhas e que `analytical_base.csv` é emitida somente quando as validações restantes passam.
 
 ## Estado de aprovação
 
-A base financeira continua bloqueada. O inventário de situações e entregas reduz uma ambiguidade — cada candidato com contas nos dois conjuntos consultados tem uma única identidade de entrega no snapshot — mas não resolve a identidade econômica das linhas repetidas nem a semântica de `Gastos Financeiros`.
+A validação de dados pode ser aprovada sob a regra metodológica de deduplicação agora escolhida, sem declarar confirmação oficial da identidade econômica das repetições. População, entregas, medida, denominador e controles permanecem em aberto em [Fixar o protocolo da análise financeira do piloto TSE 2022](https://github.com/dargmiguel/dinheiro-compra-votos/issues/11); não implementar o modelo até fechar esse ticket.

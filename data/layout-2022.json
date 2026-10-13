@@ -1598,6 +1598,273 @@
           }
         }
       }
+    },
+    {
+      "resource_key": "vote_totals_2022",
+      "resource_id": "ffb14f0e-85eb-4618-8031-7cb88f95e05e",
+      "local_path": "data/raw/2022/20261008T154908Z/votacao_partido_munzona_2022.zip",
+      "archive": {
+        "archive_name": "votacao_partido_munzona_2022.zip",
+        "member_count": 30,
+        "table_member_count": 29,
+        "members": [
+          {
+            "name": "votacao_partido_munzona_2022_BA.csv",
+            "size_bytes": 10992217,
+            "compressed_size_bytes": 731472,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_TO.csv",
+            "size_bytes": 2945786,
+            "compressed_size_bytes": 164588,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_SP.csv",
+            "size_bytes": 22677424,
+            "compressed_size_bytes": 1494605,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_SE.csv",
+            "size_bytes": 1627269,
+            "compressed_size_bytes": 85947,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_DF.csv",
+            "size_bytes": 557653,
+            "compressed_size_bytes": 27783,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_SC.csv",
+            "size_bytes": 8111938,
+            "compressed_size_bytes": 507757,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_ES.csv",
+            "size_bytes": 2011290,
+            "compressed_size_bytes": 114849,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_PB.csv",
+            "size_bytes": 5301270,
+            "compressed_size_bytes": 323957,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_RS.csv",
+            "size_bytes": 13540650,
+            "compressed_size_bytes": 858487,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_RR.csv",
+            "size_bytes": 346473,
+            "compressed_size_bytes": 16728,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_BR.csv",
+            "size_bytes": 27635361,
+            "compressed_size_bytes": 1826311,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_RO.csv",
+            "size_bytes": 1129146,
+            "compressed_size_bytes": 57474,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_RN.csv",
+            "size_bytes": 4039949,
+            "compressed_size_bytes": 234977,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_RJ.csv",
+            "size_bytes": 4906774,
+            "compressed_size_bytes": 298831,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_AP.csv",
+            "size_bytes": 327085,
+            "compressed_size_bytes": 16084,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_MG.csv",
+            "size_bytes": 24843406,
+            "compressed_size_bytes": 1645900,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_MS.csv",
+            "size_bytes": 2033158,
+            "compressed_size_bytes": 109109,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_MA.csv",
+            "size_bytes": 5254751,
+            "compressed_size_bytes": 335687,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_MT.csv",
+            "size_bytes": 2839639,
+            "compressed_size_bytes": 163536,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_AM.csv",
+            "size_bytes": 1649225,
+            "compressed_size_bytes": 87387,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_GO.csv",
+            "size_bytes": 6782541,
+            "compressed_size_bytes": 427349,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_PE.csv",
+            "size_bytes": 5703275,
+            "compressed_size_bytes": 354403,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_PI.csv",
+            "size_bytes": 4271914,
+            "compressed_size_bytes": 257467,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_PR.csv",
+            "size_bytes": 10835126,
+            "compressed_size_bytes": 703642,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_CE.csv",
+            "size_bytes": 4399505,
+            "compressed_size_bytes": 268378,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_PA.csv",
+            "size_bytes": 3703729,
+            "compressed_size_bytes": 227850,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_AL.csv",
+            "size_bytes": 2247062,
+            "compressed_size_bytes": 127567,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_AC.csv",
+            "size_bytes": 445216,
+            "compressed_size_bytes": 20357,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "votacao_partido_munzona_2022_BRASIL.csv",
+            "size_bytes": 181140715,
+            "compressed_size_bytes": 14550928,
+            "is_table": true,
+            "layout_id": "layout_1"
+          },
+          {
+            "name": "leiame.pdf",
+            "size_bytes": 118902,
+            "compressed_size_bytes": 106718,
+            "is_table": false
+          }
+        ],
+        "layouts": {
+          "layout_1": {
+            "encoding": "latin-1",
+            "delimiter": ";",
+            "columns": [
+              "DT_GERACAO",
+              "HH_GERACAO",
+              "ANO_ELEICAO",
+              "CD_TIPO_ELEICAO",
+              "NM_TIPO_ELEICAO",
+              "NR_TURNO",
+              "CD_ELEICAO",
+              "DS_ELEICAO",
+              "DT_ELEICAO",
+              "TP_ABRANGENCIA",
+              "SG_UF",
+              "SG_UE",
+              "NM_UE",
+              "CD_MUNICIPIO",
+              "NM_MUNICIPIO",
+              "NR_ZONA",
+              "CD_CARGO",
+              "DS_CARGO",
+              "TP_AGREMIACAO",
+              "NR_PARTIDO",
+              "SG_PARTIDO",
+              "NM_PARTIDO",
+              "NR_FEDERACAO",
+              "NM_FEDERACAO",
+              "SG_FEDERACAO",
+              "DS_COMPOSICAO_FEDERACAO",
+              "SQ_COLIGACAO",
+              "NM_COLIGACAO",
+              "DS_COMPOSICAO_COLIGACAO",
+              "ST_VOTO_EM_TRANSITO",
+              "QT_VOTOS_LEGENDA_VALIDOS",
+              "QT_VOTOS_NOM_CONVR_LEG_VALIDOS",
+              "QT_TOTAL_VOTOS_LEG_VALIDOS",
+              "QT_VOTOS_NOMINAIS_VALIDOS",
+              "QT_VOTOS_LEGENDA_ANUL_SUBJUD",
+              "QT_VOTOS_NOMINAIS_ANUL_SUBJUD",
+              "QT_VOTOS_LEGENDA_ANULADOS",
+              "QT_VOTOS_NOMINAIS_ANULADOS"
+            ]
+          }
+        }
+      }
     }
   ]
 }

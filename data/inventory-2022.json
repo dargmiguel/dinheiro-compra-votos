@@ -35,6 +35,17 @@
       "filename": "votacao_candidato_munzona_2022.zip",
       "format": "CSV dentro de ZIP",
       "scope": "Brasil / todas as UFs"
+    },
+    {
+      "key": "vote_totals_2022",
+      "dataset": "resultados-2022",
+      "resource_id": "ffb14f0e-85eb-4618-8031-7cb88f95e05e",
+      "resource_name": "Votação em partido por município e zona",
+      "role": "denominador oficial de votos válidos nominais e de legenda",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_partido_munzona/votacao_partido_munzona_2022.zip",
+      "filename": "votacao_partido_munzona_2022.zip",
+      "format": "CSV dentro de ZIP",
+      "scope": "Brasil / todas as UFs"
     }
   ]
 }

@@ -53,6 +53,76 @@ CORE_RESOURCES: tuple[ResourceSpec, ...] = (
     ),
 )
 
+VOTE_TOTALS_RESOURCE_2022 = ResourceSpec(
+    key="vote_totals_2022",
+    dataset="resultados-2022",
+    resource_id="ffb14f0e-85eb-4618-8031-7cb88f95e05e",
+    resource_name="Votação em partido por município e zona",
+    role="denominador oficial de votos válidos nominais e de legenda",
+    url="https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_partido_munzona/votacao_partido_munzona_2022.zip",
+    filename="votacao_partido_munzona_2022.zip",
+)
+
+ALL_RESOURCES = (*CORE_RESOURCES, VOTE_TOTALS_RESOURCE_2022)
+
+
+def freeze_vote_totals_2022(
+    manifest_path: Path,
+    *,
+    now: datetime | None = None,
+    opener: Callable[..., BinaryIO] = urlopen,
+) -> Path:
+    manifest_path = Path(manifest_path)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    existing = next(
+        (item for item in manifest["resources"] if item["resource_key"] == VOTE_TOTALS_RESOURCE_2022.key),
+        None,
+    )
+    if existing is not None:
+        frozen_path = Path(existing["local_path"])
+        expected_hash = existing.get("file", {}).get("sha256")
+        if frozen_path.is_file() and expected_hash and _sha256(frozen_path) == expected_hash:
+            return manifest_path
+        raise AcquisitionError("recurso de votos já está no manifesto, mas o arquivo congelado não confere")
+
+    candidate = next(
+        (item for item in manifest["resources"] if item["resource_key"] == "candidates_2022"),
+        None,
+    )
+    if candidate is None:
+        raise AcquisitionError("manifesto sem arquivo congelado de candidaturas para localizar o snapshot")
+    target = Path(candidate["local_path"]).parent / VOTE_TOTALS_RESOURCE_2022.filename
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        raise AcquisitionError(f"arquivo de destino já existe fora do manifesto: {target}")
+
+    timestamp = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    downloaded_at = timestamp.isoformat().replace("+00:00", "Z")
+    request = Request(VOTE_TOTALS_RESOURCE_2022.url, headers={"User-Agent": "dinheiro-compra-votos/0.1"})
+    partial = target.with_suffix(target.suffix + ".part")
+    try:
+        with opener(request) as response, partial.open("wb") as output:
+            shutil.copyfileobj(response, output, length=1024 * 1024)
+            headers = dict(response.headers.items())
+    except Exception as exc:  # pragma: no cover - exercised by the real network run
+        if partial.exists():
+            partial.unlink()
+        raise AcquisitionError(f"falha ao congelar total oficial de votos: {exc}") from exc
+    partial.replace(target)
+    manifest["resources"].append(
+        build_manifest_entry(
+            VOTE_TOTALS_RESOURCE_2022,
+            target,
+            downloaded_at=downloaded_at,
+            response_headers=headers,
+        )
+    )
+    temporary = manifest_path.with_suffix(manifest_path.suffix + ".part")
+    temporary.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(manifest_path)
+    return manifest_path
+
+
 
 class AcquisitionError(RuntimeError):
     """Raised when a source cannot be frozen without losing provenance."""
@@ -120,7 +190,7 @@ def refresh_manifest(manifest_path: Path) -> Path:
     return manifest_path
 
 
-def inventory_document(resources: Iterable[ResourceSpec] = CORE_RESOURCES) -> dict:
+def inventory_document(resources: Iterable[ResourceSpec] = ALL_RESOURCES) -> dict:
     return {
         "schema_version": 1,
         "election": 2022,
@@ -129,7 +199,7 @@ def inventory_document(resources: Iterable[ResourceSpec] = CORE_RESOURCES) -> di
     }
 
 
-def write_inventory(data_root: Path, resources: Iterable[ResourceSpec] = CORE_RESOURCES) -> Path:
+def write_inventory(data_root: Path, resources: Iterable[ResourceSpec] = ALL_RESOURCES) -> Path:
     path = data_root / "inventory-2022.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(inventory_document(resources), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -152,7 +222,7 @@ def acquire_core(
     manifest_dir.mkdir(parents=True, exist_ok=True)
 
     entries: list[dict] = []
-    for resource in CORE_RESOURCES:
+    for resource in ALL_RESOURCES:
         target = raw_dir / resource.filename
         request = Request(resource.url, headers={"User-Agent": "dinheiro-compra-votos/0.1"})
         try:

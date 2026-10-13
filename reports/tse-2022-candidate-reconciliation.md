@@ -1,15 +1,15 @@
 # Conciliação de candidatos — TSE 2022
 
-**Status:** a aprovação da base financeira permanece bloqueada. Este relatório separa revisão técnica do pipeline, evidência oficial de referência e evidência independente.
+A análise em curso adota a igualdade exata nos 53 campos originais como tratamento principal, conforme escolha metodológica do usuário. As repetições não impedem a aprovação por si só; as demais validações continuam obrigatórias. O protocolo analítico completo permanece pendente.
 
 ## Objetivo e escopo
 
-A investigação compara, por candidato a deputado federal no primeiro turno de 2022, dois cenários diagnósticos para as 21.874 repetições exatas:
+O diagnóstico compara, por candidato a deputado federal no primeiro turno de 2022, a regra escolhida para as repetições exatas no snapshot congelado:
 
-- **preservar todas as linhas:** linhas canônicas mais as linhas marcadas como repetição exata;
-- **remover repetições exatas:** somente as linhas canônicas usadas pelo diagnóstico.
+- **deduplicar integralmente iguais (principal):** uma ocorrência por grupo de igualdade nos 53 campos originais, dentro do mesmo snapshot/membro;
+- **preservar todas as ocorrências (sensibilidade):** manter também as repetições exatas, sem alterar a tabela de ocorrências de origem.
 
-A igualdade é textual em todos os campos do leiaute. `source_member` e `source_row` preservam a origem física, mas não definem a identidade econômica da despesa. Nenhum cenário foi aprovado, e a escolha não usa votos nem correlação gasto-voto.
+Essa escolha metodológica ignora colunas de auditoria e não usa `SQ_DESPESA` nem `NR_DOCUMENTO` como chave. Ela não confirma a identidade econômica oficial das repetições e não foi escolhida pela associação com votos.
 
 ## Fonte congelada e comparabilidade
 
@@ -29,7 +29,7 @@ O membro `BRASIL` é outra representação oficial dentro do mesmo ZIP e da mesm
 
 A amostra combina alto impacto absoluto, alto impacto relativo e controles sem repetição exata. Os identificadores `SQ_CANDIDATO`, nomes, números e UFs vêm das tabelas canônicas locais; o valor relativo é `diferença / preservar todas as linhas`.
 
-| Papel | SQ_CANDIDATO | Candidato — número / UF | Linhas repetidas | Documentos afetados | Remover exatas | Preservar todas | Diferença | Impacto relativo |
+| Papel | SQ_CANDIDATO | Candidato — número / UF | Linhas repetidas | Documentos afetados | Deduplicação principal | Sensibilidade: preservar | Diferença | Impacto relativo |
 |---|---|---|---:|---:|---:|---:|---:|---:|
 | Alto absoluto | `60001603454` | Denis Anderson da Rocha Bezerra — 4000 / CE | 178 | 26 | R$ 2.141.449,89 | R$ 2.702.387,94 | R$ 560.938,05 | 20,7571% |
 | Alto absoluto | `130001607568` | Weliton Fernandes Prado — 9090 / MG | 162 | 21 | R$ 2.363.750,62 | R$ 2.915.000,00 | R$ 551.249,38 | 18,9108% |
@@ -40,13 +40,13 @@ A amostra combina alto impacto absoluto, alto impacto relativo e controles sem r
 | Controle | `250001610668` | Luiz Paulo Teixeira Ferreira — 1398 / SP | 0 | 0 | R$ 3.263.156,41 | R$ 3.263.156,41 | R$ 0,00 | 0,0000% |
 | Controle | `190001619524` | Danielle Dytz da Cunha — 4477 / RJ | 0 | 0 | R$ 3.205.558,61 | R$ 3.205.558,61 | R$ 0,00 | 0,0000% |
 
-Os dois cenários são diagnósticos sobre o snapshot bloqueado. O primeiro candidato, por exemplo, tem 178 ocorrências adicionais iguais, mas isso não demonstra que elas sejam indevidas; mede apenas o quanto a decisão alteraria seu total.
+Os valores comparam o tratamento principal deduplicado à sensibilidade que preserva todas as linhas; as 178 ocorrências excedentes do primeiro candidato quantificam a diferença do tratamento, não demonstram que qualquer lançamento seja indevido.
 
 ## Comparação com o membro oficial `BRASIL`
 
 Para cada candidato, foi aplicado o mesmo filtro de eleição, turno e cargo ao membro `despesas_contratadas_candidatos_2022_BRASIL.csv`. A coluna “total oficial de referência” é a soma publicada de `VR_DESPESA_CONTRATADA` nesse membro, sem deduplicação adicional.
 
-| SQ_CANDIDATO | Linhas no membro BRASIL | Total oficial de referência | Cenário preservando todas | Diferença |
+| SQ_CANDIDATO | Linhas no membro BRASIL | Total oficial de referência | Sensibilidade: preservar todas | Diferença |
 |---|---:|---:|---:|---:|
 | `60001603454` | 693 | R$ 2.702.387,94 | R$ 2.702.387,94 | R$ 0,00 |
 | `130001607568` | 1.654 | R$ 2.915.000,00 | R$ 2.915.000,00 | R$ 0,00 |
@@ -124,13 +124,13 @@ Ela é insuficiente para:
 
 ## Recomendação técnica
 
-Manter o bloqueio da base financeira. O código está tecnicamente revisável: a aquisição é manifestada, as linhas e suas origens são preservadas, as regras críticas têm 10 testes aprovados e a execução bloqueada remove artefatos aprovados anteriores. A pendência é metodológica e semântica, não uma falha técnica identificada que impeça a revisão do código.
+O pipeline agora documenta e aplica a escolha metodológica informada pelo usuário: deduplicar somente igualdade integral nos campos originais, dentro do mesmo snapshot/membro, preservando todas as ocorrências e referências na fonte derivada. A regra não confirma a identidade econômica oficial das repetições e não foi escolhida pela associação com votos.
 
-Não deduplicar automaticamente. Não escolher o tratamento pela associação com votos. O próximo passo concreto é enviar a pergunta pronta em `reports/pergunta-tse-repeticoes-e-conciliacao.md` e obter do TSE a regra de identidade da linha, a política de entregas/retificações e a definição que liga `VR_DESPESA_CONTRATADA` ao comparativo público.
+O próximo passo concreto é fechar as decisões restantes em [Fixar o protocolo da análise financeira do piloto TSE 2022](https://github.com/dargmiguel/dinheiro-compra-votos/issues/11). Nenhum modelo será implementado até definir população, prestações, medida, denominador, tratamento de zeros e controles disponíveis.
 
 ## Fontes
 
 - [Relatório de semântica das repetições](../docs/research/tse-2022-despesas-repeticoes.md)
 - [Conciliação pública e tentativa no DivulgaCandContas](../docs/research/tse-2022-conciliacao-publica-candidatos.md)
 - [Manifesto congelado](../data/manifests/manifest-20261008T154908Z.json)
-- [Relatório de validação bloqueada](tse-2022-pilot-validation-blocked.md)
+- [Análise de deduplicação e validação](tse-2022-deduplication-analysis.md)

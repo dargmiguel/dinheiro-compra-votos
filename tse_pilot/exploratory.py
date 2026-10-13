@@ -15,8 +15,8 @@ from typing import Iterable
 
 from .pipeline import FEDERAL_CARGO, UF_CODES
 
-SCENARIO_A = "A_preservar_todas_as_linhas"
-SCENARIO_B = "B_remover_repeticoes_completas_exatas"
+SCENARIO_DEDUPLICATED = "deduplicado_principal"
+SCENARIO_ALL_ROWS = "todas_as_linhas_sensibilidade"
 CSV_COLUMN_NAMES = {
     "sq_candidate": "sq_candidato",
     "uf": "uf",
@@ -38,13 +38,13 @@ CSV_COLUMN_NAMES = {
     "valid_nominal_votes": "votos_nominais_validos",
     "vote_observation": "observacao_votacao",
     "cost_per_vote_brl": "custo_por_voto_reais",
-    "expense_a_centavos": "despesa_cenario_a_centavos",
-    "expense_b_centavos": "despesa_cenario_b_centavos",
-    "difference_centavos": "diferenca_centavos",
-    "difference_relative_to_a": "diferenca_relativa_ao_cenario_a",
-    "cost_per_vote_a_brl": "custo_por_voto_reais_cenario_a",
-    "cost_per_vote_b_brl": "custo_por_voto_reais_cenario_b",
-    "exact_repeat_rows_a": "repeticoes_exatas_cenario_a",
+    "expense_deduplicated_centavos": "despesa_tratamento_deduplicado_centavos",
+    "expense_all_rows_centavos": "despesa_todas_as_linhas_centavos",
+    "difference_all_rows_minus_deduplicated_centavos": "diferenca_todas_as_linhas_menos_deduplicado_centavos",
+    "difference_relative_to_deduplicated": "diferenca_relativa_ao_deduplicado",
+    "cost_per_vote_deduplicated_brl": "custo_por_voto_reais_deduplicado",
+    "cost_per_vote_all_rows_brl": "custo_por_voto_reais_todas_as_linhas",
+    "exact_repeat_rows_all_rows_sensitivity": "repeticoes_exatas_todas_as_linhas_sensibilidade",
     "scenario": "cenario",
     "measure": "medida",
     "count_observed": "quantidade_observada",
@@ -95,13 +95,20 @@ def _portuguese_value(field: str, value: object) -> object:
 GENERATED_FILES = (
     "exploratory_metadata.json",
     "exploratory_candidates.csv",
-    "exploratory_scenario_a_preserve_all.csv",
-    "exploratory_scenario_b_remove_exact_repeats.csv",
-    "exploratory_scenario_comparison.csv",
+    "exploratory_deduplicated_primary.csv",
+    "exploratory_all_rows_sensitivity.csv",
+    "exploratory_deduplicated_vs_all_rows.csv",
     "exploratory_cost_per_vote.csv",
     "exploratory_distributions.csv",
     "exploratory_uf_associations.csv",
     "exploratory_report.md",
+)
+OBSOLETE_FILES = (
+    "exploratory_scenario_a_deduplicated_primary.csv",
+    "exploratory_scenario_b_preserve_all_sensitivity.csv",
+    "exploratory_scenario_comparison.csv",
+    "exploratory_scenario_a_preserve_all.csv",
+    "exploratory_scenario_b_remove_exact_repeats.csv",
 )
 
 
@@ -232,14 +239,12 @@ def _spearman(pairs: list[tuple[int, int]]) -> str:
 
 def _load_validation(validation_path: Path) -> dict:
     validation = json.loads(Path(validation_path).read_text(encoding="utf-8"))
-    if validation.get("status") != "blocked":
-        raise ValueError("exploração exige uma validação bloqueada; não substitui uma base aprovada")
+    if validation.get("status") != "approved":
+        raise ValueError("exploração exige uma base aprovada pela validação do pipeline")
     fatal_counts = validation.get("fatal_counts", {})
-    unexpected = {key: value for key, value in fatal_counts.items() if value and key != "duplicate_expense_rows"}
+    unexpected = {key: value for key, value in fatal_counts.items() if value}
     if unexpected:
-        raise ValueError(f"exploração recusada: há falhas críticas além de repetições exatas: {unexpected}")
-    if not fatal_counts.get("duplicate_expense_rows"):
-        raise ValueError("exploração exige o bloqueio por duplicate_expense_rows no snapshot")
+        raise ValueError(f"exploração recusada: há falhas críticas de validação: {unexpected}")
     return validation
 
 
@@ -288,12 +293,33 @@ def _empty_scenario(candidates: dict[str, dict[str, str]]) -> dict[str, dict[str
     return {candidate_id: {"expense_row_count": 0, "declared_expense_centavos": 0, "exact_repeat_rows": 0} for candidate_id in candidates}
 
 
-def _load_final_expenses(manifest: dict, candidates: dict[str, dict[str, str]]) -> tuple[dict[str, dict[str, int]], dict[str, int]]:
-    preserve = _empty_scenario(candidates)
-    remove = _empty_scenario(candidates)
+def _load_final_expenses(
+    manifest: dict,
+    candidates: dict[str, dict[str, str]],
+    database_path: Path,
+) -> tuple[dict[str, dict[str, int]], dict[str, int]]:
+    primary = _empty_scenario(candidates)
+    sensitivity = _empty_scenario(candidates)
     seen_signatures = sqlite3.connect(":memory:")
-    seen_signatures.execute("CREATE TABLE seen_signatures (signature TEXT PRIMARY KEY)")
+    seen_signatures.execute(
+        "CREATE TABLE seen_signatures (source_member TEXT, signature TEXT, source_row INTEGER)"
+    )
+    seen_signatures.execute(
+        "CREATE INDEX seen_signatures_key ON seen_signatures (source_member, signature)"
+    )
+    occurrences = sqlite3.connect(database_path)
+    occurrence_columns = [
+        row[1]
+        for row in occurrences.execute("PRAGMA table_info(expense_occurrences)")
+        if not row[1].startswith("_")
+    ]
+    if not occurrence_columns:
+        raise ValueError("a comparação exige expense_occurrences com os campos originais")
+    quoted_fields = ", ".join(
+        '"' + field.replace('"', '""') + '"' for field in occurrence_columns
+    )
     counters = Counter()
+    affected_candidates: set[str] = set()
     archive = _resource_path(manifest, "accounts_2022")
     for row, member, row_number in _iter_rows(archive, "despesas_contratadas_candidatos_2022_"):
         if _text(row, "AA_ELEICAO") != "2022" or _text(row, "ST_TURNO") != "1" or _text(row, "DS_CARGO").casefold() != FEDERAL_CARGO:
@@ -313,18 +339,51 @@ def _load_final_expenses(manifest: dict, candidates: dict[str, dict[str, str]]) 
             amount_centavos = _centavos(amount_text)
         except (InvalidOperation, ValueError) as error:
             raise ValueError(f"valor inválido em {member}:{row_number}: {error}") from error
-        preserve[candidate_id]["expense_row_count"] += 1
-        preserve[candidate_id]["declared_expense_centavos"] += amount_centavos
+        sensitivity[candidate_id]["expense_row_count"] += 1
+        sensitivity[candidate_id]["declared_expense_centavos"] += amount_centavos
         signature = _row_signature(row)
-        inserted = seen_signatures.execute("INSERT OR IGNORE INTO seen_signatures VALUES (?)", (signature,)).rowcount
-        if inserted:
-            remove[candidate_id]["expense_row_count"] += 1
-            remove[candidate_id]["declared_expense_centavos"] += amount_centavos
-        else:
-            preserve[candidate_id]["exact_repeat_rows"] += 1
+        raw_values = tuple(row.get(field) for field in occurrence_columns)
+        duplicate = False
+        matching_rows = seen_signatures.execute(
+            "SELECT source_row FROM seen_signatures WHERE source_member = ? AND signature = ?",
+            (member, signature),
+        ).fetchall()
+        for (seen_row_number,) in matching_rows:
+            seen_values = occurrences.execute(
+                f"""
+                SELECT {quoted_fields} FROM expense_occurrences
+                WHERE _source_member = ? AND _source_row = ?
+                """,
+                (member, seen_row_number),
+            ).fetchone()
+            if seen_values is not None and tuple(seen_values) == raw_values:
+                duplicate = True
+                break
+        if duplicate:
+            sensitivity[candidate_id]["exact_repeat_rows"] += 1
             counters["exact_repeat_rows_in_final_apto"] += 1
+            affected_candidates.add(candidate_id)
+            continue
+        seen_signatures.execute(
+            "INSERT INTO seen_signatures VALUES (?, ?, ?)",
+            (member, signature, row_number),
+        )
+        primary[candidate_id]["expense_row_count"] += 1
+        primary[candidate_id]["declared_expense_centavos"] += amount_centavos
     seen_signatures.close()
-    return (preserve, remove), dict(counters)
+    occurrences.close()
+    counters["candidates_affected_by_dedup_final_apto"] = len(affected_candidates)
+    counters["preserve_all_total_centavos_final_apto"] = sum(
+        row["declared_expense_centavos"] for row in sensitivity.values()
+    )
+    counters["deduplicated_total_centavos_final_apto"] = sum(
+        row["declared_expense_centavos"] for row in primary.values()
+    )
+    counters["financial_difference_centavos_final_apto"] = (
+        counters["preserve_all_total_centavos_final_apto"]
+        - counters["deduplicated_total_centavos_final_apto"]
+    )
+    return (primary, sensitivity), dict(counters)
 
 
 def _scenario_rows(
@@ -357,59 +416,61 @@ def _scenario_rows(
     return rows
 
 
-def _comparison_rows(rows_a: list[dict[str, object]], rows_b: list[dict[str, object]]) -> list[dict[str, object]]:
-    def index_rows(rows: list[dict[str, object]], scenario: str) -> dict[str, dict[str, object]]:
+def _comparison_rows(rows_deduplicated: list[dict[str, object]], rows_all_rows: list[dict[str, object]]) -> list[dict[str, object]]:
+    def index_rows(rows: list[dict[str, object]], treatment: str) -> dict[str, dict[str, object]]:
         indexed = {}
         for row in rows:
             candidate_id = row.get("sq_candidate")
             if not isinstance(candidate_id, str) or not candidate_id:
-                raise ValueError(f"candidato sem sq_candidate no cenário {scenario}")
+                raise ValueError(f"candidato sem sq_candidate no tratamento {treatment}")
             if candidate_id in indexed:
-                raise ValueError(f"chave de candidato duplicada no cenário {scenario}: {candidate_id}")
+                raise ValueError(f"chave de candidato duplicada no tratamento {treatment}: {candidate_id}")
             indexed[candidate_id] = row
         return indexed
 
-    indexed_a = index_rows(rows_a, "A")
-    indexed_b = index_rows(rows_b, "B")
-    if len(rows_a) != len(rows_b):
+    indexed_deduplicated = index_rows(rows_deduplicated, "deduplicado")
+    indexed_all_rows = index_rows(rows_all_rows, "todas as linhas")
+    if len(rows_deduplicated) != len(rows_all_rows):
         raise ValueError(
-            f"comprimentos diferentes entre cenários A e B: {len(rows_a)} e {len(rows_b)}"
+            "comprimentos diferentes entre tratamento deduplicado e todas as linhas: "
+            f"{len(rows_deduplicated)} e {len(rows_all_rows)}"
         )
-    keys_a = set(indexed_a)
-    keys_b = set(indexed_b)
-    if keys_a != keys_b:
-        missing_from_b = sorted(keys_a - keys_b)
-        missing_from_a = sorted(keys_b - keys_a)
+    keys_deduplicated = set(indexed_deduplicated)
+    keys_all_rows = set(indexed_all_rows)
+    if keys_deduplicated != keys_all_rows:
+        missing_from_all_rows = sorted(keys_deduplicated - keys_all_rows)
+        missing_from_deduplicated = sorted(keys_all_rows - keys_deduplicated)
         raise ValueError(
-            f"chaves de candidato diferentes entre cenários; faltam em B: {missing_from_b}; "
-            f"faltam em A: {missing_from_a}"
+            "chaves de candidato diferentes entre tratamentos; "
+            f"faltam em todas as linhas: {missing_from_all_rows}; "
+            f"faltam no deduplicado: {missing_from_deduplicated}"
         )
 
     identity_fields = ("uf", "candidate_number", "candidate_name", "vote_observation", "valid_nominal_votes")
     result = []
-    for row_a in rows_a:
-        candidate_id = row_a["sq_candidate"]
-        row_b = indexed_b[candidate_id]
-        if any(row_a.get(field) != row_b.get(field) for field in identity_fields):
-            raise ValueError(f"identidade divergente para o candidato {candidate_id} entre cenários A e B")
-        amount_a = int(row_a["declared_expense_centavos"]) if row_a["declared_expense_centavos"] != "" else None
-        amount_b = int(row_b["declared_expense_centavos"]) if row_b["declared_expense_centavos"] != "" else None
-        delta = amount_a - amount_b if amount_a is not None and amount_b is not None else None
-        relative = (delta / amount_a) if delta is not None and amount_a else None
+    for row_deduplicated in rows_deduplicated:
+        candidate_id = row_deduplicated["sq_candidate"]
+        row_all_rows = indexed_all_rows[candidate_id]
+        if any(row_deduplicated.get(field) != row_all_rows.get(field) for field in identity_fields):
+            raise ValueError(f"identidade divergente para o candidato {candidate_id} entre deduplicado e todas as linhas")
+        amount_deduplicated = int(row_deduplicated["declared_expense_centavos"]) if row_deduplicated["declared_expense_centavos"] != "" else None
+        amount_all_rows = int(row_all_rows["declared_expense_centavos"]) if row_all_rows["declared_expense_centavos"] != "" else None
+        delta = amount_all_rows - amount_deduplicated if amount_deduplicated is not None and amount_all_rows is not None else None
+        relative = (delta / amount_deduplicated) if delta is not None and amount_deduplicated else None
         result.append({
             "sq_candidate": candidate_id,
-            "uf": row_a["uf"],
-            "candidate_number": row_a["candidate_number"],
-            "candidate_name": row_a["candidate_name"],
-            "expense_a_centavos": "" if amount_a is None else amount_a,
-            "expense_b_centavos": "" if amount_b is None else amount_b,
-            "difference_centavos": "" if delta is None else delta,
-            "difference_relative_to_a": "" if relative is None else f"{relative:.8f}",
-            "cost_per_vote_a_brl": row_a["cost_per_vote_brl"],
-            "cost_per_vote_b_brl": row_b["cost_per_vote_brl"],
-            "exact_repeat_rows_a": row_a["exact_repeat_rows"],
-            "vote_observation": row_a["vote_observation"],
-            "valid_nominal_votes": row_a["valid_nominal_votes"],
+            "uf": row_deduplicated["uf"],
+            "candidate_number": row_deduplicated["candidate_number"],
+            "candidate_name": row_deduplicated["candidate_name"],
+            "expense_deduplicated_centavos": "" if amount_deduplicated is None else amount_deduplicated,
+            "expense_all_rows_centavos": "" if amount_all_rows is None else amount_all_rows,
+            "difference_all_rows_minus_deduplicated_centavos": "" if delta is None else delta,
+            "difference_relative_to_deduplicated": "" if relative is None else f"{relative:.8f}",
+            "cost_per_vote_deduplicated_brl": row_deduplicated["cost_per_vote_brl"],
+            "cost_per_vote_all_rows_brl": row_all_rows["cost_per_vote_brl"],
+            "exact_repeat_rows_all_rows_sensitivity": row_all_rows["exact_repeat_rows"],
+            "vote_observation": row_deduplicated["vote_observation"],
+            "valid_nominal_votes": row_deduplicated["valid_nominal_votes"],
         })
     return result
 
@@ -499,27 +560,27 @@ def _svg_scatter(rows: list[dict[str, object]], expense_field: str, path: Path, 
     path.write_text("".join(elements), encoding="utf-8")
 
 
-def _svg_uf_totals(rows_a: list[dict[str, object]], rows_b: list[dict[str, object]], path: Path) -> None:
-    totals_a = {row["uf"]: int(row["expense_total_centavos"]) for row in rows_a}
-    totals_b = {row["uf"]: int(row["expense_total_centavos"]) for row in rows_b}
-    ufs = sorted(set(totals_a) | set(totals_b))
+def _svg_uf_totals(rows_deduplicated: list[dict[str, object]], rows_all_rows: list[dict[str, object]], path: Path) -> None:
+    totals_deduplicated = {row["uf"]: int(row["expense_total_centavos"]) for row in rows_deduplicated}
+    totals_all_rows = {row["uf"]: int(row["expense_total_centavos"]) for row in rows_all_rows}
+    ufs = sorted(set(totals_deduplicated) | set(totals_all_rows))
     width, height = 1100, 560
     left, top, plot_w, plot_h = 55, 45, 1000, 410
-    maximum = max([*totals_a.values(), *totals_b.values(), 1])
+    maximum = max([*totals_deduplicated.values(), *totals_all_rows.values(), 1])
     group_w = plot_w / max(len(ufs), 1)
-    elements = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">', '<rect width="100%" height="100%" fill="white"/>', f'<text x="{width / 2}" y="25" text-anchor="middle" font-family="sans-serif" font-size="18">Despesas declaradas por UF — cenários exploratórios</text>']
+    elements = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">', '<rect width="100%" height="100%" fill="white"/>', f'<text x="{width / 2}" y="25" text-anchor="middle" font-family="sans-serif" font-size="18">Despesas declaradas por UF — deduplicado e todas as linhas</text>']
     for index, uf in enumerate(ufs):
         x = left + index * group_w
-        for offset, value, color in ((group_w * 0.18, totals_a.get(uf, 0), "#2563eb"), (group_w * 0.52, totals_b.get(uf, 0), "#f97316")):
+        for offset, value, color in ((group_w * 0.18, totals_deduplicated.get(uf, 0), "#2563eb"), (group_w * 0.52, totals_all_rows.get(uf, 0), "#f97316")):
             bar_h = value / maximum * plot_h
             elements.append(f'<rect x="{x + offset:.2f}" y="{top + plot_h - bar_h:.2f}" width="{group_w * 0.24:.2f}" height="{bar_h:.2f}" fill="{color}"><title>{html.escape(uf)}: {_money(value)}</title></rect>')
         elements.append(f'<text x="{x + group_w / 2:.2f}" y="{top + plot_h + 18}" text-anchor="middle" font-family="sans-serif" font-size="11">{uf}</text>')
-    elements.extend([f'<line x1="{left}" y1="{top + plot_h}" x2="{left + plot_w}" y2="{top + plot_h}" stroke="black"/>', '<rect x="850" y="500" width="12" height="12" fill="#2563eb"/><text x="868" y="511" font-family="sans-serif">A — preservar</text>', '<rect x="980" y="500" width="12" height="12" fill="#f97316"/><text x="998" y="511" font-family="sans-serif">B — remover exatas</text></svg>'])
+    elements.extend([f'<line x1="{left}" y1="{top + plot_h}" x2="{left + plot_w}" y2="{top + plot_h}" stroke="black"/>', '<rect x="650" y="500" width="12" height="12" fill="#2563eb"/><text x="668" y="511" font-family="sans-serif">Tratamento deduplicado</text>', '<rect x="855" y="500" width="12" height="12" fill="#f97316"/><text x="873" y="511" font-family="sans-serif">Todas as linhas</text></svg>'])
     path.write_text("".join(elements), encoding="utf-8")
 
 
-def _svg_uf_spearman(rows_a: list[dict[str, object]], rows_b: list[dict[str, object]], path: Path) -> None:
-    by_scenario = (("A — preservar", rows_a, "#2563eb", -3), ("B — repetições exatas removidas", rows_b, "#f97316", 3))
+def _svg_uf_spearman(rows_deduplicated: list[dict[str, object]], rows_all_rows: list[dict[str, object]], path: Path) -> None:
+    by_scenario = (("Tratamento deduplicado", rows_deduplicated, "#2563eb", -3), ("Todas as linhas", rows_all_rows, "#f97316", 3))
     ufs = sorted({str(row["uf"]) for _, rows, _, _ in by_scenario for row in rows})
     width, height = 1100, 590
     left, top, plot_w, plot_h = 70, 65, 990, 420
@@ -527,7 +588,7 @@ def _svg_uf_spearman(rows_a: list[dict[str, object]], rows_b: list[dict[str, obj
     y = lambda correlation: top + (1 - float(correlation)) * plot_h / 2
     elements = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
-        f'<text x="{width / 2}" y="28" text-anchor="middle" font-family="sans-serif" font-size="18">Correlação de Spearman por UF — dois cenários</text>',
+        f'<text x="{width / 2}" y="28" text-anchor="middle" font-family="sans-serif" font-size="18">Associação de despesas e votos por UF — deduplicado e todas as linhas</text>',
         '<text x="70" y="48" font-family="sans-serif" font-size="12">Candidatos com despesa e votação observadas; zeros observados incluídos</text>',
     ]
     for correlation in (-1, -0.5, 0, 0.5, 1):
@@ -546,16 +607,15 @@ def _svg_uf_spearman(rows_a: list[dict[str, object]], rows_b: list[dict[str, obj
             point_y = y(row["spearman_expense_votes"])
             elements.append(f'<circle cx="{center + offset:.2f}" cy="{point_y:.2f}" r="3.5" fill="{color}"><title>{scenario}, {uf}: rho={row["spearman_expense_votes"]}, n={row["complete_pairs"]}</title></circle>')
     elements.extend([
-        '<rect x="340" y="550" width="12" height="12" fill="#2563eb"/><text x="358" y="561" font-family="sans-serif" font-size="12">A — preservar</text>',
-        '<rect x="510" y="550" width="12" height="12" fill="#f97316"/><text x="528" y="561" font-family="sans-serif" font-size="12">B — remover repetições exatas</text>',
+        '<rect x="330" y="550" width="12" height="12" fill="#2563eb"/><text x="348" y="561" font-family="sans-serif" font-size="12">Tratamento deduplicado</text>',
+        '<rect x="640" y="550" width="12" height="12" fill="#f97316"/><text x="658" y="561" font-family="sans-serif" font-size="12">Todas as linhas</text>',
         '</svg>',
     ])
     path.write_text("".join(elements), encoding="utf-8")
 
-
-def _svg_distributions(rows_a: list[dict[str, object]], rows_b: list[dict[str, object]], path: Path) -> None:
+def _svg_distributions(rows_deduplicated: list[dict[str, object]], rows_all_rows: list[dict[str, object]], path: Path) -> None:
     series = []
-    for label, rows, field in (("A despesas", rows_a, "declared_expense_centavos"), ("B despesas", rows_b, "declared_expense_centavos"), ("Votos", rows_a, "valid_nominal_votes")):
+    for label, rows, field in (("Despesas — deduplicado", rows_deduplicated, "declared_expense_centavos"), ("Despesas — todas as linhas", rows_all_rows, "declared_expense_centavos"), ("Votos nominais válidos", rows_deduplicated, "valid_nominal_votes")):
         if field == "valid_nominal_votes":
             values = [int(row[field]) for row in rows if row["vote_observation"] != "absent"]
         else:
@@ -590,143 +650,156 @@ def _write_report(
     uf_rows: list[dict[str, object]],
     cost_rows: list[dict[str, object]],
 ) -> None:
-    total_a = next(row["total"] for row in summary_rows if row["scenario"] == SCENARIO_A and row["measure"].startswith("despesas"))
-    total_b = next(row["total"] for row in summary_rows if row["scenario"] == SCENARIO_B and row["measure"].startswith("despesas"))
-    changed = [row for row in comparison_rows if row["difference_centavos"] not in ("", 0)]
-    top_changes = sorted(changed, key=lambda row: int(row["difference_centavos"]), reverse=True)[:10]
-    cost_a = next(row for row in cost_rows if row["scenario"] == SCENARIO_A)
-    cost_b = next(row for row in cost_rows if row["scenario"] == SCENARIO_B)
+    total_deduplicated = next(
+        row["total"] for row in summary_rows
+        if row["scenario"] == SCENARIO_DEDUPLICATED and row["measure"].startswith("despesas")
+    )
+    total_all_rows = next(
+        row["total"] for row in summary_rows
+        if row["scenario"] == SCENARIO_ALL_ROWS and row["measure"].startswith("despesas")
+    )
+    changed = [
+        row for row in comparison_rows
+        if row["difference_all_rows_minus_deduplicated_centavos"] not in ("", 0)
+    ]
+    top_changes = sorted(
+        changed,
+        key=lambda row: int(row["difference_all_rows_minus_deduplicated_centavos"]),
+        reverse=True,
+    )[:10]
+    cost_deduplicated = next(row for row in cost_rows if row["scenario"] == SCENARIO_DEDUPLICATED)
+    cost_all_rows = next(row for row in cost_rows if row["scenario"] == SCENARIO_ALL_ROWS)
     uf_by_scenario = {
         scenario: {str(row["uf"]): row for row in uf_rows if row["scenario"] == scenario}
-        for scenario in (SCENARIO_A, SCENARIO_B)
+        for scenario in (SCENARIO_DEDUPLICATED, SCENARIO_ALL_ROWS)
     }
-    ufs = sorted(set(uf_by_scenario[SCENARIO_A]) | set(uf_by_scenario[SCENARIO_B]))
-    spearman_a = [row for row in uf_by_scenario[SCENARIO_A].values() if row["spearman_expense_votes"] != ""]
-    spearman_b = [row for row in uf_by_scenario[SCENARIO_B].values() if row["spearman_expense_votes"] != ""]
+    ufs = sorted(set(uf_by_scenario[SCENARIO_DEDUPLICATED]) | set(uf_by_scenario[SCENARIO_ALL_ROWS]))
+    spearman_deduplicated = [
+        row for row in uf_by_scenario[SCENARIO_DEDUPLICATED].values()
+        if row["spearman_expense_votes"] != ""
+    ]
+    spearman_all_rows = [
+        row for row in uf_by_scenario[SCENARIO_ALL_ROWS].values()
+        if row["spearman_expense_votes"] != ""
+    ]
     complete_pair_difference = (
-        int(cost_a["expense_total_centavos_complete_pairs"])
-        - int(cost_b["expense_total_centavos_complete_pairs"])
+        int(cost_all_rows["expense_total_centavos_complete_pairs"])
+        - int(cost_deduplicated["expense_total_centavos_complete_pairs"])
     )
     zero_vote_count = next(
         row["count_zero"] for row in summary_rows
-        if row["measure"] == "votos_nominais_validos" and row["scenario"] == SCENARIO_A
+        if row["measure"] == "votos_nominais_validos" and row["scenario"] == SCENARIO_DEDUPLICATED
     )
     absent_vote_count = next(
         row["count_absent"] for row in summary_rows
-        if row["measure"] == "votos_nominais_validos" and row["scenario"] == SCENARIO_A
+        if row["measure"] == "votos_nominais_validos" and row["scenario"] == SCENARIO_DEDUPLICATED
     )
-    cost_candidate_count = f"{int(cost_a['candidate_count_with_cost']):,}".replace(",", ".")
+    cost_candidate_count = f"{int(cost_deduplicated['candidate_count_with_cost']):,}".replace(",", ".")
     lines = [
         "# Relatório exploratório provisório — TSE 2022",
         "",
-        "> **EXPLORATÓRIO / PROVISÓRIO. Não é base aprovada e não substitui `validation.json`.**",
+        "> **Validação de ingestão aprovada; protocolo 2022 definido em [Fixar o protocolo da análise financeira do piloto TSE 2022](https://github.com/dargmiguel/dinheiro-compra-votos/issues/11). Este artefato continua exploratório: ainda não usa o denominador oficial incluindo legenda, os controles definidos nem a análise secundária por sexo.**",
         "",
         "## População e medidas",
         "",
-        f"A população contém candidatos `APTO` no snapshot de candidaturas consultado após a eleição: **{metadata['population_included']}** de {metadata['candidate_rows_selected']} registros. `INAPTO` ficou fora da população principal; não foi convertido em ausência de gasto ou voto.",
+        f"Este recorte exploratório inclui candidaturas `APTO` (`CD_SITUACAO_CANDIDATURA = 12`) no snapshot posterior à eleição: **{metadata['population_included']}** de {metadata['candidate_rows_selected']} registros. `INAPTO` será levantado separadamente por tipo de prestação; este artefato não contém esse levantamento.",
         "",
-        "A medida financeira é **despesas contratadas declaradas no snapshot**, restrita a entregas `Final`. Ela não é apresentada como equivalente a `Gastos Financeiros`. Ausências continuam ausências e zeros observados continuam zeros. A votação é `QT_VOTOS_NOMINAIS_VALIDOS`.",
+        "A medida exibida é despesa contratada declarada no snapshot para prestações `Final`; não equivale a pagamento nem à dívida oficial. O voto aqui é o total nominal válido por candidato, não a participação sobre o total oficial válido da UF/cargo incluindo legenda. Ausências continuam ausências e zeros observados continuam zeros.",
         "",
-        "## Cenários",
+        "## Tratamentos",
         "",
-        "- **A — preservar todas as linhas:** mantém toda linha `Final` observada para candidatos `APTO`.",
-        "- **B — remover repetições completas exatas:** mantém a primeira ocorrência de cada assinatura completa e remove apenas ocorrências posteriores iguais, exclusivamente para comparação.",
+        "- **Tratamento deduplicado (principal):** uma ocorrência por grupo com igualdade nos 53 campos originais do TSE, no mesmo snapshot e membro de origem; campos de auditoria ficam fora da comparação.",
+        "- **Todas as linhas (sensibilidade):** preservar todas as ocorrências `Final`.",
         "",
-        "Nenhum cenário foi escolhido como correto. Estabilidade entre A e B mede sensibilidade do resultado ao tratamento, não prova de validade de qualquer tratamento.",
+        "A deduplicação é uma escolha metodológica. Não há confirmação oficial de identidade econômica das repetições.",
         "",
         "## Inclusões, exclusões e ausências",
         "",
         f"- candidatos selecionados no snapshot: **{metadata['candidate_rows_selected']}**;",
         f"- população `APTO`: **{metadata['population_included']}**;",
         f"- fora por `INAPTO`: **{metadata['population_excluded_by_reason']['inapto']}**;",
-        f"- linhas financeiras `Final` para a população: **{metadata['expense_rows_selected_final_apto']}**;",
-        f"- repetições completas exatas no recorte financeiro: **{metadata['exact_repeat_rows_in_final_apto']}**.",
+        f"- linhas financeiras `Final` no recorte: **{metadata['expense_rows_selected_final_apto']}**;",
+        f"- ocorrências excluídas do tratamento deduplicado: **{metadata['exact_repeat_rows_in_final_apto']}**;",
+        f"- candidatos afetados pelas exclusões: **{metadata['candidates_affected_by_dedup_final_apto']}**.",
         "",
-        "Os CSVs de cenário têm uma linha por candidato `APTO`, inclusive quando a despesa ou a votação está ausente. Ausente não foi transformado em zero.",
+        "Os CSVs têm uma linha por candidato `APTO`, inclusive quando despesa ou votação estão ausentes. Ausência não foi transformada em zero.",
         "",
-        "## Totais e mudança entre cenários",
+        "## Totais e diferença metodológica — recorte Final/APTO",
         "",
-        f"- cenário A: **{_money(total_a)}**;",
-        f"- cenário B: **{_money(total_b)}**;",
-        f"- diferença diagnóstica: **{_money(total_a - total_b)}**;",
-        f"- candidatos com valor financeiro diferente: **{len(changed)}** de {metadata['population_included']}.",
+        f"- tratamento deduplicado: **{_money(total_deduplicated)}** em {metadata['expense_rows_selected_final_apto'] - metadata['exact_repeat_rows_in_final_apto']} linhas;",
+        f"- todas as linhas: **{_money(total_all_rows)}** em {metadata['expense_rows_selected_final_apto']} linhas;",
+        f"- diferença todas as linhas menos deduplicado: **{_money(total_all_rows - total_deduplicated)}**;",
+        f"- candidatos com total financeiro diferente: **{len(changed)}** de {metadata['population_included']}.",
         "",
-        "## Custo exploratório por voto",
+        "## Custo exploratório por voto nominal",
         "",
-        "O custo por voto é calculado somente para candidatos com despesa observada e votos válidos maiores que zero. Despesa zero observada produz custo R$ 0,00; despesa ausente continua fora do quociente.",
-        "No CSV, as colunas de custo estão em reais por voto e usam ponto decimal para manter valores numéricos legíveis por ferramentas. O valor anterior em centavos por voto foi removido: 2.979,07 centavos/voto ÷ 100 = R$ 29,79/voto. O custo agregado é a soma das despesas dividida pela soma dos votos nos pares completos, não a média simples do custo individual.",
-
+        "O custo é calculado somente para candidatos com despesa observada e votos nominais válidos maiores que zero. Despesa zero observada produz custo R$ 0,00; despesa ausente continua fora do quociente. Esta métrica não substitui a participação sobre o total oficial válido definido no protocolo.",
+        "No CSV, os custos estão em reais por voto nominal e usam ponto decimal. O custo agregado é a soma das despesas dividida pela soma dos votos nos pares completos, não a média simples dos custos individuais.",
         "",
-        f"| Cenário | Candidatos | Despesa completa | Votos completos | Custo agregado | Mediana | P90 | P99 |",
-        f"|---|---:|---:|---:|---:|---:|---:|---:|",
-        f"| A | {cost_candidate_count} | {_money(int(cost_a['expense_total_centavos_complete_pairs']))} | {cost_a['votes_total_complete_pairs']} | {_money(round(Decimal(cost_a['aggregate_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['median_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['p90_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_a['p99_cost_brl_per_vote']) * 100))} |",
-        f"| B | {cost_candidate_count} | {_money(int(cost_b['expense_total_centavos_complete_pairs']))} | {cost_b['votes_total_complete_pairs']} | {_money(round(Decimal(cost_b['aggregate_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['median_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['p90_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_b['p99_cost_brl_per_vote']) * 100))} |",
-        f"A diferença A−B das despesas observadas no recorte `Final`/`APTO` é {_money(total_a - total_b)}. Nos {cost_candidate_count} candidatos usados no custo por voto, a diferença é {_money(complete_pair_difference)}. Os {_money((total_a - total_b) - complete_pair_difference)} restantes correspondem à diferença de despesas dos candidatos com votação observada igual a zero, excluídos dos pares de custo ({zero_vote_count}); votos ausentes: {absent_vote_count}.",
+        "| Tratamento | Candidatos | Despesa completa | Votos nominais completos | Custo agregado | Mediana | P90 | P99 |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|",
+        f"| Deduplicado | {cost_candidate_count} | {_money(int(cost_deduplicated['expense_total_centavos_complete_pairs']))} | {cost_deduplicated['votes_total_complete_pairs']} | {_money(round(Decimal(cost_deduplicated['aggregate_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_deduplicated['median_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_deduplicated['p90_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_deduplicated['p99_cost_brl_per_vote']) * 100))} |",
+        f"| Todas as linhas | {cost_candidate_count} | {_money(int(cost_all_rows['expense_total_centavos_complete_pairs']))} | {cost_all_rows['votes_total_complete_pairs']} | {_money(round(Decimal(cost_all_rows['aggregate_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_all_rows['median_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_all_rows['p90_cost_brl_per_vote']) * 100))} | {_money(round(Decimal(cost_all_rows['p99_cost_brl_per_vote']) * 100))} |",
+        f"A diferença todas as linhas menos deduplicado nas despesas observadas do recorte `Final`/`APTO` é {_money(total_all_rows - total_deduplicated)}. Nos {cost_candidate_count} candidatos com votos positivos, a diferença é {_money(complete_pair_difference)}. Os {_money((total_all_rows - total_deduplicated) - complete_pair_difference)} restantes vêm de candidatos com votação observada igual a zero ({zero_vote_count}); votos ausentes: {absent_vote_count}.",
         "",
-        "",
-        "| SQ_CANDIDATO | Candidato | UF | Diferença | Relativa a A | Repetições exatas |",
+        "| SQ_CANDIDATO | Candidato | UF | Diferença: todas as linhas menos deduplicado | Relativa ao deduplicado | Repetições em todas as linhas |",
         "|---|---|---|---:|---:|---:|",
     ]
     for row in top_changes:
-        relative = row["difference_relative_to_a"]
+        relative = row["difference_relative_to_deduplicated"]
         relative_text = "" if relative == "" else f"{float(relative) * 100:.4f}%".replace(".", ",")
-        lines.append(f"| {row['sq_candidate']} | {row['candidate_name']} | {row['uf']} | {_money(int(row['difference_centavos']))} | {relative_text} | {row['exact_repeat_rows_a']} |")
+        difference = int(row["difference_all_rows_minus_deduplicated_centavos"])
+        lines.append(
+            f"| {row['sq_candidate']} | {row['candidate_name']} | {row['uf']} | "
+            f"{_money(difference)} | {relative_text} | {row['exact_repeat_rows_all_rows_sensitivity']} |"
+        )
     lines.extend([
         "",
-        "## Associação entre despesas e votação por UF",
+        "## Associação exploratória entre despesas e votação nominal por UF",
         "",
         "Spearman é calculado dentro de cada UF entre candidatos com despesa e votação observadas. Zeros observados permanecem na amostra; apenas ausências são excluídas. O custo por voto não participa desta associação.",
         "",
-        f"Cobertura: {len(spearman_a)} de {len(ufs)} UFs têm coeficiente definido no cenário A e {len(spearman_b)} de {len(ufs)} no cenário B. A tabela informa os pares completos de cada UF.",
+        f"Cobertura: {len(spearman_deduplicated)} de {len(ufs)} UFs têm coeficiente definido para o tratamento deduplicado e {len(spearman_all_rows)} de {len(ufs)} para todas as linhas. A tabela informa os pares completos de cada UF.",
         "",
-        "| UF | Pares A | Spearman A | Pares B | Spearman B |",
+        "| UF | Pares deduplicado | Spearman deduplicado | Pares todas as linhas | Spearman todas as linhas |",
         "|---|---:|---:|---:|---:|",
     ])
     for uf in ufs:
-        row_a = uf_by_scenario[SCENARIO_A].get(uf)
-        row_b = uf_by_scenario[SCENARIO_B].get(uf)
-        rho_a = "—" if row_a is None or row_a["spearman_expense_votes"] == "" else row_a["spearman_expense_votes"]
-        rho_b = "—" if row_b is None or row_b["spearman_expense_votes"] == "" else row_b["spearman_expense_votes"]
-        pairs_a = 0 if row_a is None else row_a["complete_pairs"]
-        pairs_b = 0 if row_b is None else row_b["complete_pairs"]
-        lines.append(f"| {uf} | {pairs_a} | {rho_a} | {pairs_b} | {rho_b} |")
+        row_deduplicated = uf_by_scenario[SCENARIO_DEDUPLICATED].get(uf)
+        row_all_rows = uf_by_scenario[SCENARIO_ALL_ROWS].get(uf)
+        rho_deduplicated = "—" if row_deduplicated is None or row_deduplicated["spearman_expense_votes"] == "" else row_deduplicated["spearman_expense_votes"]
+        rho_all_rows = "—" if row_all_rows is None or row_all_rows["spearman_expense_votes"] == "" else row_all_rows["spearman_expense_votes"]
+        pairs_deduplicated = 0 if row_deduplicated is None else row_deduplicated["complete_pairs"]
+        pairs_all_rows = 0 if row_all_rows is None else row_all_rows["complete_pairs"]
+        lines.append(f"| {uf} | {pairs_deduplicated} | {rho_deduplicated} | {pairs_all_rows} | {rho_all_rows} |")
     lines.extend([
         "",
-        "Coeficiente indefinido significa menos de dois pares ou variância nula. As correlações são descritivas, não causais, e não selecionam cenário.",
-    ])
-    lines.extend([
+        "Coeficiente indefinido significa menos de dois pares ou variância nula. As correlações são descritivas, não causais, e não selecionam tratamento.",
         "",
-        "## Distribuições e associações",
+        "## Distribuições e artefatos",
         "",
-        "Os gráficos usam transformação `log10(1 + x)` somente nos eixos para tornar valores muito diferentes visíveis; os arquivos CSV mantêm os valores originais, zeros e ausências. Pontos sem despesa ou voto não foram colocados no gráfico como zero.",
+        "Os gráficos usam `log10(1 + x)` nos eixos somente para visualização; os CSVs mantêm valores, zeros e ausências originais. Pontos sem despesa ou voto não foram colocados como zero.",
         "",
-        "- [Despesas versus votos — cenário A](plots/exploratory_expense_vs_votes_a.svg)",
-        "- [Despesas versus votos — cenário B](plots/exploratory_expense_vs_votes_b.svg)",
-        "- [Correlação de Spearman por UF — cenários A/B](plots/exploratory_uf_spearman_by_scenario.svg)",
+        "- [Despesas versus votos — tratamento deduplicado](plots/exploratory_expense_vs_votes_deduplicated.svg)",
+        "- [Despesas versus votos — todas as linhas](plots/exploratory_expense_vs_votes_all_rows.svg)",
+        "- [Associação por UF — deduplicado e todas as linhas](plots/exploratory_uf_spearman_deduplicated_vs_all_rows.svg)",
         "- [Distribuições](plots/exploratory_distributions.svg)",
         "- [Totais por UF](plots/exploratory_uf_expense_totals.svg)",
         "- [Distribuições em CSV](exploratory_distributions.csv)",
         "- [Associações por UF em CSV](exploratory_uf_associations.csv)",
         "- [Dados por candidato](exploratory_candidates.csv)",
-        "- [Comparação A/B por candidato](exploratory_scenario_comparison.csv)",
-        "- [Custo por voto por cenário](exploratory_cost_per_vote.csv)",
-        "",
-        "Para análise exploratória, abra esses CSVs no Excel, LibreOffice Calc ou Google Sheets; importe com vírgula como separador de colunas e ponto decimal. As consultas também podem ser feitas em Python/pandas.",
-
-        "",
-        "A correlação de Spearman e a correlação de Pearson (também disponível no CSV por UF) são descritivas, preservam zeros observados e excluem apenas ausências. Coeficiente indefinido significa menos de dois pares ou variância nula. Nenhuma associação usa custo por voto.",
+        "- [Comparação deduplicado versus todas as linhas](exploratory_deduplicated_vs_all_rows.csv)",
+        "- [Custo por voto nominal por tratamento](exploratory_cost_per_vote.csv)",
         "",
         "## Limitações",
         "",
-        "- A população `APTO` é a situação disponível no snapshot posterior à eleição; não representa uma reconstrução histórica da situação no dia da votação.",
-        "- A entrega `Final` foi identificada pelo campo textual `TP_PRESTACAO_CONTAS`; o comando não afirma que ela seja a última entrega recebida com sucesso.",
-        "- A medida não inclui despesas pagas, dívida líquida, estimáveis ou regras de DRD.",
-        "- A duplicidade completa é um sinal textual; o cenário B não é uma decisão de deduplicação.",
-        "- Os artefatos são provisórios e não podem ser usados como `analytical_base.csv`.",
+        "- `APTO` é a situação disponível no snapshot posterior à eleição; não reconstrói situação na data da votação.",
+        "- `Final` é identificada pelo campo `TP_PRESTACAO_CONTAS`; não se afirma que seja a última entrega recepcionada com sucesso.",
+        "- O ZIP congelado contém arquivos de despesas pagas, mas este artefato não os integra. A integração paga é complementar e não bloqueia a análise contratada.",
+        "- Este artefato usa voto nominal por candidato e não implementa o denominador oficial por UF/cargo incluindo legenda, os controles definidos nem a análise secundária por sexo.",
+        "- A deduplicação é metodológica e não confirma identidade econômica; diferenças não são chamadas de desperdício ou gasto indevido. Este relatório permanece exploratório e não é o `analytical_base.csv`.",
         "",
-        "## Arquivos",
-        "",
-        "Todos os artefatos deste diretório têm prefixo `exploratory_` ou estão sob `plots/` e carregam a marca `exploratory_only` no manifesto.",
+        "Todos os artefatos têm prefixo `exploratory_` ou ficam em `plots/`; permanecem marcados como `exploratory_only`.",
     ])
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -740,7 +813,7 @@ def run_exploratory_scenarios(manifest_path: Path, validation_path: Path, output
     output_dir.mkdir(parents=True, exist_ok=True)
     plots_dir = output_dir / "plots"
     plots_dir.mkdir(parents=True, exist_ok=True)
-    for filename in GENERATED_FILES:
+    for filename in (*GENERATED_FILES, *OBSOLETE_FILES):
         path = output_dir / filename
         if path.exists():
             path.unlink()
@@ -750,49 +823,52 @@ def run_exploratory_scenarios(manifest_path: Path, validation_path: Path, output
     candidates_all = _load_candidates(manifest)
     candidates = {key: value for key, value in candidates_all.items() if value["candidate_status_code"] == "12"}
     excluded = Counter((value["candidate_status"] or value["candidate_status_code"] or "ausente").casefold() for value in candidates_all.values() if value["candidate_status_code"] != "12")
+    validation_database = Path(validation.get("database", "")) if validation.get("database") else Path(validation_path).parent / "pilot.sqlite"
     votes = _load_votes(validation, Path(validation_path), candidates)
-    (scenario_data, expense_counters) = _load_final_expenses(manifest, candidates)
-    preserve, remove = scenario_data
-    rows_a = _scenario_rows(candidates, preserve, votes)
-    rows_b = _scenario_rows(candidates, remove, votes)
-    comparison = _comparison_rows(rows_a, rows_b)
-    summary = _summary_rows(rows_a, SCENARIO_A) + _summary_rows(rows_b, SCENARIO_B)
-    cost_rows = _cost_rows(rows_a, SCENARIO_A) + _cost_rows(rows_b, SCENARIO_B)
-    uf_a = _uf_rows(rows_a, SCENARIO_A)
-    uf_b = _uf_rows(rows_b, SCENARIO_B)
-    uf_summary = uf_a + uf_b
+    (scenario_data, expense_counters) = _load_final_expenses(manifest, candidates, validation_database)
+    deduplicated, all_rows_sensitivity = scenario_data
+    rows_deduplicated = _scenario_rows(candidates, deduplicated, votes)
+    rows_all_rows = _scenario_rows(candidates, all_rows_sensitivity, votes)
+    comparison = _comparison_rows(rows_deduplicated, rows_all_rows)
+    summary = _summary_rows(rows_deduplicated, SCENARIO_DEDUPLICATED) + _summary_rows(rows_all_rows, SCENARIO_ALL_ROWS)
+    cost_rows = _cost_rows(rows_deduplicated, SCENARIO_DEDUPLICATED) + _cost_rows(rows_all_rows, SCENARIO_ALL_ROWS)
+    uf_deduplicated = _uf_rows(rows_deduplicated, SCENARIO_DEDUPLICATED)
+    uf_all_rows = _uf_rows(rows_all_rows, SCENARIO_ALL_ROWS)
+    uf_summary = uf_deduplicated + uf_all_rows
 
     metadata = {
-        "schema_version": 1,
+        "schema_version": 3,
         "status": "exploratory_only",
-        "approval_status": "blocked",
+        "validation_status": validation.get("status"),
+        "analysis_protocol_status": "specified_pending_implementation",
         "not_approved": True,
         "manifest_id": manifest.get("manifest_id"),
-        "validation_status": validation.get("status"),
-        "population_definition": "candidatos com CD_SITUACAO_CANDIDATURA = 12 (APTO) no snapshot posterior à eleição",
+        "population_definition": "candidaturas APTO no snapshot posterior à eleição; não reconstrói validade no dia do pleito",
         "candidate_rows_selected": len(candidates_all),
         "population_included": len(candidates),
         "population_excluded_by_reason": dict(excluded),
-        "expense_measure": "despesas contratadas declaradas no snapshot; TP_PRESTACAO_CONTAS = Final; não afirmar equivalência com Gastos Financeiros",
-        "vote_measure": "QT_VOTOS_NOMINAIS_VALIDOS",
+        "expense_measure": "VR_DESPESA_CONTRATADA declarada em prestações Final; despesas pagas são complementares e não estão integradas neste artefato",
+        "vote_measure": "QT_VOTOS_NOMINAIS_VALIDOS por candidato; este artefato não aplica o denominador oficial incluindo legenda",
         "absence_rule": "ausência permanece ausente; zero observado permanece zero observado",
-        "scenario_a": "preservar todas as linhas Final",
-        "scenario_b": "remover somente repetições completas exatas, mantendo a primeira ocorrência",
+        "scenario_deduplicated": SCENARIO_DEDUPLICATED,
+        "scenario_all_rows": SCENARIO_ALL_ROWS,
+        "deduplication_rule": "uma ocorrência por grupo igual nos 53 campos originais, dentro do mesmo snapshot e membro; campos de auditoria excluídos da comparação",
+        "methodological_uncertainty": "A regra é uma escolha metodológica; não há confirmação oficial de identidade econômica das repetições.",
         **expense_counters,
         "generated_at": datetime.utcnow().isoformat(timespec="seconds") + "Z",
     }
-    _write_csv(output_dir / "exploratory_candidates.csv", list(rows_a[0].keys()) if rows_a else [], rows_a)
-    _write_csv(output_dir / "exploratory_scenario_a_preserve_all.csv", list(rows_a[0].keys()) if rows_a else [], rows_a)
-    _write_csv(output_dir / "exploratory_scenario_b_remove_exact_repeats.csv", list(rows_b[0].keys()) if rows_b else [], rows_b)
-    _write_csv(output_dir / "exploratory_scenario_comparison.csv", list(comparison[0].keys()) if comparison else [], comparison)
+    _write_csv(output_dir / "exploratory_candidates.csv", list(rows_deduplicated[0].keys()) if rows_deduplicated else [], rows_deduplicated)
+    _write_csv(output_dir / "exploratory_deduplicated_primary.csv", list(rows_deduplicated[0].keys()) if rows_deduplicated else [], rows_deduplicated)
+    _write_csv(output_dir / "exploratory_all_rows_sensitivity.csv", list(rows_all_rows[0].keys()) if rows_all_rows else [], rows_all_rows)
+    _write_csv(output_dir / "exploratory_deduplicated_vs_all_rows.csv", list(comparison[0].keys()) if comparison else [], comparison)
     _write_csv(output_dir / "exploratory_cost_per_vote.csv", list(cost_rows[0].keys()) if cost_rows else [], cost_rows)
     _write_csv(output_dir / "exploratory_distributions.csv", list(summary[0].keys()) if summary else [], summary)
     _write_csv(output_dir / "exploratory_uf_associations.csv", list(uf_summary[0].keys()) if uf_summary else [], uf_summary)
     (output_dir / "exploratory_metadata.json").write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    _svg_scatter(rows_a, "declared_expense_centavos", plots_dir / "exploratory_expense_vs_votes_a.svg", "Cenário A — despesas declaradas versus votos")
-    _svg_scatter(rows_b, "declared_expense_centavos", plots_dir / "exploratory_expense_vs_votes_b.svg", "Cenário B — despesas declaradas versus votos")
-    _svg_distributions(rows_a, rows_b, plots_dir / "exploratory_distributions.svg")
-    _svg_uf_totals(uf_a, uf_b, plots_dir / "exploratory_uf_expense_totals.svg")
+    _svg_scatter(rows_deduplicated, "declared_expense_centavos", plots_dir / "exploratory_expense_vs_votes_deduplicated.svg", "Tratamento deduplicado — despesas declaradas versus votos nominais")
+    _svg_scatter(rows_all_rows, "declared_expense_centavos", plots_dir / "exploratory_expense_vs_votes_all_rows.svg", "Todas as linhas — despesas declaradas versus votos nominais")
+    _svg_distributions(rows_deduplicated, rows_all_rows, plots_dir / "exploratory_distributions.svg")
+    _svg_uf_totals(uf_deduplicated, uf_all_rows, plots_dir / "exploratory_uf_expense_totals.svg")
     _write_report(output_dir / "exploratory_report.md", metadata, summary, comparison, uf_summary, cost_rows)
-    _svg_uf_spearman(uf_a, uf_b, plots_dir / "exploratory_uf_spearman_by_scenario.svg")
+    _svg_uf_spearman(uf_deduplicated, uf_all_rows, plots_dir / "exploratory_uf_spearman_deduplicated_vs_all_rows.svg")
     return metadata

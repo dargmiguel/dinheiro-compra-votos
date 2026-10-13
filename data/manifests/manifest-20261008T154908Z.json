@@ -67,6 +67,27 @@
         "sha256": "97b16f48facb61b3d11ef2ca877e7a1d379a1975126f72921995e915b0165fcb"
       },
       "version_id": "resource:40fdcf49-256a-4c81-87cf-711545bd1528;sha256:97b16f48facb61b3d11ef2ca877e7a1d379a1975126f72921995e915b0165fcb"
+    },
+    {
+      "resource_key": "vote_totals_2022",
+      "dataset": "resultados-2022",
+      "resource_id": "ffb14f0e-85eb-4618-8031-7cb88f95e05e",
+      "resource_name": "Votação em partido por município e zona",
+      "role": "denominador oficial de votos válidos nominais e de legenda",
+      "url": "https://cdn.tse.jus.br/estatistica/sead/odsele/votacao_partido_munzona/votacao_partido_munzona_2022.zip",
+      "scope": "Brasil / todas as UFs",
+      "local_path": "data/raw/2022/20261008T154908Z/votacao_partido_munzona_2022.zip",
+      "downloaded_at": "2026-10-13T18:58:51.981468Z",
+      "version_id": "resource:ffb14f0e-85eb-4618-8031-7cb88f95e05e;sha256:4f6325c4a496cce00220e197ef3dd2dcd331c44b42e706194dd9e89294d68d9f",
+      "http": {
+        "etag": "\"18f0658-65dbb599a6c2f\"",
+        "last_modified": "Tue, 13 Oct 2026 16:31:43 GMT",
+        "content_length": 26150488
+      },
+      "file": {
+        "size_bytes": 26150488,
+        "sha256": "4f6325c4a496cce00220e197ef3dd2dcd331c44b42e706194dd9e89294d68d9f"
+      }
     }
   ]
 }
