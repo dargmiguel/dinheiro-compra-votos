@@ -10242,6 +10242,76 @@
         "vote_share_q75_pct": 0.0812849444964657
       }
     ],
+    "election_adjusted_comparison": {
+      "adjusted_estimates": [],
+      "common_population_n": 9062,
+      "controls": [
+        "UF",
+        "partido",
+        "idade na data da eleição",
+        "sexo",
+        "escolaridade"
+      ],
+      "elected_counts": {
+        "brancas": 363,
+        "pretas_pardas": 139
+      },
+      "group_counts": {
+        "brancas": 4681,
+        "pretas_pardas": 4381
+      },
+      "models": [],
+      "observed_difference_pretas_pardas_minus_brancas_pp": -4.581961657759583,
+      "observed_proportions": {
+        "brancas": 0.07754753257850887,
+        "pretas_pardas": 0.031727916000913035
+      },
+      "specifications": [
+        {
+          "common_population_n": 9062,
+          "model_population_n": null,
+          "name": "controls_only"
+        },
+        {
+          "common_population_n": 9062,
+          "model_population_n": null,
+          "name": "controls_plus_deduplicated_expense"
+        },
+        {
+          "common_population_n": 9062,
+          "model_population_n": null,
+          "name": "controls_plus_all_lines_expense"
+        }
+      ],
+      "status": "adjustment_withheld_insufficient_common_support",
+      "support": {
+        "common_support_sufficient": false,
+        "coverage_by_group": {
+          "brancas": 0.3826105533005768,
+          "pretas_pardas": 0.31842045195160923
+        },
+        "elected_counts_in_supported_population": {
+          "brancas": 135,
+          "pretas_pardas": 41
+        },
+        "eligible_group_counts": {
+          "brancas": 1791,
+          "pretas_pardas": 1395
+        },
+        "eligible_uf_party_cells_n": 74,
+        "minimum_coverage_per_group": 0.8,
+        "minimum_elected_and_not_elected_per_group": 10,
+        "minimum_group_n_per_uf_party_cell": 10,
+        "not_elected_counts_in_supported_population": {
+          "brancas": 1656,
+          "pretas_pardas": 1354
+        },
+        "outcome_support_sufficient": true,
+        "sufficient": false,
+        "supported_population_n": 3186
+      },
+      "withheld_reason": "células UF×partido com pelo menos 10 candidaturas por grupo cobrem menos de 80% de pelo menos um grupo; probabilidades nacionais ajustadas dependeriam de extrapolação"
+    },
     "interpretation": "análise secundária acrescentada após os primeiros resultados; associação ajustada, não causal; despesa contratada declarada não implica pagamento ou recurso público",
     "models": [
       {

@@ -415,6 +415,127 @@ class FinancialAnalysisTests(unittest.TestCase):
         self.assertNotIn("var(--c", svg)
 
 
+    def test_race_election_comparison_uses_common_population_and_withholds_unsupported_adjustments(self) -> None:
+        connection = sqlite3.connect(self.database)
+        connection.execute(
+            "UPDATE candidates SET candidate_total_status_code = '9', candidate_total_status = 'OUTRO' "
+            "WHERE sq_candidate = 'A000'"
+        )
+        connection.commit()
+        connection.close()
+
+        result = run_financial_analysis(self.database, self.validation, self.output)
+        comparison = result["secondary_race_analysis"]["election_adjusted_comparison"]
+        self.assertEqual(comparison["status"], "adjustment_withheld_insufficient_common_support")
+        self.assertEqual(
+            comparison["controls"],
+            ["UF", "partido", "idade na data da eleição", "sexo", "escolaridade"],
+        )
+        self.assertEqual(comparison["common_population_n"], 45)
+        self.assertEqual(comparison["group_counts"], {"brancas": 15, "pretas_pardas": 30})
+        self.assertEqual(comparison["elected_counts"], {"brancas": 7, "pretas_pardas": 15})
+        self.assertAlmostEqual(comparison["observed_proportions"]["brancas"], 7 / 15)
+        self.assertEqual(comparison["observed_proportions"]["pretas_pardas"], 0.5)
+        self.assertAlmostEqual(
+            comparison["observed_difference_pretas_pardas_minus_brancas_pp"],
+            (0.5 - 7 / 15) * 100,
+        )
+        self.assertEqual(comparison["support"]["eligible_uf_party_cells_n"], 0)
+        self.assertFalse(comparison["support"]["common_support_sufficient"])
+        self.assertFalse(comparison["support"]["sufficient"])
+        self.assertEqual(comparison["adjusted_estimates"], [])
+        self.assertEqual(
+            [model["common_population_n"] for model in comparison["specifications"]],
+            [45, 45, 45],
+        )
+        self.assertEqual(
+            [model["model_population_n"] for model in comparison["specifications"]],
+            [None, None, None],
+        )
+        report = (self.output / "tse-2022-financial-analysis.md").read_text(encoding="utf-8")
+        self.assertIn("### Comparação ajustada de eleição por raça/cor", report)
+        self.assertIn("Não estimamos probabilidades ajustadas nem ICs", report)
+    def test_race_election_comparison_estimates_all_specs_on_supported_common_population(self) -> None:
+        connection = sqlite3.connect(self.database)
+        cells = (("SP", "P0"), ("SP", "P1"), ("RJ", "P0"), ("RJ", "P1"))
+        for index in range(48):
+            group = "brancas" if index % 3 == 0 else "pretas_pardas"
+            uf, party = cells[index % len(cells)]
+            race = "BRANCA" if group == "brancas" else "PARDA"
+            connection.execute(
+                "UPDATE candidates SET uf = ?, party_code = ?, race = ? WHERE sq_candidate = ?",
+                (uf, party, race, f"A{index:03d}"),
+            )
+        occurrence_rows = []
+        deduplicated_rows = []
+        candidate_index = 0
+        for cell_index, (uf, party) in enumerate(cells):
+            for group_index, race in enumerate(("BRANCA", "PARDA")):
+                for within_group in range(20):
+                    candidate = f"S{candidate_index:03d}"
+                    candidate_index += 1
+                    elected = within_group % 2 == 0
+                    result_code = "2" if elected else "4"
+                    result_text = "ELEITO POR QP" if elected else "NÃO ELEITO"
+                    gender = ("FEMININO", "MASCULINO")[(within_group // 2 + group_index + cell_index) % 2]
+                    schooling = ("MÉDIO", "SUPERIOR", "FUNDAMENTAL")[within_group % 3]
+                    birth_year = 1960 + (within_group * 7) % 35
+                    connection.execute(
+                        "INSERT INTO candidates VALUES (?, 2022, 1, ?, '6', '12', ?, ?, ?, ?, ?, 'SOLTEIRO', 'PROFESSOR', ?, ?)",
+                        (
+                            candidate, uf, party, f"01/01/{birth_year}", gender, race, schooling,
+                            result_code, result_text,
+                        ),
+                    )
+                    votes = 100 + within_group * 13 + group_index * 5 + cell_index
+                    connection.execute("INSERT INTO votes VALUES (?, ?)", (candidate, votes))
+                    amount = 10000 + within_group * 175 + group_index * 350 + cell_index * 90
+                    expense = (candidate, f"DOC-{candidate}", "Final", f"{amount / 100:.2f}".replace(".", ","), "src.zip", "expenses.csv", 1000 + candidate_index)
+                    occurrence_rows.append(expense)
+                    deduplicated_rows.append(
+                        (candidate, expense[1], amount, "signature", "snapshot-test", "src.zip", "expenses.csv", 1000 + candidate_index)
+                    )
+        connection.executemany("INSERT INTO expense_occurrences VALUES (?, ?, ?, ?, ?, ?, ?)", occurrence_rows)
+        connection.executemany("INSERT INTO expenses VALUES (?, ?, ?, ?, ?, ?, ?, ?)", deduplicated_rows)
+        connection.commit()
+        connection.close()
+
+        result = run_financial_analysis(self.database, self.validation, self.output)
+        comparison = result["secondary_race_analysis"]["election_adjusted_comparison"]
+        self.assertEqual(comparison["status"], "adjusted_models_estimated", comparison["withheld_reason"])
+        self.assertTrue(comparison["support"]["sufficient"])
+        self.assertGreaterEqual(comparison["support"]["coverage_by_group"]["brancas"], 0.8)
+        self.assertGreaterEqual(comparison["support"]["coverage_by_group"]["pretas_pardas"], 0.8)
+        estimates = comparison["adjusted_estimates"]
+        self.assertEqual(
+            [estimate["model"] for estimate in estimates],
+            [
+                "controls_only",
+                "controls_plus_deduplicated_expense",
+                "controls_plus_all_lines_expense",
+            ],
+        )
+        self.assertEqual(
+            [model["model_population_n"] for model in comparison["specifications"]],
+            [comparison["support"]["supported_population_n"]] * 3,
+        )
+        for estimate in estimates:
+            self.assertEqual(estimate["population_n"], comparison["support"]["supported_population_n"])
+            for group in ("brancas", "pretas_pardas"):
+                summary = estimate[group]
+                self.assertGreaterEqual(summary["prediction"], 0)
+                self.assertLessEqual(summary["prediction"], 1)
+                self.assertLessEqual(summary["ci95_lower"], summary["prediction"])
+                self.assertGreaterEqual(summary["ci95_upper"], summary["prediction"])
+            self.assertTrue(math.isfinite(estimate["difference_pretas_pardas_minus_brancas_pp"]))
+            self.assertTrue(math.isfinite(estimate["difference_ci95_lower_pp"]))
+            self.assertTrue(math.isfinite(estimate["difference_ci95_upper_pp"]))
+        report = (self.output / "tse-2022-financial-analysis.md").read_text(encoding="utf-8")
+        self.assertIn("| Controles, sem despesa |", report)
+        self.assertIn("| Controles + despesa deduplicada |", report)
+        self.assertNotIn("Não estimamos probabilidades ajustadas nem ICs", report)
+
+
     def test_refuses_unapproved_pipeline_validation(self) -> None:
         self.validation.write_text(json.dumps({"status": "blocked"}), encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "approved"):

@@ -265,6 +265,12 @@ A tabela descritiva usa essa mesma coorte em ambos os cenários. Medianas e inte
 | Pretas + pardas | deduplicado | 4.381 | 49.996,85 (11.560,00–205.251,50) | 818 (278–2.957) | 0,0179% (0,0050–0,0813%) | 139/4.381 | 3,17% | 0 |
 | Pretas + pardas | todas_as_linhas | 4.381 | 50.000,00 (11.565,85–205.686,59) | 818 (278–2.957) | 0,0179% (0,0050–0,0813%) | 139/4.381 | 3,17% | 0 |
 
+### Comparação ajustada de eleição por raça/cor
+Na população comum classificável (N=9.062), as taxas observadas foram 363/4.681 (7,75%) entre brancas e 139/4.381 (3,17%) entre pretas+pardas; diferença bruta: -4,58 pontos percentuais.
+As especificações comparáveis usam os mesmos perfis: primeiro ajuste por UF, partido, idade, sexo e escolaridade; depois acrescenta-se a despesa Final deduplicada (principal) ou todas as linhas (sensibilidade). Quando o gate passa, ambas as especificações ficam restritas à mesma população nas células com suporte.
+Não estimamos probabilidades ajustadas nem ICs: somente 74 células UF×partido têm ao menos 10 candidaturas de cada grupo; cobrem 38,3% das brancas e 31,8% das pretas+pardas, abaixo do mínimo pré-fixado de 80% para ambos. A diferença observada permanece descritiva; sem suporte não é possível comparar validamente as especificações sem e com despesa.
+Uma mudança após acrescentar despesas não seria, de todo modo, explicação causal nem prova de discriminação.
+
 Interação ajustada: GLM Binomial/logit fracionário para participação de votos, com `log1p(despesa em R$)`, indicador pretas+pardas e interação entre os dois; referência: brancas. Controles: UF, partido, idade na eleição, sexo e escolaridade; erros-padrão HC1. Deduplicado é principal; todas as linhas, sensibilidade. Custo por voto não é preditor porque usa votos no denominador.
 
 | Cenário | N | Interação despesa×pretas+pardas (logit) | IC 95% HC1 | p |

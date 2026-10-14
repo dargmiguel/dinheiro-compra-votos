@@ -289,6 +289,134 @@ def _fit_election_model(name: str, frame: pd.DataFrame, expense_column: str) -> 
     }
 
 
+def _election_race_design_matrix(
+    frame: pd.DataFrame,
+    *,
+    include_expense: bool,
+    categorical_levels: dict[str, list[str]] | None = None,
+) -> tuple[pd.DataFrame, list[str]]:
+    design = pd.DataFrame(index=frame.index)
+    design["intercept"] = 1.0
+    if include_expense:
+        design["log1p_expense_brl"] = frame["log1p_expense_brl"].astype(float)
+    design["age_at_election"] = frame["age_at_election"].astype(float)
+    categorical = ["uf", "party_code", "gender", "schooling"]
+    for column in categorical:
+        values = frame[column].astype(str)
+        levels = (categorical_levels or {}).get(column)
+        category_values = pd.Categorical(values, categories=levels) if levels else values
+        dummies = pd.get_dummies(
+            category_values,
+            prefix=column,
+            drop_first=True,
+            dtype=float,
+        )
+        dummies.index = frame.index
+        design = pd.concat([design, dummies], axis=1)
+    design["black_brown"] = frame["race_group"].eq("pretas_pardas").astype(float)
+    return design, categorical
+
+
+def _fit_election_race_model(
+    name: str,
+    frame: pd.DataFrame,
+    expense_column: str | None,
+) -> tuple[dict[str, Any], Any, pd.DataFrame, np.ndarray, dict[str, list[str]]]:
+    model_frame = frame.copy()
+    include_expense = expense_column is not None
+    if include_expense:
+        model_frame["log1p_expense_brl"] = (
+            model_frame[expense_column].astype(float).div(100).map(math.log1p)
+        )
+    design, categorical = _election_race_design_matrix(
+        model_frame,
+        include_expense=include_expense,
+    )
+    if np.linalg.matrix_rank(design.to_numpy()) != design.shape[1]:
+        raise ValueError(f"matriz do modelo {name} tem colinearidade exata")
+    n, parameter_count = design.shape
+    if n <= parameter_count:
+        raise ValueError(f"modelo {name} não permite correção HC1 com N≤K")
+    fitted = sm.GLM(
+        model_frame["elected"].astype(float),
+        design,
+        family=sm.families.Binomial(),
+    ).fit(maxiter=100, cov_type="HC0")
+    if not fitted.converged:
+        raise ValueError(f"modelo {name} não convergiu")
+    correction_factor = n / (n - parameter_count)
+    covariance_hc1 = np.asarray(fitted.cov_params(), dtype=float) * correction_factor
+    standard_errors = np.sqrt(np.diag(covariance_hc1))
+    if not np.isfinite(covariance_hc1).all() or not np.isfinite(standard_errors).all():
+        raise ValueError(f"modelo {name} tem covariância HC1 ou erros-padrão não finitos")
+    categorical_levels = {
+        column: sorted(model_frame[column].astype(str).unique().tolist())
+        for column in categorical
+    }
+    return {
+        "name": name,
+        "n": int(n),
+        "elected_n": int(model_frame["elected"].sum()),
+        "not_elected_n": int(len(model_frame) - model_frame["elected"].sum()),
+        "parameter_count": int(parameter_count),
+        "converged": bool(fitted.converged),
+        "covariance": "HC1: covariância HC0 multiplicada por N/(N−K)",
+        "hc1_correction_factor": correction_factor,
+        "controls": ["UF", "partido", "idade na data da eleição", "sexo", "escolaridade"],
+        "race_reference": "brancas",
+        "black_brown_group": "autodeclarações PRETA + PARDA",
+        "expense_column": expense_column,
+    }, fitted, model_frame, covariance_hc1, categorical_levels
+
+
+def _marginal_election_race_prediction(
+    fitted: Any,
+    standardization_frame: pd.DataFrame,
+    race_group: str,
+    *,
+    include_expense: bool,
+    categorical_levels: dict[str, list[str]],
+    covariance_matrix: np.ndarray,
+) -> dict[str, Any]:
+    prediction_frame = standardization_frame.copy()
+    prediction_frame["race_group"] = race_group
+    design, _ = _election_race_design_matrix(
+        prediction_frame,
+        include_expense=include_expense,
+        categorical_levels=categorical_levels,
+    )
+    design = design.reindex(columns=fitted.model.exog_names, fill_value=0.0)
+    matrix = design.to_numpy(dtype=float)
+    if not np.isfinite(matrix).all():
+        invalid_columns = [
+            column for column in design.columns
+            if not np.isfinite(design[column].to_numpy(dtype=float)).all()
+        ]
+        raise ValueError(f"matriz padronizada contém valores não finitos: {invalid_columns}")
+    linear_predictor = matrix @ fitted.params.to_numpy(dtype=float)
+    if not np.isfinite(linear_predictor).all():
+        raise ValueError("preditor linear marginal contém valores não finitos")
+    probabilities = 1 / (1 + np.exp(-np.clip(linear_predictor, -40, 40)))
+    prediction = float(probabilities.mean())
+    gradient = (matrix * (probabilities * (1 - probabilities))[:, None]).mean(axis=0)
+    covariance = np.asarray(covariance_matrix, dtype=float)
+    variance = max(0.0, float(gradient @ covariance @ gradient))
+    standard_error = math.sqrt(variance)
+    margin = 1.959963984540054 * standard_error
+    if not all(np.isfinite(value) for value in (prediction, standard_error, margin)):
+        raise ValueError(
+            f"previsão marginal de eleição ou seu IC não é finito: "
+            f"predição={prediction}, erro-padrão={standard_error}, margem={margin}, "
+            f"betas_finitos={np.isfinite(fitted.params.to_numpy(dtype=float)).all()}"
+        )
+    return {
+        "prediction": prediction,
+        "ci95_lower": max(0.0, prediction - margin),
+        "ci95_upper": min(1.0, prediction + margin),
+        "gradient": gradient,
+    }
+
+
 def _fit_model(
     name: str,
     frame: pd.DataFrame,
@@ -1062,6 +1190,205 @@ def _build_race_secondary(
                 "election_denominator_definition": "candidaturas com código oficial 2, 3, 4 ou 5",
             })
 
+    classified_election = complete.loc[
+        complete["candidate_total_status_code"].isin({"2", "3", "4", "5"})
+    ].copy()
+    election_group_counts = {
+        group: int((classified_election["race_group"] == group).sum())
+        for group in ("brancas", "pretas_pardas")
+    }
+    election_counts = {
+        group: int(
+            (
+                classified_election["race_group"].eq(group)
+                & classified_election["candidate_total_status_code"].isin({"2", "3"})
+            ).sum()
+        )
+        for group in ("brancas", "pretas_pardas")
+    }
+    observed_election_proportions = {
+        group: election_counts[group] / election_group_counts[group]
+        if election_group_counts[group]
+        else None
+        for group in ("brancas", "pretas_pardas")
+    }
+    observed_difference_pp = (
+        (
+            observed_election_proportions["pretas_pardas"]
+            - observed_election_proportions["brancas"]
+        )
+        * 100
+        if all(value is not None for value in observed_election_proportions.values())
+        else None
+    )
+    eligible_election_cells = set()
+    for key, cell in classified_election.groupby(["uf", "party_code"], sort=True):
+        group_counts = cell["race_group"].value_counts()
+        if group_counts.get("brancas", 0) >= 10 and group_counts.get("pretas_pardas", 0) >= 10:
+            eligible_election_cells.add((str(key[0]), str(key[1])))
+    election_cell_keys = list(
+        zip(classified_election["uf"].astype(str), classified_election["party_code"].astype(str))
+    )
+    eligible_election_mask = pd.Series(
+        [key in eligible_election_cells for key in election_cell_keys],
+        index=classified_election.index,
+    )
+    eligible_election_frame = classified_election.loc[eligible_election_mask]
+    eligible_election_group_counts = {
+        group: int((eligible_election_frame["race_group"] == group).sum())
+        for group in ("brancas", "pretas_pardas")
+    }
+    election_group_coverage = {
+        group: eligible_election_group_counts[group] / max(1, election_group_counts[group])
+        for group in ("brancas", "pretas_pardas")
+    }
+    election_support_sufficient = all(
+        election_group_coverage[group] >= 0.80
+        for group in ("brancas", "pretas_pardas")
+    )
+    eligible_elected_counts = {
+        group: int(
+            (
+                eligible_election_frame["race_group"].eq(group)
+                & eligible_election_frame["candidate_total_status_code"].isin({"2", "3"})
+            ).sum()
+        )
+        for group in ("brancas", "pretas_pardas")
+    }
+    eligible_not_elected_counts = {
+        group: eligible_election_group_counts[group] - eligible_elected_counts[group]
+        for group in ("brancas", "pretas_pardas")
+    }
+    outcome_support_sufficient = all(
+        eligible_elected_counts[group] >= 10 and eligible_not_elected_counts[group] >= 10
+        for group in ("brancas", "pretas_pardas")
+    )
+    election_adjusted_models = []
+    election_adjusted_estimates = []
+    if not election_support_sufficient:
+        election_adjustment_status = "adjustment_withheld_insufficient_common_support"
+        election_withheld_reason = (
+            "células UF×partido com pelo menos 10 candidaturas por grupo cobrem menos de 80% "
+            "de pelo menos um grupo; probabilidades nacionais ajustadas dependeriam de extrapolação"
+        )
+    elif not outcome_support_sufficient:
+        election_adjustment_status = "adjustment_withheld_sparse_election_outcomes"
+        election_withheld_reason = (
+            "a população com suporte tem menos de 10 candidaturas eleitas ou não eleitas em pelo "
+            "menos um dos grupos"
+        )
+    else:
+        election_model_frame = eligible_election_frame.copy()
+        election_model_frame["elected"] = (
+            election_model_frame["candidate_total_status_code"].isin({"2", "3"}).astype(int)
+        )
+        model_specs = (
+            ("controls_only", None),
+            ("controls_plus_deduplicated_expense", "expense_deduplicated_centavos"),
+            ("controls_plus_all_lines_expense", "expense_all_lines_centavos"),
+        )
+        try:
+            for model_name, expense_column in model_specs:
+                model_summary, fitted, model_frame, covariance_hc1, categorical_levels = (
+                    _fit_election_race_model(model_name, election_model_frame, expense_column)
+                )
+                include_expense = expense_column is not None
+                white_prediction = _marginal_election_race_prediction(
+                    fitted,
+                    model_frame,
+                    "brancas",
+                    include_expense=include_expense,
+                    categorical_levels=categorical_levels,
+                    covariance_matrix=covariance_hc1,
+                )
+                black_prediction = _marginal_election_race_prediction(
+                    fitted,
+                    model_frame,
+                    "pretas_pardas",
+                    include_expense=include_expense,
+                    categorical_levels=categorical_levels,
+                    covariance_matrix=covariance_hc1,
+                )
+                difference_gradient = black_prediction["gradient"] - white_prediction["gradient"]
+                difference_variance = max(
+                    0.0,
+                    float(difference_gradient @ covariance_hc1 @ difference_gradient),
+                )
+                difference_standard_error_pp = math.sqrt(difference_variance) * 100
+                difference_pp = (
+                    black_prediction["prediction"] - white_prediction["prediction"]
+                ) * 100
+                difference_margin_pp = 1.959963984540054 * difference_standard_error_pp
+                if not all(np.isfinite(value) for value in (difference_pp, difference_standard_error_pp, difference_margin_pp)):
+                    raise ValueError(f"modelo {model_name} tem diferença ajustada ou IC não finitos")
+                model_summary["standardization_n"] = len(model_frame)
+                election_adjusted_models.append(model_summary)
+                election_adjusted_estimates.append({
+                    "model": model_name,
+                    "population_n": len(model_frame),
+                    "brancas": {
+                        key: white_prediction[key]
+                        for key in ("prediction", "ci95_lower", "ci95_upper")
+                    },
+                    "pretas_pardas": {
+                        key: black_prediction[key]
+                        for key in ("prediction", "ci95_lower", "ci95_upper")
+                    },
+                    "difference_pretas_pardas_minus_brancas_pp": difference_pp,
+                    "difference_ci95_lower_pp": difference_pp - difference_margin_pp,
+                    "difference_ci95_upper_pp": difference_pp + difference_margin_pp,
+                })
+        except (ValueError, np.linalg.LinAlgError, FloatingPointError, OverflowError) as error:
+            election_adjusted_models = []
+            election_adjusted_estimates = []
+            election_adjustment_status = "adjustment_withheld_model_instability"
+            election_withheld_reason = f"instabilidade ou matriz não identificável: {error}"
+        else:
+            election_adjustment_status = "adjusted_models_estimated"
+            election_withheld_reason = None
+    election_adjusted_comparison = {
+        "status": election_adjustment_status,
+        "common_population_n": int(len(classified_election)),
+        "group_counts": election_group_counts,
+        "elected_counts": election_counts,
+        "observed_proportions": observed_election_proportions,
+        "observed_difference_pretas_pardas_minus_brancas_pp": observed_difference_pp,
+        "support": {
+            "minimum_group_n_per_uf_party_cell": 10,
+            "minimum_coverage_per_group": 0.80,
+            "eligible_uf_party_cells_n": len(eligible_election_cells),
+            "supported_population_n": int(len(eligible_election_frame)),
+            "eligible_group_counts": eligible_election_group_counts,
+            "coverage_by_group": election_group_coverage,
+            "elected_counts_in_supported_population": eligible_elected_counts,
+            "not_elected_counts_in_supported_population": eligible_not_elected_counts,
+            "minimum_elected_and_not_elected_per_group": 10,
+            "common_support_sufficient": election_support_sufficient,
+            "outcome_support_sufficient": outcome_support_sufficient,
+            "sufficient": election_support_sufficient and outcome_support_sufficient,
+        },
+        "controls": ["UF", "partido", "idade na data da eleição", "sexo", "escolaridade"],
+        "specifications": [
+            {
+                "name": name,
+                "common_population_n": int(len(classified_election)),
+                "model_population_n": (
+                    int(len(eligible_election_frame))
+                    if election_support_sufficient and outcome_support_sufficient
+                    else None
+                ),
+            }
+            for name, _ in (
+                ("controls_only", None),
+                ("controls_plus_deduplicated_expense", "expense_deduplicated_centavos"),
+                ("controls_plus_all_lines_expense", "expense_all_lines_centavos"),
+            )
+        ],
+        "models": election_adjusted_models,
+        "adjusted_estimates": election_adjusted_estimates,
+        "withheld_reason": election_withheld_reason,
+    }
+
     curves = {}
     support_rows = []
     curve_support_rows = []
@@ -1116,6 +1443,7 @@ def _build_race_secondary(
         "models": models,
         "coefficients": coefficients,
         "descriptive_by_group": descriptive_rows,
+        "election_adjusted_comparison": election_adjusted_comparison,
         "curves": curves,
         "support_method": (
             "células UF×partido com N≥10 em cada grupo; faixas locais P10–P90; "
@@ -1694,7 +2022,7 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
         [
             "scenario", "expense_brl", "brancas_supported_n", "pretas_pardas_supported_n",
             "brancas_coverage", "pretas_pardas_coverage", "supported_uf_party_cells_n",
-            "standardization_n", "published", "brancas_prediction", "brancas_ci95_lower",
+            "supported_uf_party_strata", "standardization_n", "published", "brancas_prediction", "brancas_ci95_lower",
             "brancas_ci95_upper", "pretas_pardas_prediction", "pretas_pardas_ci95_lower",
             "pretas_pardas_ci95_upper", "difference_pretas_pardas_minus_brancas_pp",
         ],
@@ -1945,6 +2273,7 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
         f"{category}: {_pt_int(count)}"
         for category, count in race_population["outside_comparison_counts"].items()
     ) or "nenhuma categoria fora do recorte"
+    race_election_comparison = race_analysis["election_adjusted_comparison"]
     race_estimates = {
         scenario: next(
             row for row in race_coefficients
@@ -1986,6 +2315,57 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
         )
         report_lines.append(
             f"| {row['race_group_label']} | {row['scenario']} | {_pt_int(row['candidate_count'])} | {expense_summary} | {vote_summary} | {share_summary} | {_pt_int(row['elected_count'])}/{_pt_int(row['election_classified_n'])} | {elected_share} | {_pt_int(row['unclassified_result_n'])} |"
+        )
+    election_group_counts = race_election_comparison["group_counts"]
+    election_counts = race_election_comparison["elected_counts"]
+    election_proportions = race_election_comparison["observed_proportions"]
+    election_support = race_election_comparison["support"]
+    report_lines.extend([
+        "",
+        "### Comparação ajustada de eleição por raça/cor",
+        f"Na população comum classificável (N={_pt_int(race_election_comparison['common_population_n'])}), as taxas observadas foram {_pt_int(election_counts['brancas'])}/{_pt_int(election_group_counts['brancas'])} ({_pt_decimal(election_proportions['brancas'] * 100, 2)}%) entre brancas e {_pt_int(election_counts['pretas_pardas'])}/{_pt_int(election_group_counts['pretas_pardas'])} ({_pt_decimal(election_proportions['pretas_pardas'] * 100, 2)}%) entre pretas+pardas; diferença bruta: {_pt_decimal(race_election_comparison['observed_difference_pretas_pardas_minus_brancas_pp'], 2)} pontos percentuais.",
+        "As especificações comparáveis usam os mesmos perfis: primeiro ajuste por UF, partido, idade, sexo e escolaridade; depois acrescenta-se a despesa Final deduplicada (principal) ou todas as linhas (sensibilidade). Quando o gate passa, ambas as especificações ficam restritas à mesma população nas células com suporte.",
+    ])
+    adjusted_election_estimates = race_election_comparison["adjusted_estimates"]
+    if adjusted_election_estimates:
+        report_lines.extend([
+            "",
+            "| Especificação | N comum | Brancas: probabilidade eleita ajustada (IC 95%) | Pretas+pardas: probabilidade eleita ajustada (IC 95%) | Diferença pretas+pardas − brancas (p.p.; IC 95%) |",
+            "|---|---:|---:|---:|---:|",
+        ])
+        specification_labels = {
+            "controls_only": "Controles, sem despesa",
+            "controls_plus_deduplicated_expense": "Controles + despesa deduplicada",
+            "controls_plus_all_lines_expense": "Controles + todas as linhas",
+        }
+        for estimate in adjusted_election_estimates:
+            white = estimate["brancas"]
+            black_brown = estimate["pretas_pardas"]
+            report_lines.append(
+                f"| {specification_labels[estimate['model']]} | {_pt_int(estimate['population_n'])} | "
+                f"{_pt_decimal(white['prediction'] * 100, 2)}% ({_pt_decimal(white['ci95_lower'] * 100, 2)}–{_pt_decimal(white['ci95_upper'] * 100, 2)}%) | "
+                f"{_pt_decimal(black_brown['prediction'] * 100, 2)}% ({_pt_decimal(black_brown['ci95_lower'] * 100, 2)}–{_pt_decimal(black_brown['ci95_upper'] * 100, 2)}%) | "
+                f"{_pt_decimal(estimate['difference_pretas_pardas_minus_brancas_pp'], 2)} ({_pt_decimal(estimate['difference_ci95_lower_pp'], 2)}–{_pt_decimal(estimate['difference_ci95_upper_pp'], 2)}) |"
+            )
+        report_lines.append(
+            "As probabilidades são médias padronizadas sobre os mesmos perfis; ICs pontuais de 95% por método delta/HC1. A mudança ao acrescentar despesas é associativa, não explica causalmente a diferença nem prova discriminação."
+        )
+    else:
+        if not election_support["common_support_sufficient"]:
+            reason = (
+                f"somente {_pt_int(election_support['eligible_uf_party_cells_n'])} células UF×partido têm ao menos 10 candidaturas de cada grupo; "
+                f"cobrem {_pt_decimal(election_support['coverage_by_group']['brancas'] * 100, 1)}% das brancas e "
+                f"{_pt_decimal(election_support['coverage_by_group']['pretas_pardas'] * 100, 1)}% das pretas+pardas, abaixo do mínimo pré-fixado de 80% para ambos"
+            )
+        elif not election_support["outcome_support_sufficient"]:
+            reason = "o subconjunto comum não tem ao menos 10 eleitas e 10 não eleitas em cada grupo"
+        else:
+            reason = race_election_comparison["withheld_reason"]
+        report_lines.append(
+            f"Não estimamos probabilidades ajustadas nem ICs: {reason}. A diferença observada permanece descritiva; sem suporte não é possível comparar validamente as especificações sem e com despesa."
+        )
+        report_lines.append(
+            "Uma mudança após acrescentar despesas não seria, de todo modo, explicação causal nem prova de discriminação."
         )
     report_lines.extend([
         "",
