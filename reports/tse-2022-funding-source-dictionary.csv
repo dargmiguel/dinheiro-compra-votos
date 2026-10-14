@@ -1,0 +1,59 @@
+table,field,type,definition
+tse-2022-funding-source-candidates.csv,sq_candidate,text,Identificador sequencial da candidatura no TSE; chave candidata usada para ligar receitas.
+tse-2022-funding-source-candidates.csv,candidate_name,text,Nome da candidatura conforme a base candidates já existente.
+tse-2022-funding-source-candidates.csv,candidate_number,text,Número eleitoral da candidatura.
+tse-2022-funding-source-candidates.csv,uf,text,UF da candidatura de deputado federal.
+tse-2022-funding-source-candidates.csv,party_abbrev,text,Sigla partidária da candidatura.
+tse-2022-funding-source-candidates.csv,contracted_expense_centavos,integer,"Despesa Final contratada da base principal deduplicada; referência para a população, não pagamento."
+tse-2022-funding-source-candidates.csv,receipt_has_rows,boolean,Indica se há ao menos uma linha Final de receita declarada ligada à candidatura.
+tse-2022-funding-source-candidates.csv,receipt_rows,integer,"Quantidade de linhas Final de receita declarada ligadas à candidatura, sem nova deduplicação."
+tse-2022-funding-source-candidates.csv,receipt_amount_valid_rows,integer,Linhas de receita declarada com valor monetário interpretável.
+tse-2022-funding-source-candidates.csv,receipt_amount_missing_rows,integer,Linhas de receita declarada com valor ausente ou sentinela numérica #NULO/#NE.
+tse-2022-funding-source-candidates.csv,receipt_total_centavos,integer,Soma em centavos das linhas válidas de receita declarada; vazio quando não há valor válido.
+tse-2022-funding-source-candidates.csv,receipt_public_centavos,integer,Soma em centavos de receita declarada da classe public; vazio se não houver linhas no fluxo.
+tse-2022-funding-source-candidates.csv,receipt_private_centavos,integer,Soma em centavos de receita declarada da classe private; vazio se não houver linhas no fluxo.
+tse-2022-funding-source-candidates.csv,receipt_unclassified_centavos,integer,Soma em centavos de receita declarada da classe unclassified; vazio se não houver linhas no fluxo.
+tse-2022-funding-source-candidates.csv,receipt_public_financial_centavos,integer,"Soma em centavos de receita declarada, classe public e natureza financeira."
+tse-2022-funding-source-candidates.csv,receipt_public_estimable_centavos,integer,"Soma em centavos de receita declarada, classe public e natureza estimável."
+tse-2022-funding-source-candidates.csv,receipt_public_nature_unclassified_centavos,integer,"Soma em centavos de receita declarada, classe public e natureza natureza não classificada."
+tse-2022-funding-source-candidates.csv,receipt_private_financial_centavos,integer,"Soma em centavos de receita declarada, classe private e natureza financeira."
+tse-2022-funding-source-candidates.csv,receipt_private_estimable_centavos,integer,"Soma em centavos de receita declarada, classe private e natureza estimável."
+tse-2022-funding-source-candidates.csv,receipt_private_nature_unclassified_centavos,integer,"Soma em centavos de receita declarada, classe private e natureza natureza não classificada."
+tse-2022-funding-source-candidates.csv,receipt_unclassified_financial_centavos,integer,"Soma em centavos de receita declarada, classe unclassified e natureza financeira."
+tse-2022-funding-source-candidates.csv,receipt_unclassified_estimable_centavos,integer,"Soma em centavos de receita declarada, classe unclassified e natureza estimável."
+tse-2022-funding-source-candidates.csv,receipt_unclassified_nature_unclassified_centavos,integer,"Soma em centavos de receita declarada, classe unclassified e natureza natureza não classificada."
+tse-2022-funding-source-candidates.csv,payment_has_rows,boolean,Indica se há ao menos uma linha Final de pagamento declarado de despesa ligada à candidatura.
+tse-2022-funding-source-candidates.csv,payment_rows,integer,"Quantidade de linhas Final de pagamento declarado de despesa ligadas à candidatura, sem nova deduplicação."
+tse-2022-funding-source-candidates.csv,payment_amount_valid_rows,integer,Linhas de pagamento declarado de despesa com valor monetário interpretável.
+tse-2022-funding-source-candidates.csv,payment_amount_missing_rows,integer,Linhas de pagamento declarado de despesa com valor ausente ou sentinela numérica #NULO/#NE.
+tse-2022-funding-source-candidates.csv,payment_total_centavos,integer,Soma em centavos das linhas válidas de pagamento declarado de despesa; vazio quando não há valor válido.
+tse-2022-funding-source-candidates.csv,payment_public_centavos,integer,Soma em centavos de pagamento declarado de despesa da classe public; vazio se não houver linhas no fluxo.
+tse-2022-funding-source-candidates.csv,payment_private_centavos,integer,Soma em centavos de pagamento declarado de despesa da classe private; vazio se não houver linhas no fluxo.
+tse-2022-funding-source-candidates.csv,payment_unclassified_centavos,integer,Soma em centavos de pagamento declarado de despesa da classe unclassified; vazio se não houver linhas no fluxo.
+tse-2022-funding-source-candidates.csv,payment_public_financial_centavos,integer,"Soma em centavos de pagamento declarado de despesa, classe public e natureza financeira."
+tse-2022-funding-source-candidates.csv,payment_public_estimable_centavos,integer,"Soma em centavos de pagamento declarado de despesa, classe public e natureza estimável."
+tse-2022-funding-source-candidates.csv,payment_public_nature_unclassified_centavos,integer,"Soma em centavos de pagamento declarado de despesa, classe public e natureza natureza não classificada."
+tse-2022-funding-source-candidates.csv,payment_private_financial_centavos,integer,"Soma em centavos de pagamento declarado de despesa, classe private e natureza financeira."
+tse-2022-funding-source-candidates.csv,payment_private_estimable_centavos,integer,"Soma em centavos de pagamento declarado de despesa, classe private e natureza estimável."
+tse-2022-funding-source-candidates.csv,payment_private_nature_unclassified_centavos,integer,"Soma em centavos de pagamento declarado de despesa, classe private e natureza natureza não classificada."
+tse-2022-funding-source-candidates.csv,payment_unclassified_financial_centavos,integer,"Soma em centavos de pagamento declarado de despesa, classe unclassified e natureza financeira."
+tse-2022-funding-source-candidates.csv,payment_unclassified_estimable_centavos,integer,"Soma em centavos de pagamento declarado de despesa, classe unclassified e natureza estimável."
+tse-2022-funding-source-candidates.csv,payment_unclassified_nature_unclassified_centavos,integer,"Soma em centavos de pagamento declarado de despesa, classe unclassified e natureza natureza não classificada."
+tse-2022-funding-source-summary.csv,flow,text,Fluxo: receipts são receitas declaradas; payments são despesas pagas declaradas.
+tse-2022-funding-source-summary.csv,source_class,text,public = CD_FONTE 0/2; private = CD_FONTE 1 (Outros Recursos); unclassified = qualquer outro código/ausência.
+tse-2022-funding-source-summary.csv,source_code_values,text,"Códigos CD_FONTE observados nesta classe, separados por ponto e vírgula."
+tse-2022-funding-source-summary.csv,source_label_values,text,"Descrições de fonte originais observadas, separadas por ponto e vírgula."
+tse-2022-funding-source-summary.csv,record_count,integer,Linhas de origem no fluxo/classe; cada linha selecionada é contada uma vez.
+tse-2022-funding-source-summary.csv,candidate_count,integer,Candidaturas de referência com ao menos uma linha nesta classe; classes podem se sobrepor.
+tse-2022-funding-source-summary.csv,reference_candidate_count,integer,Denominador fixo: candidaturas APTO/Final com despesa contratada deduplicada observada.
+tse-2022-funding-source-summary.csv,candidate_coverage_pct,percentage,candidate_count dividido por reference_candidate_count; classes podem se sobrepor.
+tse-2022-funding-source-summary.csv,amount_valid_rows,integer,Linhas com valor interpretável.
+tse-2022-funding-source-summary.csv,amount_missing_rows,integer,"Linhas com valor ausente ou sentinela; preservadas na contagem, fora das somas."
+tse-2022-funding-source-summary.csv,amount_centavos,integer,Soma do VR_RECEITA ou VR_PAGTO_DESPESA válido em centavos.
+tse-2022-funding-source-summary.csv,financial_amount_centavos,integer,Parcela da soma com CD_NATUREZA 1 (Financeiro).
+tse-2022-funding-source-summary.csv,estimable_amount_centavos,integer,Parcela da soma com CD_NATUREZA 0 (Estimável).
+tse-2022-funding-source-summary.csv,nature_unclassified_amount_centavos,integer,Parcela da soma com CD_NATUREZA fora de 0/1 ou ausente.
+tse-2022-funding-source-summary.csv,all_flow_amount_denominator_centavos,integer,"Denominador da participação sobre todos os valores monetários válidos do fluxo, incluindo fonte não classificada."
+tse-2022-funding-source-summary.csv,classified_flow_amount_denominator_centavos,integer,Denominador da participação classificada: soma pública + private/Outros Recursos; exclui valores de fonte não classificada.
+tse-2022-funding-source-summary.csv,share_of_all_flow_amount_pct,percentage,amount_centavos dividido por all_flow_amount_denominator_centavos × 100.
+tse-2022-funding-source-summary.csv,share_of_classified_flow_amount_pct,percentage,Para classes pública/privada: amount_centavos dividido por classified_flow_amount_denominator_centavos × 100; vazio para não classificada.

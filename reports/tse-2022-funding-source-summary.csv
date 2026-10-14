@@ -1,0 +1,7 @@
+flow,source_class,source_code_values,source_label_values,record_count,candidate_count,reference_candidate_count,candidate_coverage_pct,amount_valid_rows,amount_missing_rows,amount_centavos,financial_amount_centavos,estimable_amount_centavos,nature_unclassified_amount_centavos,all_flow_amount_denominator_centavos,classified_flow_amount_denominator_centavos,share_of_all_flow_amount_pct,share_of_classified_flow_amount_pct
+receipts,public,0;2,FUNDO ESPECIAL;FUNDO PARTIDARIO,37514,8106,9204,88.0704,37514,0,277625989136,269689145934,7936843202,0,319043392188,319043392188,87.0183,87.0183
+receipts,private,1,OUTROS RECURSOS,61307,5460,9204,59.3220,61307,0,41417403052,35625612785,5791790267,0,319043392188,319043392188,12.9817,12.9817
+receipts,unclassified,-1,#NULO,421,421,9204,4.5741,421,0,0,0,0,0,319043392188,319043392188,0.0000,
+payments,public,0;2,Fundo Especial de Financiamento de Campanha;Fundo Partidário,1083564,7652,9204,83.1378,1083564,0,267926219494,267926219494,0,0,303323646443,303323646443,88.3301,88.3301
+payments,private,1,Outros Recursos,172453,3947,9204,42.8835,172453,0,35397426949,35397426949,0,0,303323646443,303323646443,11.6699,11.6699
+payments,unclassified,,,0,0,9204,0.0000,0,0,0,0,0,0,303323646443,303323646443,0.0000,

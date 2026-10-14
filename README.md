@@ -20,6 +20,7 @@ python -m unittest discover -s tests -v
 python -m tse_pilot run --manifest data/manifests/manifest-20261008T154908Z.json --output data/derived/2022
 python -m tse_pilot analyze --database data/derived/2022/pilot.sqlite --validation data/derived/2022/validation.json --output reports
 python -m tse_pilot expense-temporal --database data/derived/2022/pilot.sqlite --output reports
+python -m tse_pilot funding-source --database data/derived/2022/pilot.sqlite --archive data/raw/2022/20261008T154908Z/prestacao_de_contas_eleitorais_candidatos_2022.zip --output reports
 ```
 
 O manifesto identifica quatro ZIPs e registra URL, identificador do recurso, horário de aquisição, cabeçalhos HTTP, tamanho e SHA-256. ZIPs originais e base SQLite não são distribuídos no Git; obtenha-os conforme `docs/pilot-2022-reproduction.md` antes de reproduzir.
@@ -45,6 +46,7 @@ Para baixar um snapshot novo, execute também `python -m tse_pilot inventory --d
 - [Proporção eleita por faixas fixas de despesa — exportação Power BI](reports/tse-2022-election-powerbi-summary.csv)
 - [Candidaturas do recorte e dicionário Power BI](reports/tse-2022-election-powerbi-candidates.csv) · [dicionário](reports/tse-2022-election-powerbi-dictionary.csv) · [recorte e denominadores](reports/tse-2022-election-powerbi-recut.json)
 - [Despesas por mês e posição em relação à votação, com qualidade de datas e dicionário Power BI](reports/tse-2022-expense-temporal-monthly.csv) · [antes/no dia/depois](reports/tse-2022-expense-temporal-relative-to-election.csv) · [auditoria de datas](reports/tse-2022-expense-temporal-date-quality.csv) · [dicionário](reports/tse-2022-expense-temporal-dictionary.csv) · [recorte](reports/tse-2022-expense-temporal-recut.json)
+- [Financiamento público/privado e cobertura de receitas/pagamentos APTO/Final](reports/tse-2022-funding-source-summary.csv) · [por candidatura](reports/tse-2022-funding-source-candidates.csv) · [dicionário](reports/tse-2022-funding-source-dictionary.csv) · [recorte e denominadores](reports/tse-2022-funding-source-recut.json)
 - [Diagnósticos de deduplicação em JSON](reports/tse-2022-duplicate-diagnostics.json)
 - [Todas as ocorrências excluídas, com referência à linha mantida](reports/tse-2022-dedup-exclusions.csv)
 - [Diagnósticos de duplicação](reports/tse-2022-deduplication-analysis.md)

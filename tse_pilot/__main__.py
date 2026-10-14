@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from .acquisition import acquire_core, freeze_vote_totals_2022, refresh_manifest, write_inventory
 from .analysis import run_financial_analysis, write_expense_temporal_analysis
+from .funding import write_funding_source_analysis
 from .exploratory import run_exploratory_scenarios
 from .layout import write_layout_report
 from .pipeline import run_pipeline
@@ -14,12 +15,13 @@ from .duplicates import write_duplicate_diagnostics
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Piloto TSE 2022: inventário, congelamento, leiautes e base analítica")
-    parser.add_argument("command", choices=("inventory", "acquire", "freeze-votes", "refresh", "inspect", "run", "report", "duplicates", "explore", "analyze", "expense-temporal"))
+    parser.add_argument("command", choices=("inventory", "acquire", "freeze-votes", "refresh", "inspect", "run", "report", "duplicates", "explore", "analyze", "expense-temporal", "funding-source"))
     parser.add_argument("--data-root", type=Path, default=Path("data"))
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--database", type=Path)
     parser.add_argument("--validation", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--archive", type=Path)
     args = parser.parse_args()
 
     if args.command == "inventory":
@@ -73,6 +75,13 @@ def main() -> int:
         database = args.database or args.data_root / "derived" / "2022" / "pilot.sqlite"
         output = args.output or Path("reports")
         result = write_expense_temporal_analysis(database, output)
+        print(json.dumps(result, ensure_ascii=False))
+    elif args.command == "funding-source":
+        if not args.archive:
+            parser.error("funding-source exige --archive com o ZIP de contas congelado")
+        database = args.database or args.data_root / "derived" / "2022" / "pilot.sqlite"
+        output = args.output or Path("reports")
+        result = write_funding_source_analysis(database, args.archive, output)
         print(json.dumps(result, ensure_ascii=False))
 
 if __name__ == "__main__":

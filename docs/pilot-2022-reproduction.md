@@ -23,6 +23,7 @@ python -m tse_pilot inspect --manifest data/manifests/manifest-<snapshot>.json -
 python -m tse_pilot run --manifest data/manifests/manifest-<snapshot>.json --output data/derived/2022
 python -m tse_pilot analyze --database data/derived/2022/pilot.sqlite --validation data/derived/2022/validation.json --output reports
 python -m tse_pilot expense-temporal --database data/derived/2022/pilot.sqlite --output reports
+python -m tse_pilot funding-source --database data/derived/2022/pilot.sqlite --archive data/raw/2022/20261008T154908Z/prestacao_de_contas_eleitorais_candidatos_2022.zip --output reports
 python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --output reports/tse-2022-duplicate-diagnostics.json
 ```
 
@@ -44,6 +45,18 @@ As proporções existentes por quartis ranqueados dentro da UF permanecem separa
 O recorte temporal APTO/Final é o recorte financeiro: inclui linhas Final das candidaturas APTO a deputado federal no 1º turno que tenham despesa observada, sem exigir resultado eleitoral classificável, voto/denominador observado ou covariáveis completas. Na base atual, são 9.204 candidaturas com pelo menos uma linha Final. Ele difere do recorte completo do modelo eleitoral (N=9.202), que exige também votos e denominador observados, resultado oficial classificável (códigos 2–5) e controles completos (UF, partido, idade, sexo, raça e escolaridade), além de despesa nas duas representações. O modelo reduzido, ajustado apenas por UF e partido, usa N=9.204. Portanto, os totais temporais não devem ser interpretados como o N do modelo completo.
 
 Arquivos: `tse-2022-expense-temporal-monthly.csv`, `tse-2022-expense-temporal-relative-to-election.csv`, `tse-2022-expense-temporal-date-quality.csv`, `tse-2022-expense-temporal-dictionary.csv` e `tse-2022-expense-temporal-recut.json`.
+
+`funding-source` é uma exportação complementar: lê a base SQLite existente e o ZIP de contas congelado, sem alterar a base, reingerir dados ou executar modelos/`analyze`. O ZIP informado deve corresponder ao arquivo de origem registrado nas despesas da base. O comando exige os 27 arquivos estaduais de receitas e despesas pagas, exclui os agregados `BR`/`BRASIL` e não soma os arquivos de doador originário.
+
+O recorte de referência são as candidaturas APTO a deputado federal no 1º turno de 2022 com ao menos uma despesa contratada `Final` observada na base deduplicada: 9.204 candidaturas. Receitas são ligadas por `SQ_CANDIDATO`; pagamentos, por `SQ_PRESTADOR_CONTAS`, cuja chave é lida das ocorrências de despesas e validada como única no recorte. Ambos os fluxos usam apenas prestação `Final`. O arquivo por candidatura mantém inclusive candidaturas sem linha de receita ou pagamento, com campos de cobertura distintos de valores monetários.
+
+O leia-me oficial do ZIP define `CD_FONTE_RECEITA`/`CD_FONTE_DESPESA`: `0` Fundo Partidário e `2` Fundo Especial (públicos); `1` Outros Recursos (apresentado como privado/outros não públicos); `9`, ausências e códigos não mapeados ficam em `unclassified`. A classificação mantém o código e o rótulo originais. Nas receitas, `CD_NATUREZA_RECEITA=1` é financeiro e `0` estimável; ambos aparecem separados, e o percentual principal inclui as duas naturezas. `share_of_classified_flow_amount_pct` usa como denominador público + privado; `share_of_all_flow_amount_pct` usa todos os valores válidos, incluindo fonte não classificada. Pagamentos são `VR_PAGTO_DESPESA` por fonte declarada na linha paga; não representam pareamento/rastreio de uma receita específica nem substituem despesas contratadas.
+
+No snapshot atual, os 9.204 candidatos de referência são parte dos 9.476 APTO; 272 APTO não têm linha Final de despesa contratada observada e ficam fora da comparação. As receitas têm 99.242 linhas para 9.204/9.204 candidatos (100%). Somam R$ 3.190.433.921,88: público (códigos 0+2), R$ 2.776.259.891,36; Outros Recursos (código 1), R$ 414.174.030,52; não classificado, 421 linhas / R$ 0,00. O percentual público principal é 87,0183% = R$ 2.776.259.891,36 ÷ (R$ 2.776.259.891,36 + R$ 414.174.030,52), denominador R$ 3.190.433.921,88. Só receitas financeiras (`CD_NATUREZA_RECEITA=1`), sem as estimáveis, resultam em 88,3301% público sobre R$ 3.053.147.587,19 classificados; as estimáveis ficam separadas (R$ 79.368.432,02 públicos; R$ 57.917.902,67 Outros Recursos).
+
+Pagamentos têm 1.256.017 linhas para 8.363/9.204 candidatos (90,8627%); 841 não têm linha Final de pagamento ligada e não são tratados como valor zero. O total pago declarado é R$ 3.033.236.464,43: público, R$ 2.679.262.194,94 (88,3301% do total público + Outros Recursos); Outros Recursos, R$ 353.974.269,49; nenhuma linha de pagamento ficou sem classe de fonte. Cobertura por classe pode se sobrepor: um candidato pode declarar mais de uma fonte.
+
+Arquivos: `tse-2022-funding-source-candidates.csv`, `tse-2022-funding-source-summary.csv`, `tse-2022-funding-source-dictionary.csv` e `tse-2022-funding-source-recut.json`.
 
 ## Lendo os resultados
 
