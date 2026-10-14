@@ -1,0 +1,65 @@
+{
+  "election_year": 2022,
+  "turn": 1,
+  "cargo": "Deputado Federal",
+  "candidate_status": "APTO (CD_SITUACAO_CANDIDATURA=12)",
+  "submission_type": "Final",
+  "date_field": "DT_DESPESA",
+  "not_date_fields": [
+    "DT_PRESTACAO_CONTAS",
+    "DT_GERACAO"
+  ],
+  "date_format": "DD/MM/YYYY",
+  "monthly_and_election_day_window": [
+    "2022-01-01",
+    "2022-12-31"
+  ],
+  "election_date": "2022-10-02",
+  "expense_unit": "linha de despesa; no cenário deduplicado, linhas retidas por expenses; na sensibilidade, todas as ocorrências de expense_occurrences",
+  "deduplication_rule": "reutiliza expenses e suas referências de origem; deduplicação integral já materializada pelo pipeline para o mesmo snapshot/membro",
+  "date_quality_policy": {
+    "missing": "nulo, vazio, #NULO ou #NE",
+    "invalid": "valor não ausente que não pode ser interpretado como DD/MM/YYYY",
+    "outside_2022": "data válida cujo ano não é 2022; reportada, mas fora das tabelas mensais/evento",
+    "valid_2022": "data válida em 2022; entra nas tabelas mensais e relativa à votação"
+  },
+  "scenarios": {
+    "deduplicado": {
+      "expense_count": 1095391,
+      "candidate_count": 9204,
+      "declared_expense_centavos": 307614262875,
+      "first_valid_date": "2022-01-01",
+      "last_valid_date": "2022-12-31",
+      "first_in_election_year": "2022-01-01",
+      "last_in_election_year": "2022-12-31",
+      "date_quality": {
+        "valid_2022": 1094600,
+        "outside_2022": 0,
+        "missing": 791,
+        "invalid": 0
+      }
+    },
+    "todas_as_linhas": {
+      "expense_count": 1117066,
+      "candidate_count": 9204,
+      "declared_expense_centavos": 310467770168,
+      "first_valid_date": "2022-01-01",
+      "last_valid_date": "2022-12-31",
+      "first_in_election_year": "2022-01-01",
+      "last_in_election_year": "2022-12-31",
+      "date_quality": {
+        "valid_2022": 1116275,
+        "outside_2022": 0,
+        "missing": 791,
+        "invalid": 0
+      }
+    }
+  },
+  "interpretation_limit": "DT_DESPESA é a data registrada da despesa, não data de pagamento, prestação ou geração do arquivo.",
+  "outputs": [
+    "tse-2022-expense-temporal-monthly.csv",
+    "tse-2022-expense-temporal-relative-to-election.csv",
+    "tse-2022-expense-temporal-date-quality.csv",
+    "tse-2022-expense-temporal-dictionary.csv"
+  ]
+}

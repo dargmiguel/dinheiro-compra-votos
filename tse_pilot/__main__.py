@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 from .acquisition import acquire_core, freeze_vote_totals_2022, refresh_manifest, write_inventory
-from .analysis import run_financial_analysis
+from .analysis import run_financial_analysis, write_expense_temporal_analysis
 from .exploratory import run_exploratory_scenarios
 from .layout import write_layout_report
 from .pipeline import run_pipeline
@@ -14,7 +14,7 @@ from .duplicates import write_duplicate_diagnostics
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Piloto TSE 2022: inventário, congelamento, leiautes e base analítica")
-    parser.add_argument("command", choices=("inventory", "acquire", "freeze-votes", "refresh", "inspect", "run", "report", "duplicates", "explore", "analyze"))
+    parser.add_argument("command", choices=("inventory", "acquire", "freeze-votes", "refresh", "inspect", "run", "report", "duplicates", "explore", "analyze", "expense-temporal"))
     parser.add_argument("--data-root", type=Path, default=Path("data"))
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--database", type=Path)
@@ -68,6 +68,11 @@ def main() -> int:
         validation = args.validation or args.data_root / "derived" / "2022" / "validation.json"
         output = args.output or Path("reports")
         result = run_financial_analysis(database, validation, output)
+        print(json.dumps(result, ensure_ascii=False))
+    elif args.command == "expense-temporal":
+        database = args.database or args.data_root / "derived" / "2022" / "pilot.sqlite"
+        output = args.output or Path("reports")
+        result = write_expense_temporal_analysis(database, output)
         print(json.dumps(result, ensure_ascii=False))
 
 if __name__ == "__main__":

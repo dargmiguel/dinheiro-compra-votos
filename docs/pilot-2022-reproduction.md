@@ -22,6 +22,7 @@ python -m tse_pilot freeze-votes --manifest data/manifests/manifest-<snapshot>.j
 python -m tse_pilot inspect --manifest data/manifests/manifest-<snapshot>.json --output data/layout-2022.json
 python -m tse_pilot run --manifest data/manifests/manifest-<snapshot>.json --output data/derived/2022
 python -m tse_pilot analyze --database data/derived/2022/pilot.sqlite --validation data/derived/2022/validation.json --output reports
+python -m tse_pilot expense-temporal --database data/derived/2022/pilot.sqlite --output reports
 python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --output reports/tse-2022-duplicate-diagnostics.json
 ```
 
@@ -33,6 +34,16 @@ python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --outpu
 
 Depois dos resultados iniciais, `analyze` acrescenta uma comparação secundária de autodeclarações `BRANCA` contra `PRETA`+`PARDA`; `AMARELA`, `INDÍGENA`, `NÃO INFORMADO`, `NÃO DIVULGÁVEL` e ausentes ficam fora somente dessa comparação, preservados na base principal e contados separadamente. A interação entre grupo e `log1p(despesa)` usa os mesmos controles acordados; deduplicado é principal e todas as linhas, sensibilidade. Curvas dependem do suporte por UF×partido (N≥10 por grupo e cobertura mínima de 80%); protocolo pré-estimado em `docs/tse-2022-race-secondary-protocol.md`. Não há interpretação causal nem uso de custo por voto como preditor.
 O comando também emite tabelas de associação por resultado, modelos de eleição e proporções por UF/faixa em `reports/`.
+
+`analyze` também exporta faixas absolutas de despesa deduplicada (`até R$ 50 mil`, `acima de R$ 50 mil até R$ 200 mil`, `acima de R$ 200 mil até R$ 1 milhão` e `acima de R$ 1 milhão`) em `tse-2022-election-powerbi-summary.csv`, no Brasil e por UF. O denominador inclui apenas candidaturas APTO com resultado oficial 2/3/4/5, despesa Final disponível e as covariáveis completas do recorte dos modelos eleitorais; eleitos são códigos 2/3. `tse-2022-election-powerbi-candidates.csv` detalha cada candidatura desse recorte; `tse-2022-election-powerbi-dictionary.csv` define os campos e `tse-2022-election-powerbi-recut.json` registra faixas, filtros, numerador e denominador. Esses arquivos são exportações tabulares para Power BI, não um dashboard.
+
+As proporções existentes por quartis ranqueados dentro da UF permanecem separadas em `tse-2022-election-rate-by-uf-expense-band.csv`; as novas faixas não substituem nem recalculam quartis.
+
+`expense-temporal` reutiliza `expense_occurrences` e `expenses`, sem executar modelos: o cenário principal usa candidaturas APTO a deputado federal no 1º turno com prestação `Final` e a deduplicação já materializada; a sensibilidade usa todas as ocorrências do mesmo recorte. Usa apenas `DT_DESPESA` como data da despesa, sem confundi-la com `DT_PRESTACAO_CONTAS` ou `DT_GERACAO`. CSVs Power BI mostram totais mensais, contagens de linhas e candidatos, recorte antes/no dia/depois de 02/10/2022, e contagens/valores de datas ausentes, inválidas ou fora de 2022. Somente datas válidas dentro de 2022 entram nas séries mensais e relativas à eleição; as demais permanecem contabilizadas no CSV de qualidade e no JSON do recorte. Data de despesa não é data de pagamento.
+
+O recorte temporal APTO/Final é o recorte financeiro: inclui linhas Final das candidaturas APTO a deputado federal no 1º turno que tenham despesa observada, sem exigir resultado eleitoral classificável, voto/denominador observado ou covariáveis completas. Na base atual, são 9.204 candidaturas com pelo menos uma linha Final. Ele difere do recorte completo do modelo eleitoral (N=9.202), que exige também votos e denominador observados, resultado oficial classificável (códigos 2–5) e controles completos (UF, partido, idade, sexo, raça e escolaridade), além de despesa nas duas representações. O modelo reduzido, ajustado apenas por UF e partido, usa N=9.204. Portanto, os totais temporais não devem ser interpretados como o N do modelo completo.
+
+Arquivos: `tse-2022-expense-temporal-monthly.csv`, `tse-2022-expense-temporal-relative-to-election.csv`, `tse-2022-expense-temporal-date-quality.csv`, `tse-2022-expense-temporal-dictionary.csv` e `tse-2022-expense-temporal-recut.json`.
 
 ## Lendo os resultados
 

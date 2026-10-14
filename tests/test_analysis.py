@@ -12,8 +12,9 @@ import math
 import numpy as np
 import pandas as pd
 
-from tse_pilot.analysis import _build_race_curve, _fit_race_interaction, _race_curve_svg
+from tse_pilot.analysis import _build_race_curve, _fixed_expense_band, _fit_race_interaction, _race_curve_svg
 from tse_pilot.analysis import run_financial_analysis
+from tse_pilot.analysis import write_expense_temporal_analysis
 
 
 class FinancialAnalysisTests(unittest.TestCase):
@@ -188,6 +189,31 @@ class FinancialAnalysisTests(unittest.TestCase):
         self.assertTrue(all("custo por voto" in model["excluded_predictors"] for model in secondary["models"]))
         self.assertEqual(sum(row["candidate_count"] for row in secondary["elected_share_by_uf_expense_band"]), secondary["eligible_complete_case_n"])
         self.assertTrue(all(0 <= row["elected_share"] <= 1 for row in secondary["elected_share_by_uf_expense_band"]))
+        self.assertEqual(
+            [_fixed_expense_band(value) for value in (0, 5_000_000, 5_000_001, 20_000_000, 20_000_001, 100_000_000, 100_000_001)],
+            ["ate_50_mil", "ate_50_mil", "50_a_200_mil", "50_a_200_mil", "200_mil_a_1_milhao", "200_mil_a_1_milhao", "acima_1_milhao"],
+        )
+        fixed_band_summary = secondary["elected_share_by_fixed_expense_band_brazil_and_uf"]
+        brazil_rows = [row for row in fixed_band_summary if row["geography_type"] == "BRASIL"]
+        uf_rows = [row for row in fixed_band_summary if row["geography_type"] == "UF"]
+        self.assertEqual(len(brazil_rows), 4)
+        self.assertEqual(len(uf_rows), 8)
+        self.assertEqual(sum(row["candidate_count"] for row in brazil_rows), secondary["eligible_complete_case_n"])
+        self.assertEqual(sum(row["elected_count"] for row in brazil_rows), secondary["eligible_elected_n"])
+        self.assertEqual(
+            sum(row["candidate_count"] for row in fixed_band_summary if row["geography_type"] == "UF"),
+            sum(row["candidate_count"] for row in brazil_rows),
+        )
+        with (self.output / "tse-2022-election-powerbi-candidates.csv").open(encoding="utf-8", newline="") as handle:
+            candidate_export_rows = list(csv.DictReader(handle))
+        self.assertEqual(len(candidate_export_rows), secondary["eligible_complete_case_n"])
+        with (self.output / "tse-2022-election-powerbi-summary.csv").open(encoding="utf-8", newline="") as handle:
+            powerbi_rows = list(csv.DictReader(handle))
+        self.assertEqual(len(powerbi_rows), len(fixed_band_summary))
+        self.assertEqual(
+            sum(int(row["candidate_count"]) for row in powerbi_rows if row["geography_type"] == "BRASIL"),
+            secondary["eligible_complete_case_n"],
+        )
         expected_apto_elected = sum(
             ("2", "3", "4", "5")[(index * 7 + index // 3) % 4] in {"2", "3"}
             for index in range(48)
@@ -552,6 +578,117 @@ class FinancialAnalysisTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "fatais"):
             run_financial_analysis(self.database, self.validation, self.output)
+
+
+class ExpenseTemporalAnalysisTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory()
+        root = Path(self.temporary.name)
+        self.database = root / "temporal.sqlite"
+        self.output = root / "reports"
+        connection = sqlite3.connect(self.database)
+        connection.executescript(
+            """
+            CREATE TABLE candidates (
+                sq_candidate TEXT, candidate_status_code TEXT,
+                election_year INTEGER, turn INTEGER, cargo_code TEXT
+            );
+            CREATE TABLE expense_occurrences (
+                SQ_CANDIDATO TEXT, TP_PRESTACAO_CONTAS TEXT,
+                DT_DESPESA TEXT, DT_PRESTACAO_CONTAS TEXT, DT_GERACAO TEXT,
+                VR_DESPESA_CONTRATADA TEXT, _source_archive TEXT,
+                _source_member TEXT, _source_row INTEGER
+            );
+            CREATE TABLE expenses (
+                sq_candidate TEXT, sq_expense TEXT, amount_centavos INTEGER,
+                source_archive TEXT, source_member TEXT, source_row INTEGER
+            );
+            """
+        )
+        connection.executemany(
+            "INSERT INTO candidates VALUES (?, ?, 2022, 1, '6')",
+            [(candidate, "12") for candidate in ("A", "B", "C", "D", "E", "F")]
+            + [("G", "11")],
+        )
+        rows = []
+
+        def add_row(candidate: str, expense_date: str, amount: str, submission: str = "Final", keep: bool = True) -> None:
+            source_row = len(rows) + 1
+            rows.append((
+                candidate, submission, expense_date, "15/11/2022", "10/11/2022",
+                amount, "source.zip", "expenses.csv", source_row,
+            ))
+            if keep:
+                connection.execute(
+                    "INSERT INTO expenses VALUES (?, ?, ?, 'source.zip', 'expenses.csv', ?)",
+                    (candidate, f"DOC-{source_row}", int(amount.replace(",", "")), source_row),
+                )
+
+        add_row("A", "01/10/2022", "10,00")
+        add_row("A", "01/10/2022", "10,00", keep=False)
+        add_row("B", "02/10/2022", "30,00")
+        add_row("C", "03/10/2022", "40,00")
+        add_row("D", "", "50,00")
+        add_row("E", "31/02/2022", "60,00")
+        add_row("E", "31/02/2022", "60,00", keep=False)
+        add_row("F", "31/12/2021", "70,00")
+        add_row("A", "01/10/2022", "90,00", submission="Parcial", keep=False)
+        add_row("G", "01/10/2022", "99,00", keep=False)
+        connection.executemany(
+            "INSERT INTO expense_occurrences VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            rows,
+        )
+        connection.commit()
+        connection.close()
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
+    def test_reports_months_voting_day_and_date_quality_for_both_expense_scenarios(self) -> None:
+        result = write_expense_temporal_analysis(self.database, self.output)
+        self.assertEqual(result["scenarios"]["deduplicado"]["expense_count"], 6)
+        self.assertEqual(result["scenarios"]["todas_as_linhas"]["expense_count"], 8)
+        self.assertEqual(result["scenarios"]["deduplicado"]["first_valid_date"], "2021-12-31")
+        self.assertEqual(result["scenarios"]["deduplicado"]["first_in_election_year"], "2022-10-01")
+        self.assertEqual(result["scenarios"]["deduplicado"]["last_in_election_year"], "2022-10-03")
+
+        with (self.output / "tse-2022-expense-temporal-monthly.csv").open(encoding="utf-8", newline="") as handle:
+            monthly = list(csv.DictReader(handle))
+        deduplicated_october = next(row for row in monthly if row["scenario"] == "deduplicado" and row["month"] == "2022-10")
+        all_rows_october = next(row for row in monthly if row["scenario"] == "todas_as_linhas" and row["month"] == "2022-10")
+        self.assertEqual((deduplicated_october["expense_count"], deduplicated_october["candidate_count"], deduplicated_october["declared_expense_centavos"]), ("3", "3", "8000"))
+        self.assertEqual((all_rows_october["expense_count"], all_rows_october["candidate_count"], all_rows_october["declared_expense_centavos"]), ("4", "3", "9000"))
+        self.assertEqual((deduplicated_october["first_expense_date"], deduplicated_october["last_expense_date"]), ("2022-10-01", "2022-10-03"))
+        self.assertEqual(len(monthly), 24)
+        self.assertEqual(sum(int(row["expense_count"]) for row in monthly if row["scenario"] == "deduplicado"), 3)
+
+        with (self.output / "tse-2022-expense-temporal-relative-to-election.csv").open(encoding="utf-8", newline="") as handle:
+            timing = list(csv.DictReader(handle))
+        all_timing = {row["relative_period"]: row for row in timing if row["scenario"] == "todas_as_linhas"}
+        self.assertEqual(
+            {period: (row["expense_count"], row["candidate_count"], row["declared_expense_centavos"]) for period, row in all_timing.items()},
+            {"before": ("2", "1", "2000"), "on": ("1", "1", "3000"), "after": ("1", "1", "4000")},
+        )
+
+        with (self.output / "tse-2022-expense-temporal-date-quality.csv").open(encoding="utf-8", newline="") as handle:
+            quality = list(csv.DictReader(handle))
+        all_quality = {row["date_status"]: row for row in quality if row["scenario"] == "todas_as_linhas"}
+        self.assertEqual(all_quality["missing"]["expense_count"], "1")
+        self.assertEqual(all_quality["invalid"]["expense_count"], "2")
+        self.assertEqual(all_quality["outside_2022"]["expense_count"], "1")
+        self.assertEqual(all_quality["valid_2022"]["expense_count"], "4")
+        deduplicated_quality = {row["date_status"]: row for row in quality if row["scenario"] == "deduplicado"}
+        self.assertEqual(
+            {status: row["expense_count"] for status, row in deduplicated_quality.items()},
+            {"valid_2022": "3", "outside_2022": "1", "missing": "1", "invalid": "1"},
+        )
+        self.assertEqual(all_quality["missing"]["declared_expense_centavos"], "5000")
+        self.assertEqual(all_quality["invalid"]["declared_expense_centavos"], "12000")
+        self.assertIn("31/02/2022", all_quality["invalid"]["example_raw_values"])
+        self.assertEqual(deduplicated_quality["invalid"]["declared_expense_centavos"], "6000")
+        recut = json.loads((self.output / "tse-2022-expense-temporal-recut.json").read_text(encoding="utf-8"))
+        self.assertEqual(recut["date_field"], "DT_DESPESA")
+        self.assertEqual(recut["scenarios"]["todas_as_linhas"]["date_quality"]["invalid"], 2)
 
 
 if __name__ == "__main__":

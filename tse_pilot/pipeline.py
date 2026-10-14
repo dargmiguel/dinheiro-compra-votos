@@ -409,6 +409,8 @@ def _setup_database(connection: sqlite3.Connection) -> None:
             candidate_number TEXT NOT NULL,
             candidate_name TEXT NOT NULL,
             candidate_status_code TEXT NOT NULL,
+            candidate_total_status_code TEXT,
+            candidate_total_status TEXT,
             party_code TEXT NOT NULL,
             party_abbrev TEXT NOT NULL,
             federation_code TEXT NOT NULL,
@@ -580,6 +582,8 @@ def run_pipeline(manifest_path: Path, output_dir: Path) -> dict:
             "candidate_number": _text(row, "NR_CANDIDATO"),
             "candidate_name": _text(row, "NM_CANDIDATO"),
             "candidate_status_code": _text(row, "CD_SITUACAO_CANDIDATURA"),
+            "candidate_total_status_code": _text(row, "CD_SIT_TOT_TURNO") or None,
+            "candidate_total_status": _text(row, "DS_SIT_TOT_TURNO") or None,
             "party_code": _text(row, "NR_PARTIDO"),
             "party_abbrev": _text(row, "SG_PARTIDO"),
             "federation_code": _text(row, "NR_FEDERACAO"),
@@ -593,7 +597,7 @@ def run_pipeline(manifest_path: Path, output_dir: Path) -> dict:
         }
         try:
             connection.execute(
-                "INSERT INTO candidates VALUES (:sq_candidate, :election_year, :turn, :uf, :cargo_code, :cargo, :candidate_number, :candidate_name, :candidate_status_code, :party_code, :party_abbrev, :federation_code, :birth_date, :gender, :race, :schooling, :marital_status, :occupation, :source_archive, :source_member, :source_row)",
+                "INSERT INTO candidates VALUES (:sq_candidate, :election_year, :turn, :uf, :cargo_code, :cargo, :candidate_number, :candidate_name, :candidate_status_code, :candidate_total_status_code, :candidate_total_status, :party_code, :party_abbrev, :federation_code, :birth_date, :gender, :race, :schooling, :marital_status, :occupation, :source_archive, :source_member, :source_row)",
                 candidate,
             )
         except sqlite3.IntegrityError:
@@ -934,7 +938,7 @@ def run_pipeline(manifest_path: Path, output_dir: Path) -> dict:
 
     _write_csv(
         output_dir / "candidates_canonical.csv",
-        ["sq_candidate", "election_year", "turn", "uf", "cargo_code", "cargo", "candidate_number", "candidate_name", "candidate_status_code", "party_code", "party_abbrev", "federation_code", "birth_date", "gender", "race", "schooling", "marital_status", "occupation", "source_archive", "source_member", "source_row"],
+        ["sq_candidate", "election_year", "turn", "uf", "cargo_code", "cargo", "candidate_number", "candidate_name", "candidate_status_code", "candidate_total_status_code", "candidate_total_status", "party_code", "party_abbrev", "federation_code", "birth_date", "gender", "race", "schooling", "marital_status", "occupation", "source_archive", "source_member", "source_row"],
         (dict(row) for row in connection.execute("SELECT * FROM candidates ORDER BY uf, candidate_number, sq_candidate")),
     )
     _write_csv(
@@ -954,7 +958,8 @@ def run_pipeline(manifest_path: Path, output_dir: Path) -> dict:
     )
     analytical_query = """
         SELECT c.sq_candidate, c.election_year, c.turn, c.uf, c.cargo_code, c.cargo,
-               c.candidate_number, c.candidate_name, c.candidate_status_code, c.party_code,
+               c.candidate_number, c.candidate_name, c.candidate_status_code,
+               c.candidate_total_status_code, c.candidate_total_status, c.party_code,
                c.party_abbrev, c.federation_code, c.birth_date, c.gender, c.race, c.schooling,
                c.marital_status, c.occupation,
                c.source_archive AS candidate_source_archive,

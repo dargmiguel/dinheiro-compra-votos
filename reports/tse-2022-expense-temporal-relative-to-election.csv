@@ -1,0 +1,7 @@
+scenario,election_date,relative_period,period_order,date_rule,expense_count,candidate_count,declared_expense_centavos,expense_basis
+deduplicado,2022-10-02,before,1,data válida < 2022-10-02,1074873,8396,305429754164,"VR_DESPESA_CONTRATADA; valor contratado declarado, não pagamento"
+deduplicado,2022-10-02,on,2,data válida = 2022-10-02,2916,686,993767879,"VR_DESPESA_CONTRATADA; valor contratado declarado, não pagamento"
+deduplicado,2022-10-02,after,3,data válida > 2022-10-02,16811,2739,1190740832,"VR_DESPESA_CONTRATADA; valor contratado declarado, não pagamento"
+todas_as_linhas,2022-10-02,before,1,data válida < 2022-10-02,1095718,8396,308274320097,"VR_DESPESA_CONTRATADA; valor contratado declarado, não pagamento"
+todas_as_linhas,2022-10-02,on,2,data válida = 2022-10-02,2991,686,998495371,"VR_DESPESA_CONTRATADA; valor contratado declarado, não pagamento"
+todas_as_linhas,2022-10-02,after,3,data válida > 2022-10-02,17566,2739,1194954700,"VR_DESPESA_CONTRATADA; valor contratado declarado, não pagamento"

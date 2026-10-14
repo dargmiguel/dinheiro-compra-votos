@@ -1,0 +1,31 @@
+table,field,type,definition
+tse-2022-expense-temporal-monthly.csv,scenario,text,Cenário: principal deduplicado ou sensibilidade com todas as ocorrências.
+tse-2022-expense-temporal-monthly.csv,election_year,integer,Ano eleitoral do recorte (2022).
+tse-2022-expense-temporal-monthly.csv,turn,integer,Turno eleitoral (1).
+tse-2022-expense-temporal-monthly.csv,cargo,text,Cargo do recorte (Deputado Federal).
+tse-2022-expense-temporal-monthly.csv,month,text,"Mês de DT_DESPESA válida em 2022, formato AAAA-MM."
+tse-2022-expense-temporal-monthly.csv,month_number,integer,Número do mês para ordenação cronológica no Power BI.
+tse-2022-expense-temporal-monthly.csv,first_expense_date,date nullable,Primeira DT_DESPESA válida observada no mês.
+tse-2022-expense-temporal-monthly.csv,last_expense_date,date nullable,Última DT_DESPESA válida observada no mês.
+tse-2022-expense-temporal-monthly.csv,expense_count,integer,Quantidade de linhas de despesa do cenário no mês.
+tse-2022-expense-temporal-monthly.csv,candidate_count,integer,Candidatos distintos com linha de despesa válida no mês; não somável entre meses.
+tse-2022-expense-temporal-monthly.csv,declared_expense_centavos,integer,"Soma de VR_DESPESA_CONTRATADA das linhas no mês, em centavos."
+tse-2022-expense-temporal-monthly.csv,expense_basis,text,Despesa contratada declarada; não equivale a pagamento.
+tse-2022-expense-temporal-relative-to-election.csv,scenario,text,Cenário: principal deduplicado ou sensibilidade com todas as ocorrências.
+tse-2022-expense-temporal-relative-to-election.csv,election_date,date,Data da votação: 2022-10-02.
+tse-2022-expense-temporal-relative-to-election.csv,relative_period,text,"before (<), on (=) ou after (>) a data da votação."
+tse-2022-expense-temporal-relative-to-election.csv,period_order,integer,"Ordem cronológica: antes=1, no dia=2, depois=3."
+tse-2022-expense-temporal-relative-to-election.csv,date_rule,text,Regra de inclusão de DT_DESPESA válida no período.
+tse-2022-expense-temporal-relative-to-election.csv,expense_count,integer,Quantidade de linhas de despesa no período.
+tse-2022-expense-temporal-relative-to-election.csv,candidate_count,integer,Candidatos distintos com linha de despesa no período.
+tse-2022-expense-temporal-relative-to-election.csv,declared_expense_centavos,integer,"Soma de VR_DESPESA_CONTRATADA no período, em centavos."
+tse-2022-expense-temporal-relative-to-election.csv,expense_basis,text,Despesa contratada declarada; não equivale a pagamento.
+tse-2022-expense-temporal-date-quality.csv,scenario,text,Cenário: principal deduplicado ou sensibilidade com todas as ocorrências.
+tse-2022-expense-temporal-date-quality.csv,date_status,text,"valid_2022, outside_2022, missing ou invalid."
+tse-2022-expense-temporal-date-quality.csv,expense_count,integer,Quantidade de linhas classificadas neste estado de DT_DESPESA.
+tse-2022-expense-temporal-date-quality.csv,candidate_count,integer,Candidatos distintos com linha neste estado; pode haver interseção entre estados.
+tse-2022-expense-temporal-date-quality.csv,declared_expense_centavos,integer,"Soma declarada das linhas neste estado, em centavos."
+tse-2022-expense-temporal-date-quality.csv,first_valid_date,date nullable,Primeira data válida para o estado; vazio quando ausente/inválida.
+tse-2022-expense-temporal-date-quality.csv,last_valid_date,date nullable,Última data válida para o estado; vazio quando ausente/inválida.
+tse-2022-expense-temporal-date-quality.csv,example_raw_values,text,"Exemplos de valores originais ausentes/inválidos, quando houver."
+tse-2022-expense-temporal-date-quality.csv,included_in_monthly_and_election_day_tables,boolean,Verdadeiro somente para data válida dentro de 2022.

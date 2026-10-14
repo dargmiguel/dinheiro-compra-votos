@@ -48,6 +48,16 @@ def _pt_brl_centavos(value: int) -> str:
 
 def _pt_bool(value: bool | None) -> str:
     return "sim" if value is True else "não" if value is False else "não verificado"
+def _fixed_expense_band(expense_centavos: int) -> str:
+    if expense_centavos <= 5_000_000:
+        return "ate_50_mil"
+    if expense_centavos <= 20_000_000:
+        return "50_a_200_mil"
+    if expense_centavos <= 100_000_000:
+        return "200_mil_a_1_milhao"
+    return "acima_1_milhao"
+
+
 
 
 def _write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str]) -> None:
@@ -56,6 +66,315 @@ def _write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str]) -> Non
         writer.writeheader()
         writer.writerows(rows)
 
+
+def write_expense_temporal_analysis(database_path: Path, output_dir: Path) -> dict[str, Any]:
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    connection = sqlite3.connect(database_path)
+    try:
+        occurrence_columns = {
+            row[1] for row in connection.execute("PRAGMA table_info(expense_occurrences)")
+        }
+        if "DT_DESPESA" not in occurrence_columns:
+            raise ValueError("expense_occurrences não contém DT_DESPESA")
+
+        scope = """
+            JOIN candidates c ON c.sq_candidate = {candidate}
+            WHERE c.candidate_status_code = '12'
+              AND c.election_year = 2022 AND c.turn = 1 AND c.cargo_code = '6'
+              AND o.TP_PRESTACAO_CONTAS = 'Final'
+        """
+        queries = {
+            "deduplicado": (
+                """
+                SELECT e.sq_candidate, e.amount_centavos, o.DT_DESPESA
+                FROM expenses e
+                JOIN expense_occurrences o
+                  ON e.source_archive = o._source_archive
+                 AND e.source_member = o._source_member
+                 AND e.source_row = o._source_row
+                """
+                + scope.format(candidate="e.sq_candidate")
+                + " ORDER BY e.source_archive, e.source_member, e.source_row"
+            ),
+            "todas_as_linhas": (
+                """
+                SELECT o.SQ_CANDIDATO, o.VR_DESPESA_CONTRATADA, o.DT_DESPESA
+                FROM expense_occurrences o
+                """
+                + scope.format(candidate="o.SQ_CANDIDATO")
+                + " ORDER BY o._source_archive, o._source_member, o._source_row"
+            ),
+        }
+        election_date = date(2022, 10, 2)
+        status_order = ("valid_2022", "outside_2022", "missing", "invalid")
+        period_rules = {
+            "before": ("data válida < 2022-10-02", 1),
+            "on": ("data válida = 2022-10-02", 2),
+            "after": ("data válida > 2022-10-02", 3),
+        }
+        monthly_rows: list[dict[str, Any]] = []
+        event_rows: list[dict[str, Any]] = []
+        quality_rows: list[dict[str, Any]] = []
+        scenario_results: dict[str, dict[str, Any]] = {}
+        expense_basis = "VR_DESPESA_CONTRATADA; valor contratado declarado, não pagamento"
+
+        for scenario, query in queries.items():
+            quality = {
+                status: {
+                    "expense_count": 0,
+                    "amount_centavos": 0,
+                    "candidates": set(),
+                    "first_valid_date": None,
+                    "last_valid_date": None,
+                    "raw_examples": set(),
+                }
+                for status in status_order
+            }
+            months = {
+                month: {
+                    "expense_count": 0,
+                    "amount_centavos": 0,
+                    "candidates": set(),
+                    "first_expense_date": None,
+                    "last_expense_date": None,
+                }
+                for month in range(1, 13)
+            }
+            periods = {
+                period: {"expense_count": 0, "amount_centavos": 0, "candidates": set()}
+                for period in period_rules
+            }
+            all_candidates: set[str] = set()
+            first_valid_date = last_valid_date = None
+            first_in_year = last_in_year = None
+            expense_count = total_amount_centavos = 0
+
+            for candidate_id, raw_amount, raw_date in connection.execute(query):
+                candidate_id = str(candidate_id)
+                amount_centavos = int(raw_amount) if scenario == "deduplicado" else _centavos(raw_amount)
+                expense_count += 1
+                total_amount_centavos += amount_centavos
+                all_candidates.add(candidate_id)
+
+                if _missing(raw_date):
+                    status = "missing"
+                    expense_date = None
+                else:
+                    try:
+                        expense_date = datetime.strptime(str(raw_date).strip(), "%d/%m/%Y").date()
+                    except ValueError:
+                        status = "invalid"
+                        expense_date = None
+                    else:
+                        status = "valid_2022" if expense_date.year == 2022 else "outside_2022"
+
+                bucket = quality[status]
+                bucket["expense_count"] += 1
+                bucket["amount_centavos"] += amount_centavos
+                bucket["candidates"].add(candidate_id)
+                if _missing(raw_date):
+                    raw_example = "(ausente)" if raw_date is None or not str(raw_date).strip() else str(raw_date).strip()
+                    bucket["raw_examples"].add(raw_example)
+                elif status == "invalid":
+                    bucket["raw_examples"].add(str(raw_date).strip())
+                if expense_date is None:
+                    continue
+
+                iso_date = expense_date.isoformat()
+                if bucket["first_valid_date"] is None or expense_date < bucket["first_valid_date"]:
+                    bucket["first_valid_date"] = expense_date
+                if bucket["last_valid_date"] is None or expense_date > bucket["last_valid_date"]:
+                    bucket["last_valid_date"] = expense_date
+                if first_valid_date is None or expense_date < first_valid_date:
+                    first_valid_date = expense_date
+                if last_valid_date is None or expense_date > last_valid_date:
+                    last_valid_date = expense_date
+                if status != "valid_2022":
+                    continue
+
+                if first_in_year is None or expense_date < first_in_year:
+                    first_in_year = expense_date
+                if last_in_year is None or expense_date > last_in_year:
+                    last_in_year = expense_date
+                month_bucket = months[expense_date.month]
+                month_bucket["expense_count"] += 1
+                month_bucket["amount_centavos"] += amount_centavos
+                month_bucket["candidates"].add(candidate_id)
+                if month_bucket["first_expense_date"] is None or expense_date < month_bucket["first_expense_date"]:
+                    month_bucket["first_expense_date"] = expense_date
+                if month_bucket["last_expense_date"] is None or expense_date > month_bucket["last_expense_date"]:
+                    month_bucket["last_expense_date"] = expense_date
+                period = "before" if expense_date < election_date else "on" if expense_date == election_date else "after"
+                period_bucket = periods[period]
+                period_bucket["expense_count"] += 1
+                period_bucket["amount_centavos"] += amount_centavos
+                period_bucket["candidates"].add(candidate_id)
+
+            for month, bucket in months.items():
+                first_month_date = bucket["first_expense_date"]
+                last_month_date = bucket["last_expense_date"]
+                monthly_rows.append({
+                    "scenario": scenario,
+                    "election_year": 2022,
+                    "turn": 1,
+                    "cargo": "Deputado Federal",
+                    "month": f"2022-{month:02d}",
+                    "month_number": month,
+                    "first_expense_date": first_month_date.isoformat() if first_month_date else None,
+                    "last_expense_date": last_month_date.isoformat() if last_month_date else None,
+                    "expense_count": bucket["expense_count"],
+                    "candidate_count": len(bucket["candidates"]),
+                    "declared_expense_centavos": bucket["amount_centavos"],
+                    "expense_basis": expense_basis,
+                })
+            for period, (rule, order) in period_rules.items():
+                bucket = periods[period]
+                event_rows.append({
+                    "scenario": scenario,
+                    "election_date": election_date.isoformat(),
+                    "relative_period": period,
+                    "period_order": order,
+                    "date_rule": rule,
+                    "expense_count": bucket["expense_count"],
+                    "candidate_count": len(bucket["candidates"]),
+                    "declared_expense_centavos": bucket["amount_centavos"],
+                    "expense_basis": expense_basis,
+                })
+            date_quality_counts = {}
+            for status in status_order:
+                bucket = quality[status]
+                date_quality_counts[status] = bucket["expense_count"]
+                quality_rows.append({
+                    "scenario": scenario,
+                    "date_status": status,
+                    "expense_count": bucket["expense_count"],
+                    "candidate_count": len(bucket["candidates"]),
+                    "declared_expense_centavos": bucket["amount_centavos"],
+                    "first_valid_date": bucket["first_valid_date"].isoformat() if bucket["first_valid_date"] else None,
+                    "last_valid_date": bucket["last_valid_date"].isoformat() if bucket["last_valid_date"] else None,
+                    "example_raw_values": " | ".join(sorted(bucket["raw_examples"])[:5]),
+                    "included_in_monthly_and_election_day_tables": status == "valid_2022",
+                })
+            scenario_results[scenario] = {
+                "expense_count": expense_count,
+                "candidate_count": len(all_candidates),
+                "declared_expense_centavos": total_amount_centavos,
+                "first_valid_date": first_valid_date.isoformat() if first_valid_date else None,
+                "last_valid_date": last_valid_date.isoformat() if last_valid_date else None,
+                "first_in_election_year": first_in_year.isoformat() if first_in_year else None,
+                "last_in_election_year": last_in_year.isoformat() if last_in_year else None,
+                "date_quality": date_quality_counts,
+            }
+    finally:
+        connection.close()
+
+    _write_csv(
+        output_dir / "tse-2022-expense-temporal-monthly.csv",
+        monthly_rows,
+        [
+            "scenario", "election_year", "turn", "cargo", "month", "month_number",
+            "first_expense_date", "last_expense_date", "expense_count", "candidate_count",
+            "declared_expense_centavos", "expense_basis",
+        ],
+    )
+    _write_csv(
+        output_dir / "tse-2022-expense-temporal-relative-to-election.csv",
+        event_rows,
+        [
+            "scenario", "election_date", "relative_period", "period_order", "date_rule",
+            "expense_count", "candidate_count", "declared_expense_centavos", "expense_basis",
+        ],
+    )
+    _write_csv(
+        output_dir / "tse-2022-expense-temporal-date-quality.csv",
+        quality_rows,
+        [
+            "scenario", "date_status", "expense_count", "candidate_count",
+            "declared_expense_centavos", "first_valid_date", "last_valid_date",
+            "example_raw_values", "included_in_monthly_and_election_day_tables",
+        ],
+    )
+    dictionary = [
+        {"table": table, "field": field, "type": field_type, "definition": definition}
+        for table, fields in {
+            "tse-2022-expense-temporal-monthly.csv": [
+                ("scenario", "text", "Cenário: principal deduplicado ou sensibilidade com todas as ocorrências."),
+                ("election_year", "integer", "Ano eleitoral do recorte (2022)."),
+                ("turn", "integer", "Turno eleitoral (1)."),
+                ("cargo", "text", "Cargo do recorte (Deputado Federal)."),
+                ("month", "text", "Mês de DT_DESPESA válida em 2022, formato AAAA-MM."),
+                ("month_number", "integer", "Número do mês para ordenação cronológica no Power BI."),
+                ("first_expense_date", "date nullable", "Primeira DT_DESPESA válida observada no mês."),
+                ("last_expense_date", "date nullable", "Última DT_DESPESA válida observada no mês."),
+                ("expense_count", "integer", "Quantidade de linhas de despesa do cenário no mês."),
+                ("candidate_count", "integer", "Candidatos distintos com linha de despesa válida no mês; não somável entre meses."),
+                ("declared_expense_centavos", "integer", "Soma de VR_DESPESA_CONTRATADA das linhas no mês, em centavos."),
+                ("expense_basis", "text", "Despesa contratada declarada; não equivale a pagamento."),
+            ],
+            "tse-2022-expense-temporal-relative-to-election.csv": [
+                ("scenario", "text", "Cenário: principal deduplicado ou sensibilidade com todas as ocorrências."),
+                ("election_date", "date", "Data da votação: 2022-10-02."),
+                ("relative_period", "text", "before (<), on (=) ou after (>) a data da votação."),
+                ("period_order", "integer", "Ordem cronológica: antes=1, no dia=2, depois=3."),
+                ("date_rule", "text", "Regra de inclusão de DT_DESPESA válida no período."),
+                ("expense_count", "integer", "Quantidade de linhas de despesa no período."),
+                ("candidate_count", "integer", "Candidatos distintos com linha de despesa no período."),
+                ("declared_expense_centavos", "integer", "Soma de VR_DESPESA_CONTRATADA no período, em centavos."),
+                ("expense_basis", "text", "Despesa contratada declarada; não equivale a pagamento."),
+            ],
+            "tse-2022-expense-temporal-date-quality.csv": [
+                ("scenario", "text", "Cenário: principal deduplicado ou sensibilidade com todas as ocorrências."),
+                ("date_status", "text", "valid_2022, outside_2022, missing ou invalid."),
+                ("expense_count", "integer", "Quantidade de linhas classificadas neste estado de DT_DESPESA."),
+                ("candidate_count", "integer", "Candidatos distintos com linha neste estado; pode haver interseção entre estados."),
+                ("declared_expense_centavos", "integer", "Soma declarada das linhas neste estado, em centavos."),
+                ("first_valid_date", "date nullable", "Primeira data válida para o estado; vazio quando ausente/inválida."),
+                ("last_valid_date", "date nullable", "Última data válida para o estado; vazio quando ausente/inválida."),
+                ("example_raw_values", "text", "Exemplos de valores originais ausentes/inválidos, quando houver."),
+                ("included_in_monthly_and_election_day_tables", "boolean", "Verdadeiro somente para data válida dentro de 2022."),
+            ],
+        }.items()
+        for field, field_type, definition in fields
+    ]
+    _write_csv(
+        output_dir / "tse-2022-expense-temporal-dictionary.csv",
+        dictionary,
+        ["table", "field", "type", "definition"],
+    )
+    recut = {
+        "election_year": 2022,
+        "turn": 1,
+        "cargo": "Deputado Federal",
+        "candidate_status": "APTO (CD_SITUACAO_CANDIDATURA=12)",
+        "submission_type": "Final",
+        "date_field": "DT_DESPESA",
+        "not_date_fields": ["DT_PRESTACAO_CONTAS", "DT_GERACAO"],
+        "date_format": "DD/MM/YYYY",
+        "monthly_and_election_day_window": ["2022-01-01", "2022-12-31"],
+        "election_date": election_date.isoformat(),
+        "expense_unit": "linha de despesa; no cenário deduplicado, linhas retidas por expenses; na sensibilidade, todas as ocorrências de expense_occurrences",
+        "deduplication_rule": "reutiliza expenses e suas referências de origem; deduplicação integral já materializada pelo pipeline para o mesmo snapshot/membro",
+        "date_quality_policy": {
+            "missing": "nulo, vazio, #NULO ou #NE",
+            "invalid": "valor não ausente que não pode ser interpretado como DD/MM/YYYY",
+            "outside_2022": "data válida cujo ano não é 2022; reportada, mas fora das tabelas mensais/evento",
+            "valid_2022": "data válida em 2022; entra nas tabelas mensais e relativa à votação",
+        },
+        "scenarios": scenario_results,
+        "interpretation_limit": "DT_DESPESA é a data registrada da despesa, não data de pagamento, prestação ou geração do arquivo.",
+        "outputs": [
+            "tse-2022-expense-temporal-monthly.csv",
+            "tse-2022-expense-temporal-relative-to-election.csv",
+            "tse-2022-expense-temporal-date-quality.csv",
+            "tse-2022-expense-temporal-dictionary.csv",
+        ],
+    }
+    (output_dir / "tse-2022-expense-temporal-recut.json").write_text(
+        json.dumps(recut, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return recut
 
 def _read_validation(path: Path) -> dict[str, Any]:
     validation = json.loads(path.read_text(encoding="utf-8"))
@@ -1706,6 +2025,112 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
             }
             for (uf, band), group in band_frame.groupby(["uf", "expense_band_within_uf"], sort=True)
         ]
+        election_band_definitions = [
+            {"expense_band_code": "ate_50_mil", "expense_band_label": "Até R$ 50 mil", "lower_exclusive_centavos": None, "upper_inclusive_centavos": 5_000_000},
+            {"expense_band_code": "50_a_200_mil", "expense_band_label": "Acima de R$ 50 mil até R$ 200 mil", "lower_exclusive_centavos": 5_000_000, "upper_inclusive_centavos": 20_000_000},
+            {"expense_band_code": "200_mil_a_1_milhao", "expense_band_label": "Acima de R$ 200 mil até R$ 1 milhão", "lower_exclusive_centavos": 20_000_000, "upper_inclusive_centavos": 100_000_000},
+            {"expense_band_code": "acima_1_milhao", "expense_band_label": "Acima de R$ 1 milhão", "lower_exclusive_centavos": 100_000_000, "upper_inclusive_centavos": None},
+        ]
+        election_band_labels = {
+            item["expense_band_code"]: item["expense_band_label"]
+            for item in election_band_definitions
+        }
+
+        fixed_band_frame = election_frame.copy()
+        fixed_band_frame["expense_band_code"] = fixed_band_frame["expense_deduplicated_centavos"].map(_fixed_expense_band)
+        fixed_band_frame["expense_band_label"] = fixed_band_frame["expense_band_code"].map(election_band_labels)
+        fixed_band_candidate_rows = [
+            {
+                "election_year": 2022,
+                "turn": 1,
+                "cargo": "Deputado Federal",
+                "sq_candidate": str(row.sq_candidate),
+                "uf": str(row.uf),
+                "candidate_total_status_code": str(row.candidate_total_status_code),
+                "expense_deduplicated_centavos": int(row.expense_deduplicated_centavos),
+                "expense_all_lines_centavos": int(row.expense_all_lines_centavos),
+                "expense_band_code": row.expense_band_code,
+                "expense_band_label": row.expense_band_label,
+                "elected": int(row.elected),
+            }
+            for row in fixed_band_frame.sort_values(["uf", "sq_candidate"]).itertuples(index=False)
+        ]
+        fixed_band_summary_rows = []
+        for geography_type, geography_code, group in [
+            ("BRASIL", "BR", fixed_band_frame),
+            *[
+                ("UF", str(uf), group)
+                for uf, group in fixed_band_frame.groupby("uf", sort=True)
+            ],
+        ]:
+            for definition in election_band_definitions:
+                band_group = group.loc[group["expense_band_code"] == definition["expense_band_code"]]
+                candidate_count = int(len(band_group))
+                elected_count = int(band_group["elected"].sum())
+                fixed_band_summary_rows.append({
+                    "election_year": 2022,
+                    "turn": 1,
+                    "cargo": "Deputado Federal",
+                    "geography_type": geography_type,
+                    "geography_code": geography_code,
+                    "expense_band_code": definition["expense_band_code"],
+                    "expense_band_label": definition["expense_band_label"],
+                    "lower_exclusive_centavos": definition["lower_exclusive_centavos"],
+                    "upper_inclusive_centavos": definition["upper_inclusive_centavos"],
+                    "candidate_count": candidate_count,
+                    "elected_count": elected_count,
+                    "elected_share": elected_count / candidate_count if candidate_count else None,
+                    "denominator_definition": "candidaturas APTO com resultado oficial 2/3/4/5, despesa Final deduplicada e todas as covariáveis do recorte dos modelos eleitorais",
+                    "expense_basis": "despesa Final deduplicada",
+                })
+        election_powerbi_recut = {
+            "election_year": 2022,
+            "turn": 1,
+            "cargo": "Deputado Federal",
+            "candidate_status": "APTO",
+            "included_result_codes": {"2": "ELEITO POR QP", "3": "ELEITO POR MÉDIA", "4": "NÃO ELEITO", "5": "SUPLENTE"},
+            "included_candidates": int(len(fixed_band_frame)),
+            "elected_numerator": int(fixed_band_frame["elected"].sum()),
+            "excluded_classified_results_for_missing_expense_or_controls": int(
+                frame["candidate_total_status_code"].isin({"2", "3", "4", "5"}).sum() - len(election_frame)
+            ),
+            "excluded_other_or_missing_official_result_codes": int(
+                len(frame) - frame["candidate_total_status_code"].isin({"2", "3", "4", "5"}).sum()
+            ),
+            "expense_basis": "VR_DESPESA_CONTRATADA em prestação Final; deduplicação integral usada na análise principal",
+            "election_denominator": "candidaturas com resultado oficial classificável, despesa Final deduplicada presente e covariáveis completas, igual ao recorte dos modelos eleitorais",
+            "rate": "eleitos (códigos 2 e 3) / candidaturas (códigos 2, 3, 4 e 5) no recorte",
+            "bands": election_band_definitions,
+            "quartile_analysis_preserved": "tse-2022-election-rate-by-uf-expense-band.csv; quartis ranqueados dentro da UF",
+        }
+
+        election_powerbi_dictionary = [
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "election_year", "type": "integer", "definition": "Ano da eleição; 2022."},
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "turn", "type": "integer", "definition": "Turno eleitoral; primeiro turno."},
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "cargo", "type": "text", "definition": "Cargo; Deputado Federal."},
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "sq_candidate", "type": "text", "definition": "Identificador único da candidatura no TSE."},
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "uf", "type": "text", "definition": "UF da candidatura."},
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "candidate_total_status_code", "type": "text", "definition": "Código oficial do resultado total; somente 2, 3, 4 ou 5 no recorte."},
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "expense_deduplicated_centavos", "type": "integer", "definition": "Despesa Final deduplicada em centavos; base das faixas e da análise principal."},
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "expense_all_lines_centavos", "type": "integer", "definition": "Despesa Final com todas as linhas em centavos; sensibilidade."},
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "expense_band_code", "type": "text", "definition": "Faixa fixa de despesa deduplicada; limites descritos em tse-2022-election-powerbi-recut.json."},
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "expense_band_label", "type": "text", "definition": "Rótulo legível da faixa fixa de despesa."},
+            {"table": "tse-2022-election-powerbi-candidates.csv", "field": "elected", "type": "integer", "definition": "Indicador: 1 para código 2 ou 3; 0 para código 4 ou 5."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "geography_type", "type": "text", "definition": "Nível geográfico: BRASIL ou UF."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "geography_code", "type": "text", "definition": "BR para Brasil; sigla da UF para nível estadual."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "candidate_count", "type": "integer", "definition": "Denominador: candidaturas classificáveis no recorte e faixa."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "elected_count", "type": "integer", "definition": "Numerador: eleitos pelos códigos 2 e 3 no denominador."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "elected_share", "type": "decimal", "definition": "elected_count / candidate_count; vazio se denominador zero."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "lower_exclusive_centavos", "type": "integer nullable", "definition": "Limite inferior estrito da faixa, em centavos; vazio na primeira faixa."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "upper_inclusive_centavos", "type": "integer nullable", "definition": "Limite superior inclusivo da faixa, em centavos; vazio na última faixa."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "election_year", "type": "integer", "definition": "Ano da eleição; 2022."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "turn", "type": "integer", "definition": "Turno eleitoral; primeiro turno."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "cargo", "type": "text", "definition": "Cargo; Deputado Federal."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "expense_band_code", "type": "text", "definition": "Código estável da faixa fixa de despesa."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "expense_band_label", "type": "text", "definition": "Rótulo legível da faixa fixa de despesa."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "expense_basis", "type": "text", "definition": "Base monetária da faixa: despesa Final deduplicada."},
+            {"table": "tse-2022-election-powerbi-summary.csv", "field": "denominator_definition", "type": "text", "definition": "Definição do denominador usado para a proporção."},
+        ]
         official_result_counts = {
             str(code): int((frame["candidate_total_status_code"] == code).sum())
             for code in sorted(frame["candidate_total_status_code"].dropna().unique())
@@ -1743,6 +2168,10 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
             "elected_share_by_uf_expense_band": election_rates_by_uf_band,
             "interpretation": "análise secundária acrescentada após os primeiros resultados; associação não causal; despesa declarada não implica recurso público",
         }
+        election_analysis["fixed_expense_band_definitions"] = election_band_definitions
+        election_analysis["elected_share_by_fixed_expense_band_brazil_and_uf"] = fixed_band_summary_rows
+        election_analysis["powerbi_data_dictionary"] = election_powerbi_dictionary
+        election_analysis["powerbi_recut"] = election_powerbi_recut
         coefficients: list[dict[str, Any]] = []
         models: list[dict[str, Any]] = []
         fitted_models: dict[str, tuple[Any, pd.DataFrame, str]] = {}
@@ -1965,6 +2394,34 @@ def run_financial_analysis(database_path: Path, validation_path: Path, output_di
         output_dir / "tse-2022-election-rate-by-uf-expense-band.csv",
         election_analysis["elected_share_by_uf_expense_band"],
         ["uf", "expense_band_within_uf", "candidate_count", "elected_count", "elected_share", "expense_basis"],
+    )
+    _write_csv(
+        output_dir / "tse-2022-election-powerbi-candidates.csv",
+        fixed_band_candidate_rows,
+        [
+            "election_year", "turn", "cargo", "sq_candidate", "uf",
+            "candidate_total_status_code", "expense_deduplicated_centavos",
+            "expense_all_lines_centavos", "expense_band_code", "expense_band_label", "elected",
+        ],
+    )
+    _write_csv(
+        output_dir / "tse-2022-election-powerbi-summary.csv",
+        election_analysis["elected_share_by_fixed_expense_band_brazil_and_uf"],
+        [
+            "election_year", "turn", "cargo", "geography_type", "geography_code",
+            "expense_band_code", "expense_band_label", "lower_exclusive_centavos",
+            "upper_inclusive_centavos", "candidate_count", "elected_count", "elected_share",
+            "denominator_definition", "expense_basis",
+        ],
+    )
+    _write_csv(
+        output_dir / "tse-2022-election-powerbi-dictionary.csv",
+        election_analysis["powerbi_data_dictionary"],
+        ["table", "field", "type", "definition"],
+    )
+    (output_dir / "tse-2022-election-powerbi-recut.json").write_text(
+        json.dumps(election_analysis["powerbi_recut"], ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
     )
     _write_csv(
         output_dir / "tse-2022-race-population-counts.csv",
