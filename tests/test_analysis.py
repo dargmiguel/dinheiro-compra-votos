@@ -7,6 +7,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
+import math
+
+import numpy as np
+import pandas as pd
+
+from tse_pilot.analysis import _build_race_curve, _fit_race_interaction, _race_curve_svg
 from tse_pilot.analysis import run_financial_analysis
 
 
@@ -45,7 +51,8 @@ class FinancialAnalysisTests(unittest.TestCase):
                 sq_candidate TEXT PRIMARY KEY, election_year INTEGER, turn INTEGER,
                 uf TEXT, cargo_code TEXT, candidate_status_code TEXT,
                 party_code TEXT, birth_date TEXT, gender TEXT, race TEXT, schooling TEXT,
-                marital_status TEXT, occupation TEXT
+                marital_status TEXT, occupation TEXT, candidate_total_status_code TEXT,
+                candidate_total_status TEXT
             );
             CREATE TABLE vote_denominators (
                 uf TEXT PRIMARY KEY, election_year INTEGER, turn INTEGER, cargo_code TEXT, cargo TEXT,
@@ -88,8 +95,12 @@ class FinancialAnalysisTests(unittest.TestCase):
             race = ("BRANCA", "PARDA", "PRETA")[index % 3]
             schooling = ("MÉDIO", "SUPERIOR", "FUNDAMENTAL")[(index // 3) % 3]
             connection.execute(
-                "INSERT INTO candidates VALUES (?, 2022, 1, ?, '6', '12', ?, ?, ?, ?, ?, 'SOLTEIRO', 'PROFESSOR')",
-                (candidate, uf, party, birth, gender, race, schooling),
+                "INSERT INTO candidates VALUES (?, 2022, 1, ?, '6', '12', ?, ?, ?, ?, ?, 'SOLTEIRO', 'PROFESSOR', ?, ?)",
+                (
+                    candidate, uf, party, birth, gender, race, schooling,
+                    ("2", "3", "4", "5")[(index * 7 + index // 3) % 4],
+                    ("ELEITO POR QP", "ELEITO POR MÉDIA", "NÃO ELEITO", "SUPLENTE")[(index * 7 + index // 3) % 4],
+                ),
             )
             votes = (index * 1877 + (index % 5) * 2911) % 1200
             connection.execute("INSERT INTO votes VALUES (?, ?)", (candidate, votes))
@@ -109,7 +120,7 @@ class FinancialAnalysisTests(unittest.TestCase):
         for index, submission_type, amount in ((48, "Parcial", "15,00"), (49, "Final", "0,00")):
             candidate = f"I{index:03d}"
             connection.execute(
-                "INSERT INTO candidates VALUES (?, 2022, 1, 'SP', '6', '3', 'P1', '01/01/1970', ?, 'PARDA', 'MÉDIO', 'SOLTEIRO', 'PROFESSOR')",
+                "INSERT INTO candidates VALUES (?, 2022, 1, 'SP', '6', '3', 'P1', '01/01/1970', ?, 'PARDA', 'MÉDIO', 'SOLTEIRO', 'PROFESSOR', '2', 'ELEITO POR QP')",
                 (candidate, "FEMININO" if index == 48 else "MASCULINO"),
             )
             occurrence_rows.append((candidate, f"DOC-{candidate}", submission_type, amount, "src.zip", "expenses.csv", 300 + index))
@@ -170,6 +181,23 @@ class FinancialAnalysisTests(unittest.TestCase):
         self.assertEqual(reduced_model["n"], 47)
         self.assertTrue(all(model["converged"] for model in result["models"]))
         self.assertIn("expense_x_female", {row["term"] for row in result["coefficients"]})
+        secondary = result["secondary_election_analysis"]
+        self.assertEqual(secondary["official_elected_codes"], {"2": "ELEITO POR QP", "3": "ELEITO POR MÉDIA"})
+        self.assertEqual(secondary["official_not_elected_codes"], {"4": "NÃO ELEITO", "5": "SUPLENTE"})
+        self.assertEqual({model["name"] for model in secondary["models"]}, {"eleicao_deduplicado", "eleicao_todas_as_linhas"})
+        self.assertTrue(all("custo por voto" in model["excluded_predictors"] for model in secondary["models"]))
+        self.assertEqual(sum(row["candidate_count"] for row in secondary["elected_share_by_uf_expense_band"]), secondary["eligible_complete_case_n"])
+        self.assertTrue(all(0 <= row["elected_share"] <= 1 for row in secondary["elected_share_by_uf_expense_band"]))
+        expected_apto_elected = sum(
+            ("2", "3", "4", "5")[(index * 7 + index // 3) % 4] in {"2", "3"}
+            for index in range(48)
+        )
+        expected_complete_case_elected = expected_apto_elected - sum(
+            ("2", "3", "4", "5")[(index * 7 + index // 3) % 4] in {"2", "3"}
+            for index in (2, 4)
+        )
+        self.assertEqual(secondary["apto_elected_n"], expected_apto_elected)
+        self.assertEqual(secondary["eligible_elected_n"], expected_complete_case_elected)
         self.assertFalse(result["payment_integration"]["integrated_in_analysis_database"])
         self.assertIn("despesas_pagas_candidatos_2022_SP.csv", result["payment_integration"]["frozen_archive_payment_members"])
         self.assertIn("não bloqueia", result["payment_integration"]["status"])
@@ -225,6 +253,167 @@ class FinancialAnalysisTests(unittest.TestCase):
         self.assertIn("primeiro turno de 2022", report)
         self.assertIn("modelo de comparação com ajuste apenas por UF/partido, sem idade, usa N=47", report)
         self.assertIn("Com ajuste somente por UF/partido, sem idade (N=47)", report)
+
+    def test_secondary_race_analysis_counts_apto_before_votes_and_reports_unsupported_curve(self) -> None:
+        connection = sqlite3.connect(self.database)
+        connection.execute("UPDATE candidates SET race = 'AMARELA' WHERE sq_candidate = 'A000'")
+        connection.execute("UPDATE candidates SET race = 'INDÍGENA' WHERE sq_candidate = 'A001'")
+        connection.execute("UPDATE candidates SET race = NULL WHERE sq_candidate = 'A006'")
+        connection.execute("DELETE FROM votes WHERE sq_candidate = 'A003'")
+        connection.commit()
+        connection.close()
+
+        result = run_financial_analysis(self.database, self.validation, self.output)
+        secondary = result["secondary_race_analysis"]
+
+        self.assertEqual(secondary["population"]["apto_candidates_n"], 48)
+        self.assertEqual(secondary["population"]["apto_with_votes_n"], 47)
+        self.assertEqual(
+            secondary["population"]["race_category_counts"],
+            {"AMARELA": 1, "BRANCA": 14, "INDÍGENA": 1, "PARDA": 15, "PRETA": 16, "(ausente)": 1},
+        )
+        self.assertEqual(secondary["population"]["race_category_counts_with_votes"]["BRANCA"], 13)
+        self.assertEqual(
+            secondary["population"]["comparison_group_counts"],
+            {"brancas": 14, "pretas_pardas": 31},
+        )
+        self.assertEqual(
+            secondary["population"]["comparison_group_counts_with_votes"],
+            {"brancas": 13, "pretas_pardas": 31},
+        )
+        self.assertEqual(
+            secondary["population"]["outside_comparison_counts"],
+            {"AMARELA": 1, "INDÍGENA": 1, "(ausente)": 1},
+        )
+        self.assertEqual(secondary["comparison_binary_apto_n"], 45)
+        self.assertEqual(secondary["comparison_binary_population_n"], 44)
+        self.assertEqual(secondary["comparison_complete_case_n"], 42)
+        self.assertEqual(secondary["comparison_exclusions"]["missing_vote_or_denominator_n"], 1)
+        self.assertEqual(secondary["comparison_exclusions"]["missing_either_expense_n"], 1)
+        self.assertEqual(secondary["comparison_exclusions"]["missing_controls_n"], 1)
+        self.assertEqual(secondary["comparison_complete_case_group_counts"], {"brancas": 13, "pretas_pardas": 29})
+        self.assertEqual({model["name"] for model in secondary["models"]}, {"raca_deduplicado", "raca_todas_as_linhas"})
+        self.assertTrue(all(model["converged"] for model in secondary["models"]))
+        self.assertTrue(all(model["n"] == 42 for model in secondary["models"]))
+        self.assertTrue(all(model["hc1_correction_factor"] == 42 / (42 - model["parameter_count"]) for model in secondary["models"]))
+        self.assertTrue(all("expense_x_black_brown" in {row["term"] for row in secondary["coefficients"] if row["model"] == model["name"]} for model in secondary["models"]))
+        for model in secondary["models"]:
+            self.assertEqual(
+                model["controls"],
+                ["UF", "partido", "idade na data da eleição", "sexo", "escolaridade"],
+            )
+            self.assertIn("custo por voto", model["excluded_predictors"])
+        self.assertEqual(result["model_complete_case_n"], 44)
+        self.assertEqual(sum(row["candidate_count"] for row in secondary["descriptive_by_group"]), 84)
+        for row in secondary["descriptive_by_group"]:
+            self.assertEqual(row["candidate_count"], row["election_classified_n"] + row["unclassified_result_n"])
+            if row["election_classified_n"]:
+                self.assertAlmostEqual(
+                    row["elected_proportion"],
+                    row["elected_count"] / row["election_classified_n"],
+                )
+            self.assertEqual(
+                (row["elected_count"], row["election_classified_n"]),
+                {"brancas": (6, 13), "pretas_pardas": (15, 29)}[row["race_group"]],
+            )
+        self.assertTrue(all(not curve["points"] for curve in secondary["curves"].values()))
+        self.assertTrue(all(curve["no_curve_reason"] for curve in secondary["curves"].values()))
+        report = (self.output / "tse-2022-financial-analysis.md").read_text(encoding="utf-8")
+        self.assertIn("Análise secundária acrescentada após os primeiros resultados: raça/cor", report)
+        self.assertIn("suporte insuficiente", report)
+        for suffix in ("deduplicado", "todas-as-linhas"):
+            svg = (self.output / f"tse-2022-race-interaction-curve-{suffix}.svg").read_text(encoding="utf-8")
+            self.assertIn("Curva não exibida", svg)
+
+        with (self.output / "tse-2022-race-group-descriptives.csv").open(encoding="utf-8", newline="") as handle:
+            descriptive_rows = list(csv.DictReader(handle))
+        self.assertEqual(len(descriptive_rows), 4)
+        with (self.output / "tse-2022-race-support-by-uf-party.csv").open(encoding="utf-8", newline="") as handle:
+            support_rows = list(csv.DictReader(handle))
+        self.assertTrue(any(row["dimension"] == "UF" for row in support_rows))
+        self.assertTrue(any(row["dimension"] == "partido" for row in support_rows))
+        with (self.output / "tse-2022-race-curve-support.csv").open(encoding="utf-8", newline="") as handle:
+            curve_support_reader = csv.DictReader(handle)
+            self.assertIn("supported_uf_party_strata", curve_support_reader.fieldnames)
+        for scenario in ("deduplicado", "todas_as_linhas"):
+            scenario_rows = [row for row in support_rows if row["scenario"] == scenario]
+            self.assertEqual(sum(row["dimension"] == "UF" for row in scenario_rows), 2)
+            self.assertEqual(sum(row["dimension"] == "partido" for row in scenario_rows), 4)
+            self.assertEqual(sum(row["dimension"] == "UF×partido" for row in scenario_rows), 8)
+
+    def test_supported_race_curve_uses_training_reference_levels_and_svg_breaks_gaps(self) -> None:
+        rows = []
+        for uf, count in (("SP", 100), ("RJ", 5)):
+            for race_group in ("brancas", "pretas_pardas"):
+                for index in range(count):
+                    expense = 1_000_000 + index * 50_000
+                    log_expense = math.log1p(expense / 100)
+                    linear_predictor = (
+                        (-1.0 if uf == "RJ" else 1.5)
+                        + 0.08 * log_expense
+                        + (0.15 if race_group == "pretas_pardas" else 0)
+                        + 0.04 * (index % 2)
+                    )
+                    rows.append({
+                        "uf": uf,
+                        "party_code": "P0",
+                        "age_at_election": 30 + index % 40,
+                        "gender": ("FEMININO", "MASCULINO")[index % 2],
+                        "schooling": ("MÉDIO", "SUPERIOR", "FUNDAMENTAL")[index % 3],
+                        "race_group": race_group,
+                        "expense_deduplicated_centavos": expense,
+                        "vote_share": min(0.99, max(0.01, 1 / (1 + math.exp(-linear_predictor)) + 0.02 * math.sin(index * 1.7))),
+                    })
+        frame = pd.DataFrame(rows)
+        model, _, fitted, model_frame, covariance = _fit_race_interaction(
+            "race_support_test",
+            frame,
+            "expense_deduplicated_centavos",
+        )
+        curve, support, _ = _build_race_curve(
+            "deduplicado",
+            fitted,
+            model_frame,
+            "expense_deduplicated_centavos",
+            covariance,
+        )
+
+        self.assertTrue(curve["points"])
+        self.assertEqual(curve["eligible_uf_party_cells_n"], 1)
+        self.assertAlmostEqual(curve["eligible_group_coverage"]["brancas"], 100 / 105)
+        self.assertTrue(all(point["brancas_prediction"] > 0.5 for point in curve["points"]))
+        self.assertTrue(any(row["stratum"] == "RJ × P0" and not row["eligible_uf_party_cell"] for row in support))
+        self.assertIn("uf_SP", fitted.model.exog_names)
+        self.assertGreater(model["hc1_correction_factor"], 1)
+
+        points = [
+            {
+                "expense_brl": expense,
+                **{
+                    f"{group}_{stat}": value
+                    for group in ("brancas", "pretas_pardas")
+                    for stat, value in (
+                        ("prediction", 0.4),
+                        ("ci95_lower", 0.3),
+                        ("ci95_upper", 0.5),
+                    )
+                },
+            }
+            for expense in (100.0, 200.0, 800.0)
+        ]
+        svg = _race_curve_svg({
+            "points": points,
+            "candidate_support_points": [
+                {"expense_brl": 100.0, "published": True},
+                {"expense_brl": 200.0, "published": True},
+                {"expense_brl": 500.0, "published": False},
+                {"expense_brl": 800.0, "published": True},
+            ],
+        })
+        self.assertEqual(svg.count("<polyline"), 2)
+        self.assertEqual(svg.count("<circle"), 2)
+        self.assertNotIn("var(--c", svg)
+
 
     def test_refuses_unapproved_pipeline_validation(self) -> None:
         self.validation.write_text(json.dumps({"status": "blocked"}), encoding="utf-8")

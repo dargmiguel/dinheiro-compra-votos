@@ -29,8 +29,10 @@ python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --outpu
 
 `run` lê os ZIPs por streaming, preserva cada ocorrência original em `expense_occurrences` e materializa a base principal com deduplicação de linhas iguais nos 53 campos originais, dentro do mesmo snapshot e membro. `duplicates` mede exclusões, candidatos afetados e diferenças financeiras sem classificá-las como desperdício ou gasto indevido; também exporta cada ocorrência excluída e a referência mantida para `reports/tse-2022-dedup-exclusions.csv`.
 
-`analyze` exige validação aprovada e denominadores reconciliados nas 27 UFs. Executa o GLM fracionário principal e sensibilidades; emite relatório com previsões padronizadas e diagnósticos, denominadores por UF, coeficientes, comparação por sexo, arquivos de influência/calibração e levantamento de INAPTO em `reports/`.
-`explore` permanece como diagnóstico exploratório anterior, separado da análise principal. Os resultados definitivos são gerados por `analyze` e não dependem dos gráficos exploratórios.
+`analyze` exige validação aprovada e denominadores reconciliados nas 27 UFs. Executa primeiro o GLM fracionário da análise principal de participação de votos e suas sensibilidades. Uma análise secundária, acrescentada após os primeiros resultados, classifica eleição pelos códigos oficiais 2 (`ELEITO POR QP`) e 3 (`ELEITO POR MÉDIA`), compara despesas/custo por voto, calcula proporções eleitas por quartil de despesa dentro da UF e estima modelos logísticos com UF, partido, idade, sexo, raça e escolaridade. Códigos 4 (`NÃO ELEITO`) e 5 (`SUPLENTE`) formam o grupo não eleito; códigos ausentes/nulos ou outros ficam excluídos e contados. Custo por voto não é preditor. A análise é associativa, não causal; despesa contratada declarada não significa necessariamente dinheiro público.
+
+Depois dos resultados iniciais, `analyze` acrescenta uma comparação secundária de autodeclarações `BRANCA` contra `PRETA`+`PARDA`; `AMARELA`, `INDÍGENA`, `NÃO INFORMADO`, `NÃO DIVULGÁVEL` e ausentes ficam fora somente dessa comparação, preservados na base principal e contados separadamente. A interação entre grupo e `log1p(despesa)` usa os mesmos controles acordados; deduplicado é principal e todas as linhas, sensibilidade. Curvas dependem do suporte por UF×partido (N≥10 por grupo e cobertura mínima de 80%); protocolo pré-estimado em `docs/tse-2022-race-secondary-protocol.md`. Não há interpretação causal nem uso de custo por voto como preditor.
+O comando também emite tabelas de associação por resultado, modelos de eleição e proporções por UF/faixa em `reports/`.
 
 ## Lendo os resultados
 
@@ -39,6 +41,8 @@ python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --outpu
 - `reports/tse-2022-financial-model-estimates.csv` contém coeficientes e intervalos robustos; `reports/tse-2022-predicted-expense-scenarios.csv` mostra previsões por quartis de despesa comparáveis nos dois cenários.
 - `reports/tse-2022-sex-interaction-curve.csv` contém curvas e ICs pontuais apenas na interseção das faixas P5–P95 de despesas de mulheres e homens.
 - `reports/tse-2022-model-calibration-deciles.csv`, `reports/tse-2022-model-influence-top-candidates.csv` e `reports/tse-2022-top-one-percent-expense-sensitivity.csv` registram calibração em amostra, casos influentes e sensibilidade ao topo da distribuição.
+- A análise secundária de eleição aparece depois dos primeiros resultados em `reports/tse-2022-financial-analysis.md`; os arquivos `tse-2022-election-expense-comparison.csv`, `tse-2022-election-expense-models.csv` e `tse-2022-election-rate-by-uf-expense-band.csv` contêm comparações descritivas, coeficientes e proporções por UF/faixa.
+- A análise racial e seus limites aparecem como seção secundária posterior em `reports/tse-2022-financial-analysis.md`; `tse-2022-race-population-counts.csv`, `tse-2022-race-group-descriptives.csv`, `tse-2022-race-interaction-coefficients.csv`, `tse-2022-race-interaction-curve.csv`, `tse-2022-race-curve-support.csv` e `tse-2022-race-support-by-uf-party.csv` trazem grupos, descrições, interação e cobertura; os SVGs documentam as curvas (ou a supressão por falta de suporte).
 - `reports/tse-2022-duplicate-diagnostics.json` registra ocorrências excluídas, candidatos afetados e impacto financeiro no universo completo.
 - `reports/tse-2022-dedup-exclusions.csv` lista todas as ocorrências excluídas, membro/linha de origem, referência à ocorrência mantida, candidatura, despesa e valor em centavos.
 - A exploração anterior está em `reports/tse-2022-exploratory-provisional.md`; não deve ser interpretada como o resultado ajustado do protocolo.
@@ -153,4 +157,4 @@ Somente erros das validações já existentes (campos inválidos, valores ausent
 python -m unittest discover -s tests -v
 ```
 
-Os testes também exercitam o denominador oficial com legenda, controles, sensibilidades de despesas e desfecho, interação por sexo, distinção entre zero e ausência e levantamento de despesas INAPTO. `analyze` recusa uma validação bloqueada ou denominadores sem cobertura e reconciliação das 27 UFs.
+Os testes exercitam o denominador oficial com legenda, controles, sensibilidades de despesas e desfecho, interação por sexo, grupos raciais/exclusões e supressão de curvas sem suporte, denominadores de eleição, distinção entre zero e ausência e levantamento de despesas INAPTO. `analyze` recusa uma validação bloqueada ou denominadores sem cobertura e reconciliação das 27 UFs.

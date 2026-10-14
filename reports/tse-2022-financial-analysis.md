@@ -113,6 +113,186 @@ A sensibilidade abaixo remove somente candidaturas acima do P99 da despesa dedup
 
 Arquivos: `tse-2022-predicted-expense-scenarios.csv`, `tse-2022-sex-interaction-curve.csv`, `tse-2022-model-calibration-deciles.csv`, `tse-2022-model-influence-top-candidates.csv` e `tse-2022-top-one-percent-expense-sensitivity.csv`. As curvas mostram médias previstas ajustadas; toda interpretação é associativa.
 
+
+## Análise secundária acrescentada após os primeiros resultados: despesas e eleição
+
+Esta análise secundária não substitui a análise principal de participação de votos. Eleito é definido pelos códigos oficiais 2 (ELEITO POR QP) e 3 (ELEITO POR MÉDIA); códigos 4 (NÃO ELEITO) e 5 (SUPLENTE) são não eleitos. Códigos ausentes, nulos ou outros não são forçados a nenhuma classe.
+No recorte APTO com votos observados, 512 candidaturas têm código oficial eleito e 8.964 têm código não eleito; 0 têm código ausente/outro. A amostra completa usada nos modelos contém 510 eleitos e 8.692 não eleitos (9.202 candidaturas).
+Foram excluídas da amostra completa de eleição 274 candidaturas com código oficial classificável por falta de despesa Final ou controle (272 sem despesa Final; 2 com controle ausente; sobreposição: 0); contagens de resultados no universo APTO com votos observados: código 2: 334, código 3: 178, código 4: 4.720, código 5: 4.244. Códigos fora da classificação: nenhum.
+Comparação descritiva usa apenas as observações completas com resultado classificável; custo por voto é despesa declarada dividida por votos nominais, portanto fica indefinido para voto zero e não entra como preditor. A tabela mostra deduplicado e todas as linhas.
+
+| Resultado | Base | N | Despesa média (R$) | Despesa mediana (R$) | N com votos positivos | N com custo indefinido por voto zero | Custo médio por voto (R$) | Custo mediano por voto (R$) |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| eleitos | deduplicado | 510 | 1.870.634,12 | 1.881.139,39 | 510 | 0 | 23,03 | 17,79 |
+| eleitos | todas_as_linhas | 510 | 1.897.720,77 | 1.901.988,18 | 510 | 0 | 23,32 | 18,14 |
+| nao_eleitos | deduplicado | 8.692 | 243.811,43 | 52.996,07 | 8.588 | 104 | 110,19 | 46,75 |
+| nao_eleitos | todas_as_linhas | 8.692 | 245.504,06 | 53.346,88 | 8.588 | 104 | 110,54 | 46,93 |
+
+Modelos logísticos binários: log(1 + despesa contratada) com controles acordados — UF, partido, idade na eleição, sexo, raça e escolaridade — e erros-padrão HC1. Números abaixo são OR por unidade de log(1 + R$), não por real; votos/custo por voto não entram no modelo.
+
+| Cenário | N | Eleitos | Não eleitos | OR da despesa | IC 95% | p |
+|---|---:|---:|---:|---:|---:|---:|
+| eleicao_deduplicado | 9.202 | 510 | 8.692 | 11,685 | 9,230–14,793 | <0,0001 |
+| eleicao_todas_as_linhas | 9.202 | 510 | 8.692 | 11,884 | 9,353–15,101 | <0,0001 |
+
+Proporção eleita por quartil de despesa deduplicada dentro de cada UF; empates recebem ordem determinística por classificação sequencial. CSV traz contagens por faixa/UF. A associação é observacional, não causal. Despesas são declaradas contratadas e não são necessariamente recursos públicos.
+
+| UF | Faixa de despesa dentro da UF | Candidaturas | Eleitos | Proporção eleita |
+|---|---:|---:|---:|---:|
+| AC | Q1 | 30 | 0 | 0,00% |
+| AC | Q2 | 31 | 0 | 0,00% |
+| AC | Q3 | 30 | 0 | 0,00% |
+| AC | Q4 | 31 | 8 | 25,81% |
+| AL | Q1 | 36 | 0 | 0,00% |
+| AL | Q2 | 36 | 0 | 0,00% |
+| AL | Q3 | 36 | 1 | 2,78% |
+| AL | Q4 | 36 | 8 | 22,22% |
+| AM | Q1 | 34 | 0 | 0,00% |
+| AM | Q2 | 34 | 0 | 0,00% |
+| AM | Q3 | 34 | 0 | 0,00% |
+| AM | Q4 | 35 | 8 | 22,86% |
+| AP | Q1 | 30 | 0 | 0,00% |
+| AP | Q2 | 31 | 1 | 3,23% |
+| AP | Q3 | 30 | 1 | 3,33% |
+| AP | Q4 | 31 | 6 | 19,35% |
+| BA | Q1 | 162 | 0 | 0,00% |
+| BA | Q2 | 163 | 0 | 0,00% |
+| BA | Q3 | 163 | 0 | 0,00% |
+| BA | Q4 | 163 | 38 | 23,31% |
+| CE | Q1 | 81 | 0 | 0,00% |
+| CE | Q2 | 81 | 0 | 0,00% |
+| CE | Q3 | 81 | 0 | 0,00% |
+| CE | Q4 | 82 | 22 | 26,83% |
+| DF | Q1 | 48 | 0 | 0,00% |
+| DF | Q2 | 48 | 0 | 0,00% |
+| DF | Q3 | 48 | 0 | 0,00% |
+| DF | Q4 | 48 | 8 | 16,67% |
+| ES | Q1 | 45 | 0 | 0,00% |
+| ES | Q2 | 45 | 0 | 0,00% |
+| ES | Q3 | 45 | 1 | 2,22% |
+| ES | Q4 | 45 | 9 | 20,00% |
+| GO | Q1 | 83 | 0 | 0,00% |
+| GO | Q2 | 84 | 0 | 0,00% |
+| GO | Q3 | 83 | 1 | 1,20% |
+| GO | Q4 | 84 | 16 | 19,05% |
+| MA | Q1 | 77 | 0 | 0,00% |
+| MA | Q2 | 78 | 0 | 0,00% |
+| MA | Q3 | 78 | 0 | 0,00% |
+| MA | Q4 | 78 | 18 | 23,08% |
+| MG | Q1 | 248 | 0 | 0,00% |
+| MG | Q2 | 248 | 0 | 0,00% |
+| MG | Q3 | 248 | 0 | 0,00% |
+| MG | Q4 | 249 | 53 | 21,29% |
+| MS | Q1 | 36 | 0 | 0,00% |
+| MS | Q2 | 37 | 0 | 0,00% |
+| MS | Q3 | 37 | 0 | 0,00% |
+| MS | Q4 | 37 | 8 | 21,62% |
+| MT | Q1 | 36 | 0 | 0,00% |
+| MT | Q2 | 37 | 0 | 0,00% |
+| MT | Q3 | 37 | 0 | 0,00% |
+| MT | Q4 | 37 | 8 | 21,62% |
+| PA | Q1 | 70 | 0 | 0,00% |
+| PA | Q2 | 70 | 0 | 0,00% |
+| PA | Q3 | 70 | 0 | 0,00% |
+| PA | Q4 | 71 | 17 | 23,94% |
+| PB | Q1 | 43 | 0 | 0,00% |
+| PB | Q2 | 44 | 0 | 0,00% |
+| PB | Q3 | 44 | 0 | 0,00% |
+| PB | Q4 | 44 | 12 | 27,27% |
+| PE | Q1 | 99 | 0 | 0,00% |
+| PE | Q2 | 100 | 0 | 0,00% |
+| PE | Q3 | 100 | 1 | 1,00% |
+| PE | Q4 | 100 | 24 | 24,00% |
+| PI | Q1 | 35 | 0 | 0,00% |
+| PI | Q2 | 36 | 0 | 0,00% |
+| PI | Q3 | 35 | 0 | 0,00% |
+| PI | Q4 | 36 | 10 | 27,78% |
+| PR | Q1 | 143 | 0 | 0,00% |
+| PR | Q2 | 143 | 0 | 0,00% |
+| PR | Q3 | 143 | 0 | 0,00% |
+| PR | Q4 | 144 | 29 | 20,14% |
+| RJ | Q1 | 244 | 0 | 0,00% |
+| RJ | Q2 | 244 | 0 | 0,00% |
+| RJ | Q3 | 244 | 2 | 0,82% |
+| RJ | Q4 | 245 | 44 | 17,96% |
+| RN | Q1 | 41 | 0 | 0,00% |
+| RN | Q2 | 41 | 0 | 0,00% |
+| RN | Q3 | 41 | 1 | 2,44% |
+| RN | Q4 | 41 | 7 | 17,07% |
+| RO | Q1 | 34 | 0 | 0,00% |
+| RO | Q2 | 35 | 1 | 2,86% |
+| RO | Q3 | 35 | 0 | 0,00% |
+| RO | Q4 | 35 | 7 | 20,00% |
+| RR | Q1 | 33 | 0 | 0,00% |
+| RR | Q2 | 34 | 0 | 0,00% |
+| RR | Q3 | 34 | 1 | 2,94% |
+| RR | Q4 | 34 | 7 | 20,59% |
+| RS | Q1 | 124 | 0 | 0,00% |
+| RS | Q2 | 125 | 0 | 0,00% |
+| RS | Q3 | 124 | 1 | 0,81% |
+| RS | Q4 | 125 | 30 | 24,00% |
+| SC | Q1 | 71 | 0 | 0,00% |
+| SC | Q2 | 71 | 0 | 0,00% |
+| SC | Q3 | 71 | 0 | 0,00% |
+| SC | Q4 | 71 | 16 | 22,54% |
+| SE | Q1 | 35 | 0 | 0,00% |
+| SE | Q2 | 36 | 0 | 0,00% |
+| SE | Q3 | 35 | 0 | 0,00% |
+| SE | Q4 | 36 | 8 | 22,22% |
+| SP | Q1 | 336 | 0 | 0,00% |
+| SP | Q2 | 336 | 0 | 0,00% |
+| SP | Q3 | 336 | 1 | 0,30% |
+| SP | Q4 | 337 | 68 | 20,18% |
+| TO | Q1 | 35 | 0 | 0,00% |
+| TO | Q2 | 36 | 0 | 0,00% |
+| TO | Q3 | 36 | 0 | 0,00% |
+| TO | Q4 | 36 | 8 | 22,22% |
+
+Artefatos: `tse-2022-election-expense-comparison.csv`, `tse-2022-election-expense-models.csv` e `tse-2022-election-rate-by-uf-expense-band.csv`.
+
+
+## Análise secundária acrescentada após os primeiros resultados: raça/cor
+
+A análise principal de votos permanece inalterada; raça/cor já era um controle categórico nela, mas isso não testa se a associação entre despesa e votação varia entre grupos. Esta análise binária adicional compara autodeclarações `BRANCA` com `PRETA`+`PARDA`. As demais categorias permanecem na base principal e são excluídas apenas desta comparação.
+Entre as 9.476 candidaturas APTO estão 9.476 com votos observados. As categorias autodeclaradas, contadas antes da restrição por votos, são: AMARELA: 39, BRANCA: 4.795, INDÍGENA: 50, NÃO DIVULGÁVEL: 2, NÃO INFORMADO: 56, PARDA: 3.214, PRETA: 1.320, (ausente): 0. A comparação considera 9.329 candidaturas BRANCA/PRETA/PARDA: brancas 4.795, pretas+pardas 4.534. Fora dela, sem recodificação: AMARELA: 39, INDÍGENA: 50, NÃO DIVULGÁVEL: 2, NÃO INFORMADO: 56, (ausente): 0.
+Das candidaturas binárias APTO, 9.329 têm voto/denominador observado; 0 foram excluídas por ausência de voto/denominador. A coorte completa pareada nas duas medidas de despesa e controles tem N=9.062: brancas 4.681, pretas+pardas 4.381. Das observadas, 267 não tinham uma das despesas Final e 0 tinham controle ausente; sobreposição 0.
+A tabela descritiva usa essa mesma coorte em ambos os cenários. Medianas e intervalos interquartis resumem despesa contratada, votos nominais e participação nos votos válidos da UF. A proporção eleita tem como denominador somente resultados classificáveis (códigos 2, 3, 4 ou 5); ausentes/outros resultados aparecem à parte.
+
+| Grupo | Despesa Final | N | Despesa mediana (Q25–Q75, R$) | Votos nominais mediana (Q25–Q75) | Votos válidos da UF: mediana (Q25–Q75) | Eleitos / classificáveis | Proporção eleita | Resultado ausente/outro |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| Brancas | deduplicado | 4.681 | 92.358,53 (20.000,00–407.455,60) | 1.716 (478–8.321) | 0,0292% (0,0065–0,1689%) | 363/4.681 | 7,75% | 0 |
+| Brancas | todas_as_linhas | 4.681 | 94.000,00 (20.000,00–408.559,75) | 1.716 (478–8.321) | 0,0292% (0,0065–0,1689%) | 363/4.681 | 7,75% | 0 |
+| Pretas + pardas | deduplicado | 4.381 | 49.996,85 (11.560,00–205.251,50) | 818 (278–2.957) | 0,0179% (0,0050–0,0813%) | 139/4.381 | 3,17% | 0 |
+| Pretas + pardas | todas_as_linhas | 4.381 | 50.000,00 (11.565,85–205.686,59) | 818 (278–2.957) | 0,0179% (0,0050–0,0813%) | 139/4.381 | 3,17% | 0 |
+
+Interação ajustada: GLM Binomial/logit fracionário para participação de votos, com `log1p(despesa em R$)`, indicador pretas+pardas e interação entre os dois; referência: brancas. Controles: UF, partido, idade na eleição, sexo e escolaridade; erros-padrão HC1. Deduplicado é principal; todas as linhas, sensibilidade. Custo por voto não é preditor porque usa votos no denominador.
+
+| Cenário | N | Interação despesa×pretas+pardas (logit) | IC 95% HC1 | p |
+|---|---:|---:|---:|---:|
+| deduplicado | 9.062 | 0,0222 | -0,0434–0,0879 | 0,5068 |
+| todas_as_linhas | 9.062 | 0,0229 | -0,0425–0,0883 | 0,4920 |
+O coeficiente de interação resume a diferença entre inclinações na escala logit; não é uma diferença causal nem uma mudança direta em pontos percentuais. Os demais coeficientes e seus intervalos estão no CSV.
+No cenário deduplicado, o IC 95% inclui zero; estes dados não distinguem com clareza as inclinações dos grupos.
+No cenário todas_as_linhas, o IC 95% inclui zero; estes dados não distinguem com clareza as inclinações dos grupos.
+
+Curvas padronizadas usam os mesmos perfis de UF, partido, idade, sexo e escolaridade em ambos os grupos, mas apenas em faixas de despesa com suporte contextual pré-especificado. Sombras mostram ICs pontuais de 95% pelo método delta/HC1; não são intervalos individuais.
+Suporte deduplicado: 74 células UF×partido elegíveis (N≥10 em cada grupo), cobrindo 38,3% das brancas e 31,8% das pretas+pardas. A maior cobertura de qualquer ponto candidato foi 24,9% e 21,2%, respectivamente; 0 pontos publicados.
+Sem curva por suporte insuficiente: cobertura das células com suporte ficou abaixo de 80% em pelo menos um grupo. Não houve extrapolação.
+Suporte todas_as_linhas: 74 células UF×partido elegíveis (N≥10 em cada grupo), cobrindo 38,3% das brancas e 31,8% das pretas+pardas. A maior cobertura de qualquer ponto candidato foi 24,9% e 20,5%, respectivamente; 0 pontos publicados.
+Sem curva por suporte insuficiente: cobertura das células com suporte ficou abaixo de 80% em pelo menos um grupo. Não houve extrapolação.
+
+| Cenário | Despesa (R$) | Brancas: participação prevista (IC 95%) | Pretas+pardas: participação prevista (IC 95%) | Cobertura brancas | Cobertura pretas+pardas |
+|---|---:|---:|---:|---:|---:|
+
+![Curva raça/cor — despesas deduplicadas](tse-2022-race-interaction-curve-deduplicado.svg)
+
+![Curva raça/cor — todas as linhas](tse-2022-race-interaction-curve-todas-as-linhas.svg)
+
+A tabela de suporte apresenta contagens, faixas P10–P90 e proporção da coorte por UF, partido e célula UF×partido; a tabela de suporte por ponto registra a cobertura usada para aceitar ou suprimir cada ponto. Diferenças são associações ajustadas, não efeitos causais ou prova de discriminação. Despesa declarada contratada não significa pagamento efetivo nem recurso necessariamente público.
+A comparação financeira com 2026 permanece adiada. Depois de 3 de novembro, verificar novamente disponibilidade e cobertura das prestações `Final`; a data não aprova automaticamente a base.
+
+Artefatos: `tse-2022-race-population-counts.csv`, `tse-2022-race-group-descriptives.csv`, `tse-2022-race-interaction-coefficients.csv`, `tse-2022-race-interaction-curve.csv`, `tse-2022-race-curve-support.csv` e `tse-2022-race-support-by-uf-party.csv`.
+
 ## INAPTO — levantamento separado por tipo de prestação
 
 Entre 1.154 candidaturas INAPTO, 992 têm ao menos uma ocorrência e 162 não têm linha de despesa na base. A tabela usa ocorrências intactas e também mostra o cenário deduplicado; não mistura INAPTO à regressão APTO.
