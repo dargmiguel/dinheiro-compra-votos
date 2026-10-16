@@ -1,0 +1,14 @@
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!uv.lock
+!tse_pilot/
+!tse_pilot/**
+!tests/
+!tests/**
+!data/
+!data/manifests/
+!data/manifests/**
+!data/inventory-2022.json
+!data/layout-2022.json

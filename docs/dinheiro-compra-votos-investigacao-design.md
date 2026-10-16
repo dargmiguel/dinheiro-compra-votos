@@ -2,7 +2,7 @@
 
 ## Resumo
 
-Esta investigação estudará, em módulos conectados mas não confundidos, a relação entre dinheiro declarado, atenção pública e resultados eleitorais. O estudo integrado principal será feito com as eleições de 2026, usando 2022 para desenvolver e validar o pipeline antes de incorporar 2026. A primeira análise estimará associações condicionais — não efeitos causais — entre gastos declarados de campanhas para deputado federal e participação de votos dentro da UF. Uma camada de atenção relacionará gastos e publicidade a métricas públicas de redes e buscas, sem tratar curtidas, comentários, seguidores ou visualizações como votos. Um segundo módulo fará *backtests* históricos de comparecimento e votação geográfica, inclusive da disputa presidencial de 2022 entre Lula e Bolsonaro, usando apenas informações disponíveis antes de cada resultado e medindo os erros contra resultados conhecidos. A entrega principal será um repositório reproduzível com metodologia, dados derivados e figuras; um artigo no LinkedIn contará a investigação, e um dashboard só será incluído se não comprometer a auditoria.
+Esta investigação estuda, em módulos conectados mas não confundidos, a relação entre dinheiro declarado, atenção pública e resultados eleitorais. A análise financeira reproduzível de 2022 é a entrega corrente e vem antes de 2026, redes sociais, PJe e backtests. A camada de atenção e os ciclos posteriores não bloqueiam a análise contratada de 2022. Todas as estimativas financeiras são associativas, não causais.
 
 ## Termos
 
@@ -34,7 +34,7 @@ A análise de financiamento estimará a associação condicional entre gasto dec
 
 ### Q2 e Q10 — Papéis de 2022 e 2026
 
-A escolha inicial foi usar 2026 como estudo principal e 2022 como contexto. A decisão posterior esclareceu a ordem: 2022 será usado primeiro para desenvolver e validar o pipeline; 2026 será o estudo integrado principal, sem treinar nele antes da análise principal e sem agrupar os dois ciclos automaticamente. A alternativa de fazer 2022 o estudo principal perdeu porque a decisão de produto prioriza 2026; agrupar eleições desde o início mistura regimes e facilita vazamento; separar 2022 para financiamento e 2026 para redes impede a comparação integrada.
+A decisão original priorizou 2026, mas a ordem operacional foi corrigida: concluir primeiro a análise financeira reproduzível de 2022; 2026 e a integração com atenção são etapas posteriores. Não agrupar ciclos automaticamente nem permitir que módulos futuros bloqueiem a entrega 2022.
 
 ### Q4 — Congelamento das fontes
 
@@ -88,20 +88,36 @@ O modelo principal será apropriado a um desfecho fracionário limitado entre ze
 
 Antes de olhar todos os resultados, serão fixados pergunta, população, exposição, desfecho, controles e métricas. A publicação separará análise principal, exploração e sensibilidades. Não será escolhida depois a especificação que melhor conta a história, nem publicada apenas a combinação significativa entre muitos cortes. Intervalos e diagnósticos serão parte do resultado, não decoração.
 
+## Protocolo financeiro do piloto TSE 2022
+
+Este protocolo específico rege a análise de 2022; ele não altera silenciosamente a população de outros ciclos.
+
+- **População:** candidaturas a deputado federal `APTO` (`CD_SITUACAO_CANDIDATURA = 12`) no snapshot congelado são o principal. Isso não reconstitui validade na data da eleição. `INAPTO` fica em levantamento separado de despesas, por tipo de prestação.
+- **Prestações:** `Final` é principal; demais tipos são apresentados separadamente. Não se presume qual versão foi a última recepcionada com sucesso.
+- **Despesas:** o principal é log do total `VR_DESPESA_CONTRATADA` declarado em `Final`, usando a regra de igualdade exata nos 53 campos originais por snapshot/membro; todas as linhas permanecem como sensibilidade auditável. A escolha não confirma identidade econômica oficial. Despesas pagas, se integradas e validadas, são medida complementar separada; sua integração não bloqueia a análise contratada.
+- **Votos:** para deputado federal no 1º turno de 2022, a participação do candidato usa votos nominais válidos divididos pelo total oficial de votos válidos da UF/cargo, incluindo legenda. O denominador é calculado antes dos filtros de situação `APTO` e prestação `Final`; basta uma fonte oficial de total válido, sem exigir detalhe partidário.
+- **Controles:** UF, partido, idade na eleição, sexo, raça e escolaridade; comparar com ajuste apenas por UF/partido. Estado civil e ocupação ficam para descrição/sensibilidade. Partido e federação não entram simultaneamente sem avaliação de redundância.
+- **Análise secundária:** permitir que a associação despesas–votos varie entre mulheres e homens; reportá-la como associação, sem interpretação causal.
+- **Análise secundária por raça/cor (TSE 2022):** comparar autodeclarações `PRETA`+`PARDA` com `BRANCA`, deixando `AMARELA`, `INDÍGENA`, ausentes e demais categorias fora apenas da comparação, não da base. Estimar interação grupo×`log1p(despesa)` com os controles acordados, deduplicado principal e todas as linhas como sensibilidade; restringir curvas ao suporte comum por célula `UF × partido`. Regras, limiares de suporte e denominadores foram registrados antes da estimação em `docs/tse-2022-race-secondary-protocol.md`. Interpretação associativa, não causal.
+- **Análise secundária posterior de eleição por raça/cor:** comparar proporções eleitas observadas e, somente com suporte comum suficiente, probabilidades ajustadas sem e com despesa na mesma população. Limiares de suporte e critérios de estabilidade registrados em `docs/tse-2022-race-election-secondary-protocol.md`; mudança com despesas é associativa, não causal.
+- **Critério de aprovação:** zero erros fatais; fonte oficial e agregados reconciliados; chaves, checksums e comandos reproduzíveis verificados; exclusões auditáveis; sensibilidades e limitações documentadas. Zero observado, ausência e registro inválido devem permanecer distintos. Ausências conhecidas e repetições exatas cobertas pela regra acordada não bloqueiam sozinhas; as demais validações obrigatórias continuam valendo.
+
+
+
 ## Escolhas rotineiras
 
 - **Q3 — Estrutura editorial:** um artigo terá duas partes explicitamente separadas, com implementação começando pelo financiamento. A conexão conceitual será preservada sem transformar os módulos em um único modelo.
-- **Q5 — População:** entram todas as candidaturas válidas a deputado federal, preservando votos zero e contas zeradas quando os registros forem válidos. Eleitos, somente candidatos com valores positivos e limiares serão sensibilidades, não a população principal.
+- **Q5 — População geral:** entram candidaturas operacionalmente válidas a deputado federal, preservando votos zero e contas zeradas quando os registros forem válidos. Eleitos, somente candidatos com valores positivos e limiares serão sensibilidades, não a população principal. Para o piloto TSE 2022, vale a regra específica de APTO no snapshot registrada acima.
 - **Q9 — Extremos e registros problemáticos:** zeros válidos serão preservados; registros inválidos serão excluídos com motivo codificado; extremos serão tratados por diagnóstico e sensibilidade, não por limpeza silenciosa, winsorização automática ou imputação sem justificativa.
 - **Q20 — Sentimento e temas:** entram apenas como módulo exploratório secundário, com amostra, classificador, avaliação e limitações documentados. Não serão usados como proxy direto de voto. Comentários incompletos, sarcasmo, bots, moderação e viés de amostragem devem ser explicitados.
 - **Q21 — Entrega:** o repositório reproduzível com metodologia, dados derivados e figuras é a entrega de verificação; o LinkedIn é a narrativa pública; o dashboard é opcional e só entra se não prejudicar congelamento, auditoria e documentação.
-- **Q24 — Primeiro portão:** antes da coleta completa, será feito um piloto pequeno em 2022 com checklist de downloads, chaves candidato-eleição, duplicatas, cobertura de contas e disponibilidade social. O piloto terá critério de parada antes da incorporação de 2026 e das redes.
+- **Q24 — Primeiro portão:** concluir a análise financeira de 2022 com fontes congeladas, chaves, deduplicação, denominador reconciliado, modelos, sensibilidades e limitações. Disponibilidade social não é critério de bloqueio; módulos de atenção, 2026 e backtests ficam para depois.
 
 ## Fatos verificados
 
-- O diretório do projeto estava sem arquivos quando a estrutura foi inspecionada. Portanto, não há convenção de código, esquema ou pipeline existente a preservar nesta fase.
-- A interface da entrevista foi conduzida em português e a sessão foi encerrada sem perguntas abertas.
-- Não foi feita uma verificação independente, durante a entrevista, da cobertura atual das APIs, dos arquivos do TSE ou dos termos de uso das plataformas. Essas verificações pertencem ao piloto de viabilidade e não devem ser tratadas como fatos já confirmados.
+- O diretório estava sem arquivos quando o projeto foi inicialmente inspecionado; desde então, pipeline, SQLite derivado, testes e relatórios foram criados.
+- O ZIP congelado de prestação de contas contém despesas pagas por UF com `SQ_PRESTADOR_CONTAS` e `VR_PAGTO_DESPESA`; sua integração ampla ainda não foi validada e é complementar. A análise contratada não depende dela.
+- A fonte oficial de totais válidos por UF, incluindo legenda, foi adicionada ao manifesto de 2022. O processamento valida os componentes de legenda e reconcilia nominal por UF contra a fonte de votos por candidato; o resultado está registrado no relatório e CSV por UF.
 
 ## Riscos
 
@@ -127,4 +143,4 @@ Nenhuma pergunta foi formalmente adiada. O que ainda não existe é implementaç
 
 ## Threads abertos
 
-Não há discussão sem decisão registrada. A única tensão relevante — começar operacionalmente por 2022, mas manter 2026 como estudo integrado principal — foi resolvida pela separação entre desenvolvimento/validação e estudo principal. A preferência por “resolver depois” bloqueios de coleta também foi convertida em uma regra: parar a fonte bloqueada, registrar a lacuna e não contornar controles.
+Não há decisões abertas do protocolo financeiro 2022. A prioridade corrente é executar e documentar esse protocolo; 2026, atenção/redes sociais, PJe e backtests são etapas posteriores, não bloqueios.

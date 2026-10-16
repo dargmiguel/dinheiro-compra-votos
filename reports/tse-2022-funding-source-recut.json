@@ -1,0 +1,184 @@
+{
+  "population": {
+    "election_year": 2022,
+    "turn": 1,
+    "cargo_code": "6",
+    "candidate_status_code": "12",
+    "reference_definition": "candidatura APTO com ao menos uma linha Final retida em expenses; despesas contratadas observadas na base principal deduplicada",
+    "reference_candidates_with_final_expenses": 9204,
+    "all_apto_candidates": 9476,
+    "apto_candidates_without_observed_final_expense": 272,
+    "receipts_candidates_with_rows": 9204,
+    "receipts_candidates_without_rows": 0,
+    "receipts_candidate_coverage_pct": "100.0000",
+    "payments_candidates_with_rows": 8363,
+    "payments_candidates_without_rows": 841,
+    "payments_candidate_coverage_pct": "90.8627",
+    "receipt_account_key_mismatch_candidates": 0
+  },
+  "coverage": {
+    "reference_candidates_with_final_expenses": 9204,
+    "all_apto_candidates": 9476,
+    "apto_candidates_without_observed_final_expense": 272,
+    "receipts_candidates_with_rows": 9204,
+    "receipts_candidates_without_rows": 0,
+    "receipts_candidate_coverage_pct": "100.0000",
+    "payments_candidates_with_rows": 8363,
+    "payments_candidates_without_rows": 841,
+    "payments_candidate_coverage_pct": "90.8627",
+    "receipt_account_key_mismatch_candidates": 0
+  },
+  "source_archive": "data\\raw\\2022\\20261008T154908Z\\prestacao_de_contas_eleitorais_candidatos_2022.zip",
+  "source_members": {
+    "receipts_selected": [
+      "receitas_candidatos_2022_AC.csv",
+      "receitas_candidatos_2022_AL.csv",
+      "receitas_candidatos_2022_AM.csv",
+      "receitas_candidatos_2022_AP.csv",
+      "receitas_candidatos_2022_BA.csv",
+      "receitas_candidatos_2022_CE.csv",
+      "receitas_candidatos_2022_DF.csv",
+      "receitas_candidatos_2022_ES.csv",
+      "receitas_candidatos_2022_GO.csv",
+      "receitas_candidatos_2022_MA.csv",
+      "receitas_candidatos_2022_MG.csv",
+      "receitas_candidatos_2022_MS.csv",
+      "receitas_candidatos_2022_MT.csv",
+      "receitas_candidatos_2022_PA.csv",
+      "receitas_candidatos_2022_PB.csv",
+      "receitas_candidatos_2022_PE.csv",
+      "receitas_candidatos_2022_PI.csv",
+      "receitas_candidatos_2022_PR.csv",
+      "receitas_candidatos_2022_RJ.csv",
+      "receitas_candidatos_2022_RN.csv",
+      "receitas_candidatos_2022_RO.csv",
+      "receitas_candidatos_2022_RR.csv",
+      "receitas_candidatos_2022_RS.csv",
+      "receitas_candidatos_2022_SC.csv",
+      "receitas_candidatos_2022_SE.csv",
+      "receitas_candidatos_2022_SP.csv",
+      "receitas_candidatos_2022_TO.csv"
+    ],
+    "receipts_excluded_aggregate_or_document": [
+      "receitas_candidatos_2022_BR.csv",
+      "receitas_candidatos_2022_BRASIL.csv"
+    ],
+    "payments_selected": [
+      "despesas_pagas_candidatos_2022_AC.csv",
+      "despesas_pagas_candidatos_2022_AL.csv",
+      "despesas_pagas_candidatos_2022_AM.csv",
+      "despesas_pagas_candidatos_2022_AP.csv",
+      "despesas_pagas_candidatos_2022_BA.csv",
+      "despesas_pagas_candidatos_2022_CE.csv",
+      "despesas_pagas_candidatos_2022_DF.csv",
+      "despesas_pagas_candidatos_2022_ES.csv",
+      "despesas_pagas_candidatos_2022_GO.csv",
+      "despesas_pagas_candidatos_2022_MA.csv",
+      "despesas_pagas_candidatos_2022_MG.csv",
+      "despesas_pagas_candidatos_2022_MS.csv",
+      "despesas_pagas_candidatos_2022_MT.csv",
+      "despesas_pagas_candidatos_2022_PA.csv",
+      "despesas_pagas_candidatos_2022_PB.csv",
+      "despesas_pagas_candidatos_2022_PE.csv",
+      "despesas_pagas_candidatos_2022_PI.csv",
+      "despesas_pagas_candidatos_2022_PR.csv",
+      "despesas_pagas_candidatos_2022_RJ.csv",
+      "despesas_pagas_candidatos_2022_RN.csv",
+      "despesas_pagas_candidatos_2022_RO.csv",
+      "despesas_pagas_candidatos_2022_RR.csv",
+      "despesas_pagas_candidatos_2022_RS.csv",
+      "despesas_pagas_candidatos_2022_SC.csv",
+      "despesas_pagas_candidatos_2022_SE.csv",
+      "despesas_pagas_candidatos_2022_SP.csv",
+      "despesas_pagas_candidatos_2022_TO.csv"
+    ],
+    "payments_excluded_aggregate_or_document": [
+      "despesas_pagas_candidatos_2022_BR.csv",
+      "despesas_pagas_candidatos_2022_BRASIL.csv"
+    ],
+    "receipts_donor_origin_not_selected": [
+      "receitas_candidatos_doador_originario_2022_AC.csv",
+      "receitas_candidatos_doador_originario_2022_AL.csv",
+      "receitas_candidatos_doador_originario_2022_AM.csv",
+      "receitas_candidatos_doador_originario_2022_AP.csv",
+      "receitas_candidatos_doador_originario_2022_BA.csv",
+      "receitas_candidatos_doador_originario_2022_BR.csv",
+      "receitas_candidatos_doador_originario_2022_BRASIL.csv",
+      "receitas_candidatos_doador_originario_2022_CE.csv",
+      "receitas_candidatos_doador_originario_2022_DF.csv",
+      "receitas_candidatos_doador_originario_2022_ES.csv",
+      "receitas_candidatos_doador_originario_2022_GO.csv",
+      "receitas_candidatos_doador_originario_2022_MA.csv",
+      "receitas_candidatos_doador_originario_2022_MG.csv",
+      "receitas_candidatos_doador_originario_2022_MS.csv",
+      "receitas_candidatos_doador_originario_2022_MT.csv",
+      "receitas_candidatos_doador_originario_2022_PA.csv",
+      "receitas_candidatos_doador_originario_2022_PB.csv",
+      "receitas_candidatos_doador_originario_2022_PE.csv",
+      "receitas_candidatos_doador_originario_2022_PI.csv",
+      "receitas_candidatos_doador_originario_2022_PR.csv",
+      "receitas_candidatos_doador_originario_2022_RJ.csv",
+      "receitas_candidatos_doador_originario_2022_RN.csv",
+      "receitas_candidatos_doador_originario_2022_RO.csv",
+      "receitas_candidatos_doador_originario_2022_RR.csv",
+      "receitas_candidatos_doador_originario_2022_RS.csv",
+      "receitas_candidatos_doador_originario_2022_SC.csv",
+      "receitas_candidatos_doador_originario_2022_SE.csv",
+      "receitas_candidatos_doador_originario_2022_SP.csv",
+      "receitas_candidatos_doador_originario_2022_TO.csv"
+    ],
+    "receipt_rows_linked_to_reference_candidates": 99242,
+    "payment_rows_linked_to_reference_candidates": 1256017
+  },
+  "filters": {
+    "receipts": "AA_ELEICAO=2022; ST_TURNO=1; TP_PRESTACAO_CONTAS case-insensitive FINAL; CD_CARGO=6; SQ_CANDIDATO in reference population",
+    "payments": "AA_ELEICAO=2022; ST_TURNO=1; TP_PRESTACAO_CONTAS case-insensitive FINAL; SQ_PRESTADOR_CONTAS linked to reference population through expense_occurrences",
+    "receipt_candidate_key": "SQ_CANDIDATO liga receitas a candidates.sq_candidate; SQ_PRESTADOR_CONTAS é verificado contra a chave da prestação Final de despesas contratadas.",
+    "payment_candidate_key": "SQ_PRESTADOR_CONTAS dos pagamentos liga à mesma chave extraída de expense_occurrences para cada candidatura APTO/Final; a chave é única no recorte.",
+    "aggregation": "Todas as linhas dos arquivos estaduais selecionados; sem deduplicação adicional. Arquivos BR/BRASIL e receitas de doador originário não entram na soma."
+  },
+  "classification": {
+    "public_source_codes": [
+      "0",
+      "2"
+    ],
+    "public_source_definitions": {
+      "0": "Fundo Partidário",
+      "2": "Fundo Especial de Financiamento de Campanha (FEFC)"
+    },
+    "private_source_codes": [
+      "1"
+    ],
+    "private_source_definition": "Outros Recursos (CD_FONTE=1); apresentado separadamente como recursos privados/outros não públicos conforme a categoria do leiaute.",
+    "unclassified_source_codes": [
+      "9",
+      "-1",
+      "-3",
+      "#NULO",
+      "#NE",
+      "(vazio)",
+      "qualquer código não mapeado"
+    ],
+    "resource_nature_codes": {
+      "0": "Estimável",
+      "1": "Financeiro",
+      "other": "Natureza não classificada"
+    },
+    "percentage_denominators": {
+      "share_of_classified_flow_amount_pct": "valor público ou privado dividido pela soma pública + privada (CD_FONTE=0/2 + CD_FONTE=1); exclui fonte não classificada",
+      "share_of_all_flow_amount_pct": "valor da classe dividido por todos os valores monetários válidos no fluxo, inclusive fonte não classificada"
+    }
+  },
+  "interpretation": {
+    "receipts": "VR_RECEITA é receita declarada; valores financeiros e estimáveis são separados. Ausência de linha não é receita zero.",
+    "payments": "VR_PAGTO_DESPESA é despesa paga declarada; CD_FONTE_DESPESA descreve a fonte informada para a despesa, não rastreamento de fungibilidade nem pareamento a uma receita específica.",
+    "contracted_expense": "A despesa contratada deduplicada define a população de referência e não equivale a pagamento.",
+    "unclassified": "Códigos de fonte fora de 0/1/2, valores ausentes e sentinelas são mantidos em classe separada, nunca atribuídos a público ou privado."
+  },
+  "outputs": [
+    "tse-2022-funding-source-candidates.csv",
+    "tse-2022-funding-source-summary.csv",
+    "tse-2022-funding-source-dictionary.csv",
+    "tse-2022-funding-source-recut.json"
+  ]
+}

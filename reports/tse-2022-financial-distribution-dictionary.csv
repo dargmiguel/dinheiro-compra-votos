@@ -1,0 +1,21 @@
+﻿field,definition
+group_type,Dimensão da linha: sexo ou raça/cor; linhas combinadas identificadas no rótulo.
+group_value,Categoria oficial da base eleitoral; PRETAS + PARDAS é um agregado sobreposto e não soma de categorias exclusivas.
+candidate_count,Número de candidatos do grupo dentro da população APTO/Final com despesa observada.
+financial_receipt_candidates,Candidatos com ao menos uma linha de receita financeira (CD_NATUREZA=1); valores registrados iguais a zero continuam cobertos.
+financial_receipt_coverage_pct,financial_receipt_candidates dividido pelo número de candidatos do grupo.
+no_financial_receipt_candidates,Candidatos sem qualquer linha CD_NATUREZA=1; excluídos das medianas de receitas e não imputados como zero observado.
+financial_receipts_median_centavos,Mediana do total financeiro individual entre candidatos com ao menos uma linha financeira. Fontes não presentes contribuem sem valor da fonte no cálculo comum; ausência fica separadamente sinalizada.
+public_financial_median_centavos,Mediana da receita financeira pública na mesma população com ao menos uma linha financeira total; não é mediana só entre recebedores públicos. Sem linha pública não significa zero observado.
+other_resources_financial_median_centavos,Mediana de Outros Recursos na mesma população financeira comum; não é mediana só entre recebedores de Outros Recursos. Sem linha da fonte não significa zero observado.
+financial_public_absent_in_covered_candidates,"Candidatos com receita financeira observada em alguma fonte, mas sem linha pública financeira."
+financial_private_absent_in_covered_candidates,"Candidatos com receita financeira observada em alguma fonte, mas sem linha financeira de Outros Recursos."
+*_zero_amount_with_financial_row_candidates,Candidatos com linha financeira da fonte cujo total da fonte é zero; separa zero observado da ausência de linha.
+contracted_expenses_median_centavos,Mediana da despesa contratada deduplicada entre todos os candidatos do grupo; despesa observada igual a zero permanece incluída.
+elected_pct,"Eleitos com status total 2 ou 3 divididos por todos os candidatos do grupo, não apenas pela cobertura financeira."
+small_group_n_lt_30,Sinaliza apenas grupo com menos de 30 candidatos; não é teste de significância.
+*_coverage_pct,Candidatos com linha/cobertura observada divididos pelo denominador nomeado; ausências não são valores observados iguais a zero.
+*_median_centavos,"Mediana em centavos; pode conter 0,5 centavo quando o número de observações é par. Dividir por 100 para obter reais."
+amount_centavos,Valor em centavos inteiros; dividir por 100 para exibir R$.
+coverage_pct,Candidatos com linha no recorte divididos pelo denominador indicado; não representa completude além do recorte.
+share_pct,Participação do valor na base indicada em amount_denominator_centavos.

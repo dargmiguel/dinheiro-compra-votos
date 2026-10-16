@@ -1,0 +1,9 @@
+scenario,date_status,expense_count,candidate_count,declared_expense_centavos,first_valid_date,last_valid_date,example_raw_values,included_in_monthly_and_election_day_tables
+deduplicado,valid_2022,1094600,8413,307614262875,2022-01-01,2022-12-31,,True
+deduplicado,outside_2022,0,0,0,,,,False
+deduplicado,missing,791,791,0,,,(ausente),False
+deduplicado,invalid,0,0,0,,,,False
+todas_as_linhas,valid_2022,1116275,8413,310467770168,2022-01-01,2022-12-31,,True
+todas_as_linhas,outside_2022,0,0,0,,,,False
+todas_as_linhas,missing,791,791,0,,,(ausente),False
+todas_as_linhas,invalid,0,0,0,,,,False

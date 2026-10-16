@@ -1,0 +1,46 @@
+{
+  "election_year": 2022,
+  "turn": 1,
+  "cargo": "Deputado Federal",
+  "candidate_status": "APTO",
+  "included_result_codes": {
+    "2": "ELEITO POR QP",
+    "3": "ELEITO POR MÉDIA",
+    "4": "NÃO ELEITO",
+    "5": "SUPLENTE"
+  },
+  "included_candidates": 9202,
+  "elected_numerator": 510,
+  "excluded_classified_results_for_missing_expense_or_controls": 274,
+  "excluded_other_or_missing_official_result_codes": 0,
+  "expense_basis": "VR_DESPESA_CONTRATADA em prestação Final; deduplicação integral usada na análise principal",
+  "election_denominator": "candidaturas com resultado oficial classificável, despesa Final deduplicada presente e covariáveis completas, igual ao recorte dos modelos eleitorais",
+  "rate": "eleitos (códigos 2 e 3) / candidaturas (códigos 2, 3, 4 e 5) no recorte",
+  "bands": [
+    {
+      "expense_band_code": "ate_50_mil",
+      "expense_band_label": "Até R$ 50 mil",
+      "lower_exclusive_centavos": null,
+      "upper_inclusive_centavos": 5000000
+    },
+    {
+      "expense_band_code": "50_a_200_mil",
+      "expense_band_label": "Acima de R$ 50 mil até R$ 200 mil",
+      "lower_exclusive_centavos": 5000000,
+      "upper_inclusive_centavos": 20000000
+    },
+    {
+      "expense_band_code": "200_mil_a_1_milhao",
+      "expense_band_label": "Acima de R$ 200 mil até R$ 1 milhão",
+      "lower_exclusive_centavos": 20000000,
+      "upper_inclusive_centavos": 100000000
+    },
+    {
+      "expense_band_code": "acima_1_milhao",
+      "expense_band_label": "Acima de R$ 1 milhão",
+      "lower_exclusive_centavos": 100000000,
+      "upper_inclusive_centavos": null
+    }
+  ],
+  "quartile_analysis_preserved": "tse-2022-election-rate-by-uf-expense-band.csv; quartis ranqueados dentro da UF"
+}

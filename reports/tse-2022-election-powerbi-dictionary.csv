@@ -1,0 +1,26 @@
+table,field,type,definition
+tse-2022-election-powerbi-candidates.csv,election_year,integer,Ano da eleição; 2022.
+tse-2022-election-powerbi-candidates.csv,turn,integer,Turno eleitoral; primeiro turno.
+tse-2022-election-powerbi-candidates.csv,cargo,text,Cargo; Deputado Federal.
+tse-2022-election-powerbi-candidates.csv,sq_candidate,text,Identificador único da candidatura no TSE.
+tse-2022-election-powerbi-candidates.csv,uf,text,UF da candidatura.
+tse-2022-election-powerbi-candidates.csv,candidate_total_status_code,text,"Código oficial do resultado total; somente 2, 3, 4 ou 5 no recorte."
+tse-2022-election-powerbi-candidates.csv,expense_deduplicated_centavos,integer,Despesa Final deduplicada em centavos; base das faixas e da análise principal.
+tse-2022-election-powerbi-candidates.csv,expense_all_lines_centavos,integer,Despesa Final com todas as linhas em centavos; sensibilidade.
+tse-2022-election-powerbi-candidates.csv,expense_band_code,text,Faixa fixa de despesa deduplicada; limites descritos em tse-2022-election-powerbi-recut.json.
+tse-2022-election-powerbi-candidates.csv,expense_band_label,text,Rótulo legível da faixa fixa de despesa.
+tse-2022-election-powerbi-candidates.csv,elected,integer,Indicador: 1 para código 2 ou 3; 0 para código 4 ou 5.
+tse-2022-election-powerbi-summary.csv,geography_type,text,Nível geográfico: BRASIL ou UF.
+tse-2022-election-powerbi-summary.csv,geography_code,text,BR para Brasil; sigla da UF para nível estadual.
+tse-2022-election-powerbi-summary.csv,candidate_count,integer,Denominador: candidaturas classificáveis no recorte e faixa.
+tse-2022-election-powerbi-summary.csv,elected_count,integer,Numerador: eleitos pelos códigos 2 e 3 no denominador.
+tse-2022-election-powerbi-summary.csv,elected_share,decimal,elected_count / candidate_count; vazio se denominador zero.
+tse-2022-election-powerbi-summary.csv,lower_exclusive_centavos,integer nullable,"Limite inferior estrito da faixa, em centavos; vazio na primeira faixa."
+tse-2022-election-powerbi-summary.csv,upper_inclusive_centavos,integer nullable,"Limite superior inclusivo da faixa, em centavos; vazio na última faixa."
+tse-2022-election-powerbi-summary.csv,election_year,integer,Ano da eleição; 2022.
+tse-2022-election-powerbi-summary.csv,turn,integer,Turno eleitoral; primeiro turno.
+tse-2022-election-powerbi-summary.csv,cargo,text,Cargo; Deputado Federal.
+tse-2022-election-powerbi-summary.csv,expense_band_code,text,Código estável da faixa fixa de despesa.
+tse-2022-election-powerbi-summary.csv,expense_band_label,text,Rótulo legível da faixa fixa de despesa.
+tse-2022-election-powerbi-summary.csv,expense_basis,text,Base monetária da faixa: despesa Final deduplicada.
+tse-2022-election-powerbi-summary.csv,denominator_definition,text,Definição do denominador usado para a proporção.

@@ -1,0 +1,33 @@
+﻿party_abbrev,candidate_count,reference_population_n,candidate_coverage_pct,contracted_expenses_total_centavos,contracted_expenses_median_centavos,contracted_expense_zero_candidates,small_group_n_lt_30,expense_subject
+AGIR,283,9204,3.0748,922446730,500000,53,False,Candidatos; não é orçamento/despesa de diretório partidário
+AVANTE,368,9204,3.9983,7230695305,8635550,21,False,Candidatos; não é orçamento/despesa de diretório partidário
+CIDADANIA,149,9204,1.6189,5290857249,7999765,7,False,Candidatos; não é orçamento/despesa de diretório partidário
+DC,198,9204,2.1512,129204810,436750,47,False,Candidatos; não é orçamento/despesa de diretório partidário
+MDB,454,9204,4.9326,22822915044,13267925.5,18,False,Candidatos; não é orçamento/despesa de diretório partidário
+NOVO,208,9204,2.2599,2218999539,1642051.5,11,False,Candidatos; não é orçamento/despesa de diretório partidário
+PATRIOTA,420,9204,4.5632,6552269095,4609803,24,False,Candidatos; não é orçamento/despesa de diretório partidário
+PC do B,63,9204,0.6845,4196218850,11471073,1,False,Candidatos; não é orçamento/despesa de diretório partidário
+PCB,35,9204,0.3803,54137971,1400000,3,False,Candidatos; não é orçamento/despesa de diretório partidário
+PCO,22,9204,0.239,0,0,22,True,Candidatos; não é orçamento/despesa de diretório partidário
+PDT,439,9204,4.7697,8144838275,5005000,9,False,Candidatos; não é orçamento/despesa de diretório partidário
+PL,465,9204,5.0522,21393156350,15198735,26,False,Candidatos; não é orçamento/despesa de diretório partidário
+PMB,167,9204,1.8144,44633374,0,92,False,Candidatos; não é orçamento/despesa de diretório partidário
+PMN,244,9204,2.651,1298593468,1997300,34,False,Candidatos; não é orçamento/despesa de diretório partidário
+PODE,466,9204,5.063,13625701718,10875102.5,14,False,Candidatos; não é orçamento/despesa de diretório partidário
+PP,462,9204,5.0196,29580235193,21000414.5,16,False,Candidatos; não é orçamento/despesa de diretório partidário
+PROS,297,9204,3.2269,4155823524,2000000,93,False,Candidatos; não é orçamento/despesa de diretório partidário
+PRTB,281,9204,3.053,234690570,150000,113,False,Candidatos; não é orçamento/despesa de diretório partidário
+PSB,413,9204,4.4872,15672830389,14950000,11,False,Candidatos; não é orçamento/despesa de diretório partidário
+PSC,377,9204,4.096,6217692716,2995585,33,False,Candidatos; não é orçamento/despesa de diretório partidário
+PSD,395,9204,4.2916,22556346839,24467900,17,False,Candidatos; não é orçamento/despesa de diretório partidário
+PSDB,286,9204,3.1073,14586468632,14954309.5,19,False,Candidatos; não é orçamento/despesa de diretório partidário
+PSOL,292,9204,3.1725,5046231464,4325365,1,False,Candidatos; não é orçamento/despesa de diretório partidário
+PSTU,36,9204,0.3911,33202186,513060,2,False,Candidatos; não é orçamento/despesa de diretório partidário
+PT,355,9204,3.857,23900337497,24792881,1,False,Candidatos; não é orçamento/despesa de diretório partidário
+PTB,445,9204,4.8349,7762469971,3016000,54,False,Candidatos; não é orçamento/despesa de diretório partidário
+PV,82,9204,0.8909,2723070542,16199312.5,3,False,Candidatos; não é orçamento/despesa de diretório partidário
+REDE,166,9204,1.8036,3397839565,3649941.5,6,False,Candidatos; não é orçamento/despesa de diretório partidário
+REPUBLICANOS,497,9204,5.3998,22177797880,15369510,6,False,Candidatos; não é orçamento/despesa de diretório partidário
+SOLIDARIEDADE,350,9204,3.8027,6323925148,4996162.5,25,False,Candidatos; não é orçamento/despesa de diretório partidário
+UNIÃO,472,9204,5.1282,49288695116,69914779.5,3,False,Candidatos; não é orçamento/despesa de diretório partidário
+UP,17,9204,0.1847,31937865,813330,6,True,Candidatos; não é orçamento/despesa de diretório partidário
