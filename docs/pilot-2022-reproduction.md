@@ -11,20 +11,20 @@ O snapshot executado é `manifest-20261008T154908Z.json`. O ZIP de totais partid
 
 ## Comandos
 
-Na raiz do repositório, com Python 3.11+:
+Na raiz do repositório, com Python 3.11.x e UV 0.9.15 ou superior. Instale o UV pelo [guia oficial](https://docs.astral.sh/uv/getting-started/installation/) e prepare o ambiente a partir do lock:
 
 ```text
-python -m pip install -r requirements.txt
-python -m unittest discover -s tests -v
-python -m tse_pilot inventory --data-root data
-python -m tse_pilot acquire --data-root data
-python -m tse_pilot freeze-votes --manifest data/manifests/manifest-<snapshot>.json
-python -m tse_pilot inspect --manifest data/manifests/manifest-<snapshot>.json --output data/layout-2022.json
-python -m tse_pilot run --manifest data/manifests/manifest-<snapshot>.json --output data/derived/2022
-python -m tse_pilot analyze --database data/derived/2022/pilot.sqlite --validation data/derived/2022/validation.json --output reports
-python -m tse_pilot expense-temporal --database data/derived/2022/pilot.sqlite --output reports
-python -m tse_pilot funding-source --database data/derived/2022/pilot.sqlite --archive data/raw/2022/20261008T154908Z/prestacao_de_contas_eleitorais_candidatos_2022.zip --output reports
-python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --output reports/tse-2022-duplicate-diagnostics.json
+uv sync --locked
+uv run --locked python -m unittest discover -s tests -v
+uv run --locked python -m tse_pilot inventory --data-root data
+uv run --locked python -m tse_pilot acquire --data-root data
+uv run --locked python -m tse_pilot freeze-votes --manifest data/manifests/manifest-<snapshot>.json
+uv run --locked python -m tse_pilot inspect --manifest data/manifests/manifest-<snapshot>.json --output data/layout-2022.json
+uv run --locked python -m tse_pilot run --manifest data/manifests/manifest-<snapshot>.json --output data/derived/2022
+uv run --locked python -m tse_pilot analyze --database data/derived/2022/pilot.sqlite --validation data/derived/2022/validation.json --output reports
+uv run --locked python -m tse_pilot expense-temporal --database data/derived/2022/pilot.sqlite --output reports
+uv run --locked python -m tse_pilot funding-source --database data/derived/2022/pilot.sqlite --archive data/raw/2022/20261008T154908Z/prestacao_de_contas_eleitorais_candidatos_2022.zip --output reports
+uv run --locked python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --output reports/tse-2022-duplicate-diagnostics.json
 ```
 
 `freeze-votes` congela incrementalmente o recurso oficial de total partidário no manifesto; `run` exige que ele esteja presente, filtra eleição 2022/turno 1/deputado federal e calcula o denominador por UF antes dos filtros `APTO` ou `Final`. O denominador usa o membro nacional `BRASIL` uma vez, nunca somado aos membros `BR`/UF. Confere legenda total contra seus dois componentes e reconcilia voto nominal oficial com a soma de votos válidos por candidato em cada UF.
@@ -179,7 +179,7 @@ Somente erros das validações já existentes (campos inválidos, valores ausent
 ## Testes e auditoria
 
 ```text
-python -m unittest discover -s tests -v
+uv run --locked python -m unittest discover -s tests -v
 ```
 
 Os testes exercitam o denominador oficial com legenda, controles, sensibilidades de despesas e desfecho, interação por sexo, grupos raciais/exclusões e supressão de curvas sem suporte, denominadores de eleição, distinção entre zero e ausência e levantamento de despesas INAPTO. `analyze` recusa uma validação bloqueada ou denominadores sem cobertura e reconciliação das 27 UFs.

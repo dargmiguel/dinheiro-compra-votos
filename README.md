@@ -41,25 +41,38 @@ O trabalho concluído analisa candidaturas a deputado federal no primeiro turno 
 
 ## Reproduzir
 
-Requer Python 3.11+. Os comandos abaixo estão registrados no CLI `python -m tse_pilot`; para obter e preparar os ZIPs, siga primeiro o [protocolo de reprodução](docs/pilot-2022-reproduction.md).
+Requer Python 3.11.x e UV 0.9.15 ou superior. Instale o UV conforme o [guia oficial](https://docs.astral.sh/uv/getting-started/installation/). As dependências exatas ficam em `pyproject.toml` e `uv.lock`; `uv sync --locked` recusa alterações incompatíveis ao lock.
 
 ```sh
-python -m pip install -r requirements.txt
-python -m unittest discover -s tests -v
+uv sync --locked
+uv run --locked python -m unittest discover -s tests -v
 
 # Processar o snapshot congelado e gerar as análises
-python -m tse_pilot run --manifest data/manifests/manifest-20261008T154908Z.json --output data/derived/2022
-python -m tse_pilot analyze --database data/derived/2022/pilot.sqlite --validation data/derived/2022/validation.json --output reports
-python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --output reports/tse-2022-duplicate-diagnostics.json
-python -m tse_pilot expense-temporal --database data/derived/2022/pilot.sqlite --output reports
-python -m tse_pilot funding-source --database data/derived/2022/pilot.sqlite --archive data/raw/2022/20261008T154908Z/prestacao_de_contas_eleitorais_candidatos_2022.zip --output reports
+uv run --locked python -m tse_pilot run --manifest data/manifests/manifest-20261008T154908Z.json --output data/derived/2022
+uv run --locked python -m tse_pilot analyze --database data/derived/2022/pilot.sqlite --validation data/derived/2022/validation.json --output reports
+uv run --locked python -m tse_pilot duplicates --database data/derived/2022/pilot.sqlite --output reports/tse-2022-duplicate-diagnostics.json
+uv run --locked python -m tse_pilot expense-temporal --database data/derived/2022/pilot.sqlite --output reports
+uv run --locked python -m tse_pilot funding-source --database data/derived/2022/pilot.sqlite --archive data/raw/2022/20261008T154908Z/prestacao_de_contas_eleitorais_candidatos_2022.zip --output reports
 ```
 
-Para iniciar um snapshot novo, o CLI também oferece `inventory`, `acquire`, `freeze-votes` e `inspect`. Os comandos, parâmetros e ordem estão detalhados no protocolo.
+Para iniciar um snapshot novo, o CLI também oferece `inventory`, `acquire`, `freeze-votes` e `inspect`. Os comandos, parâmetros e ordem estão detalhados no [protocolo de reprodução](docs/pilot-2022-reproduction.md).
+
+### Reproduzir com Docker
+
+O `Dockerfile` fixa Python 3.11.14 por digest, UV 0.9.15 e as dependências do `uv.lock`. Dados brutos e saídas não entram na imagem; monte as pastas locais para persistir os arquivos.
+
+```sh
+docker build -t dinheiro-compra-votos:local .
+docker run --rm dinheiro-compra-votos:local --help
+docker run --rm --entrypoint python dinheiro-compra-votos:local -m unittest discover -s tests -v
+docker run --rm -v "${PWD}/data:/app/data" -v "${PWD}/reports:/app/reports" dinheiro-compra-votos:local run --manifest data/manifests/manifest-20261008T154908Z.json --output data/derived/2022
+```
+
+Para gerar os relatórios, execute `analyze`, `duplicates`, `expense-temporal` ou `funding-source` no lugar de `run`, mantendo os volumes. O ZIP congelado exigido por `funding-source` precisa estar em `data/raw/`.
 
 ## Tecnologias
 
-Python 3.11+, biblioteca padrão (`argparse`, `csv`, `sqlite3`, `zipfile`, `unittest`), SQLite, NumPy, pandas, SciPy, statsmodels, CSV, JSON e SVG.
+UV, Docker, Python 3.11, biblioteca padrão (`argparse`, `csv`, `sqlite3`, `zipfile`, `unittest`), SQLite, NumPy, pandas, SciPy, statsmodels, CSV, JSON e SVG.
 
 ## Limitações e próximos passos
 
