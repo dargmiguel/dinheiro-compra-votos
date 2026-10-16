@@ -23,6 +23,7 @@ O trabalho concluído analisa candidaturas a deputado federal no primeiro turno 
 - [Descrições por raça/cor](reports/tse-2022-race-group-descriptives.csv) · [denominador oficial de votos válidos por UF](reports/tse-2022-vote-denominator-by-uf.csv)
 - [Protocolo de reprodução e fontes](docs/pilot-2022-reproduction.md)
 - [Decisões metodológicas do estudo](docs/dinheiro-compra-votos-investigacao-design.md)
+- [Guia completo do repositório (código, dados, testes e documentação)](docs/repository-guide.md) · [índice dos relatórios e artefatos versionados](reports/README.md)
 
 ## Como os dados viram resultados
 
