@@ -26,7 +26,9 @@ Para ver os resultados em oito lâminas: [carrossel completo (PDF)](reports/link
 
 ## Reproduzir
 
-Requer Python 3.11.x e UV 0.9.15 ou superior. Os dados brutos não estão versionados; siga o [protocolo de reprodução](docs/pilot-2022-reproduction.md) para obtê-los e executar o snapshot congelado.
+Requer Python 3.11.x e UV 0.9.15 ou superior ([instalação do UV](https://docs.astral.sh/uv/getting-started/installation/)). Os dados brutos do TSE não estão no Git. O [protocolo de reprodução](docs/pilot-2022-reproduction.md) documenta as fontes, a aquisição dos ZIPs e as análises complementares.
+
+Na raiz do repositório:
 
 ```sh
 uv sync --locked
@@ -35,7 +37,18 @@ uv run --locked python -m tse_pilot run --manifest data/manifests/manifest-20261
 uv run --locked python -m tse_pilot analyze --database data/derived/2022/pilot.sqlite --validation data/derived/2022/validation.json --output reports
 ```
 
-Para a execução completa, análises complementares ou Docker, use os comandos e pré-requisitos do protocolo. Os resultados e tabelas publicados podem ser consultados sem executar o pipeline.
+`run` constrói e valida a base local; `analyze` gera os relatórios. Para executar um snapshot novo, obter as fontes e rodar diagnósticos como `duplicates`, `expense-temporal` ou `funding-source`, siga os comandos do protocolo.
+
+Também há suporte a Docker:
+
+```sh
+docker build -t dinheiro-compra-votos:local .
+docker run --rm dinheiro-compra-votos:local --help
+docker run --rm --entrypoint python dinheiro-compra-votos:local -m unittest discover -s tests -v
+docker run --rm -v "${PWD}/data:/app/data" -v "${PWD}/reports:/app/reports" dinheiro-compra-votos:local run --manifest data/manifests/manifest-20261008T154908Z.json --output data/derived/2022
+```
+
+Os resultados publicados podem ser lidos sem instalar dependências nem executar o pipeline.
 
 ## Status
 
