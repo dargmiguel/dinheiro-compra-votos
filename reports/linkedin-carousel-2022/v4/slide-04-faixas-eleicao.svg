@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+<title>Quanto declararam gastar os candidatos que se elegeram?</title>
+<rect x="0" y="0" width="1080" height="1350" fill="#F7F6F1" rx="0"/>
+<text x="64.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="700" text-anchor="start" fill="#0B514D" letter-spacing="0.7">CADERNO DE DADOS  /  ELEIÇÕES 2022</text>
+<text x="1016.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="600" text-anchor="end" fill="#5D6D74">04 / 08</text>
+<line x1="64" y1="69" x2="1016" y2="69" stroke="#172A3A" stroke-width="2"/>
+<text x="64.0" y="135.0" font-family="Georgia, 'Times New Roman', serif" font-size="40" font-weight="700" text-anchor="start" fill="#172A3A">Quanto declararam gastar</text>
+<text x="64.0" y="183.0" font-family="Georgia, 'Times New Roman', serif" font-size="40" font-weight="700" text-anchor="start" fill="#172A3A">os candidatos que se elegeram?</text>
+<text x="64.0" y="218.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#5D6D74"></text>
+<text x="540.0" y="276.0" font-family="Georgia, 'Times New Roman', serif" font-size="88" font-weight="700" text-anchor="middle" fill="#B34F3D">82,4%</text>
+<text x="540.0" y="314.0" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="600" text-anchor="middle" fill="#172A3A">dos eleitos declararam mais de R$ 1 milhão</text>
+<text x="64.0" y="376.0" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" text-anchor="start" fill="#172A3A">Distribuição dos 510 eleitos por faixa de despesa</text>
+<text x="64.0" y="417.0" font-family="Consolas, 'Courier New', monospace" font-size="20" font-weight="500" text-anchor="middle" fill="#5D6D74">0%</text>
+<line x1="64.0" y1="428" x2="64.0" y2="744" stroke="#D8D9D2" stroke-width="1"/>
+<text x="302.0" y="417.0" font-family="Consolas, 'Courier New', monospace" font-size="20" font-weight="500" text-anchor="middle" fill="#5D6D74">25%</text>
+<line x1="302.0" y1="428" x2="302.0" y2="744" stroke="#D8D9D2" stroke-width="1"/>
+<text x="540.0" y="417.0" font-family="Consolas, 'Courier New', monospace" font-size="20" font-weight="500" text-anchor="middle" fill="#5D6D74">50%</text>
+<line x1="540.0" y1="428" x2="540.0" y2="744" stroke="#D8D9D2" stroke-width="1"/>
+<text x="778.0" y="417.0" font-family="Consolas, 'Courier New', monospace" font-size="20" font-weight="500" text-anchor="middle" fill="#5D6D74">75%</text>
+<line x1="778.0" y1="428" x2="778.0" y2="744" stroke="#D8D9D2" stroke-width="1"/>
+<text x="1016.0" y="417.0" font-family="Consolas, 'Courier New', monospace" font-size="20" font-weight="500" text-anchor="middle" fill="#5D6D74">100%</text>
+<line x1="1016.0" y1="428" x2="1016.0" y2="744" stroke="#D8D9D2" stroke-width="1"/>
+<text x="64.0" y="447.0" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="600" text-anchor="start" fill="#172A3A">Até R$ 50 mil</text>
+<text x="76.0" y="490.0" font-family="Consolas, 'Courier New', monospace" font-size="20" font-weight="700" text-anchor="start" fill="#5D6D74">0,0%</text>
+<text x="64.0" y="528.0" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="600" text-anchor="start" fill="#172A3A">Acima de R$ 50 mil até R$ 200 mil</text>
+<rect x="64" y="542" width="13.066666666666666" height="38" fill="#DDECE8" rx="2"/>
+<text x="89.1" y="571.0" font-family="Consolas, 'Courier New', monospace" font-size="20" font-weight="700" text-anchor="start" fill="#5D6D74">1,4%</text>
+<text x="64.0" y="609.0" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="600" text-anchor="start" fill="#172A3A">Acima de R$ 200 mil até R$ 1 milhão</text>
+<rect x="64" y="623" width="154.93333333333334" height="38" fill="#DDECE8" rx="2"/>
+<text x="230.9" y="652.0" font-family="Consolas, 'Courier New', monospace" font-size="20" font-weight="700" text-anchor="start" fill="#5D6D74">16,3%</text>
+<text x="64.0" y="690.0" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="600" text-anchor="start" fill="#172A3A">Acima de R$ 1 milhão</text>
+<rect x="64" y="704" width="784.0" height="38" fill="#B34F3D" rx="2"/>
+<text x="860.0" y="733.0" font-family="Consolas, 'Courier New', monospace" font-size="20" font-weight="700" text-anchor="start" fill="#B34F3D">82,4%</text>
+<text x="540.0" y="799.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" text-anchor="middle" fill="#B34F3D">Mas a maioria dos candidatos dessa faixa não se elegeu.</text>
+<text x="540.0" y="828.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">Entre os 987 candidatos acima de R$ 1 milhão</text>
+<rect x="128" y="848" width="400" height="136" fill="#FFFFFF" rx="4" stroke="#D8D9D2" stroke-width="2"/>
+<text x="328.0" y="916.0" font-family="Georgia, 'Times New Roman', serif" font-size="54" font-weight="700" text-anchor="middle" fill="#0B514D">420</text>
+<text x="328.0" y="960.0" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="600" text-anchor="middle" fill="#0B514D">eleitos · 42,6%</text>
+<rect x="552" y="848" width="400" height="136" fill="#FFFFFF" rx="4" stroke="#D8D9D2" stroke-width="2"/>
+<text x="752.0" y="916.0" font-family="Georgia, 'Times New Roman', serif" font-size="54" font-weight="700" text-anchor="middle" fill="#7A263A">567</text>
+<text x="752.0" y="960.0" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="600" text-anchor="middle" fill="#7A263A">não eleitos · 57,4%</text>
+<line x1="64" y1="1060" x2="1016" y2="1060" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1170.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#5D6D74">Fonte: TSE 2022 · recorte APTO/Final com controles completos.</text>
+<line x1="64" y1="1235" x2="1016" y2="1235" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="start" fill="#0B514D" letter-spacing="0.2">ELEIÇÕES FEDERAIS 2022  ·  TSE</text>
+<text x="1016.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="end" fill="#5D6D74">2022</text>
+</svg>

@@ -22,6 +22,7 @@ As estimativas e comparações são descritivas ou associativas. Não demonstram
 | Arquivo | O que contém / como usar |
 |---|---|
 | [`tse-2022-financial-analysis.md`](tse-2022-financial-analysis.md) | Relatório principal: escopo, população, cobertura, deduplicação, modelos de participação nos votos válidos, cenários padronizados, sexo, eleições, raça/cor, diagnósticos e limitações. É a referência narrativa para os resultados publicados. |
+| [`tse-2022-readme-summary.svg`](tse-2022-readme-summary.svg) | Resumo visual dos principais resultados, incorporado ao README. É uma síntese de resultados publicados, não uma análise independente. |
 | [`tse-2022-financial-analysis.json`](tse-2022-financial-analysis.json) | Versão estruturada das contagens, resultados, modelos, diagnósticos, predições e metadados da execução; não é um estudo ou recorte alternativo. |
 | [`tse-2022-financial-model-estimates.csv`](tse-2022-financial-model-estimates.csv) | Coeficientes e incerteza dos modelos. GLM na escala logit; coeficientes OLS na escala do desfecho indicada. |
 | [`tse-2022-predicted-expense-scenarios.csv`](tse-2022-predicted-expense-scenarios.csv) | Predições padronizadas em níveis de despesa selecionados, com intervalos e tamanho da amostra. Associações de população padronizadas, não predições individuais nem efeitos causais. |
@@ -113,6 +114,10 @@ O protocolo e os critérios completos estão em [`docs/tse-2022-race-secondary-p
 ## 7. Artefato explicitamente exploratório
 
 - [`tse-2022-exploratory-provisional.md`](tse-2022-exploratory-provisional.md) — análise exploratória e provisória, não é o resultado principal. Usa votos nominais sem o denominador oficial completo com votos de legenda e não usa os controles finais. Consulte apenas como registro do desenvolvimento; não misture suas métricas com as estimativas finais.
+
+## 8. Pacote visual do carrossel TSE 2022
+
+O pacote visual mantido é a [versão 4](linkedin-carousel-2022/v4/POWERBI-IMPORT.md), com [PDF final](linkedin-carousel-2022/v4/carrossel-final.pdf), SVGs e prévias. As tabelas de apoio ficam em [`linkedin-carousel-2022/data/`](linkedin-carousel-2022/data/); a geometria cartográfica necessária ao renderizador está em `v4/apoio/`. Não há outras versões do carrossel mantidas no repositório.
 
 ## Leitura aprofundada recomendada
 

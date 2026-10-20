@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1850" viewBox="0 0 1000 1850" role="img" aria-labelledby="title desc">
+  <title id="title">Resumo visual da análise de despesas de campanha e resultados eleitorais de 2022</title>
+  <desc id="desc">Despesas contratadas, origem das receitas financeiras, associação ajustada com votos, despesas por partido, resultados acima de um milhão de reais e diferenças descritivas por sexo e raça ou cor.</desc>
+  <style>
+    text { font-family: Arial, Helvetica, sans-serif; fill: #172A3A; }
+    .muted { fill: #5D6D74; }
+    .accent { fill: #0B514D; }
+    .c1 { fill: #0B514D; }
+    .c2 { fill: #B34F3D; }
+    .c3 { fill: #DDECE8; }
+    .panel { fill: #FFFFFF; stroke: #D8D9D2; stroke-width: 1.5; }
+    .rule { stroke: #D8D9D2; stroke-width: 1.5; }
+  </style>
+  <rect x="0" y="0" width="1000" height="1850" fill="#F7F6F1"/>
+  <text x="44" y="48" font-size="16" font-weight="700" letter-spacing="1.2" class="accent">TSE · DEPUTADO FEDERAL · 1º TURNO DE 2022</text>
+  <text x="44" y="100" font-size="36" font-weight="700">O que as contas mostram — e o que não mostram</text>
+  <text x="44" y="132" font-size="18" class="muted">Uma leitura visual dos dados declarados. Associações não identificam causalidade.</text>
+
+  <rect x="44" y="164" width="444" height="190" rx="10" class="panel"/>
+  <text x="72" y="204" font-size="16" font-weight="700" class="muted">DESPESAS CONTRATADAS DECLARADAS</text>
+  <text x="72" y="270" font-size="46" font-weight="700" class="accent">R$ 3,08 bi</text>
+  <text x="72" y="310" font-size="18">9.204 candidaturas com despesa</text>
+  <text x="72" y="336" font-size="15" class="muted">Não equivale a receita recebida nem a pagamento.</text>
+
+  <rect x="512" y="164" width="444" height="190" rx="10" class="panel"/>
+  <text x="540" y="204" font-size="16" font-weight="700" class="muted">RECEITAS FINANCEIRAS CLASSIFICADAS</text>
+  <text x="540" y="270" font-size="46" font-weight="700" class="c2">88,3%</text>
+  <text x="540" y="310" font-size="18">vieram de fontes públicas</text>
+  <text x="540" y="336" font-size="15" class="muted">R$ 2,70 bi de R$ 3,05 bi classificados.</text>
+
+  <rect x="44" y="378" width="912" height="260" rx="10" class="panel"/>
+  <text x="72" y="420" font-size="23" font-weight="700">Mais despesa se associa a maior participação nos votos</text>
+  <text x="72" y="454" font-size="17" class="muted">Modelo principal · GLM binomial / logit fracionário · 9.202 candidaturas</text>
+  <text x="72" y="520" font-size="20" font-weight="700">log(1 + despesa contratada)</text>
+  <text x="72" y="574" font-size="40" font-weight="700" class="accent">β = 0,948</text>
+  <text x="330" y="566" font-size="20">IC 95% robusto: 0,910–0,985</text>
+  <line x1="72" y1="596" x2="928" y2="596" class="rule"/>
+  <text x="72" y="622" font-size="16" class="muted">Ajustado por UF, partido, idade, sexo, raça e escolaridade. É associação condicional, não efeito causal.</text>
+
+  <rect x="44" y="662" width="912" height="330" rx="10" class="panel"/>
+  <text x="72" y="704" font-size="23" font-weight="700">Mais despesa partidária não significa mais eleitos</text>
+  <text x="72" y="738" font-size="16" class="muted">Despesas das candidaturas filiadas ao partido; não são contas dos diretórios.</text>
+  <text x="72" y="794" font-size="19" font-weight="700">UNIÃO</text>
+  <rect x="210" y="770" width="410" height="32" rx="4" fill="#D8D9D2" opacity="0.35"/>
+  <rect x="210" y="770" width="404" height="32" rx="4" class="c1"/>
+  <text x="630" y="795" font-size="18" font-weight="700">R$ 492,9 mi</text>
+  <text x="928" y="795" font-size="18" font-weight="700" text-anchor="end">57 eleitos</text>
+  <text x="72" y="854" font-size="19" font-weight="700">PL</text>
+  <rect x="210" y="830" width="410" height="32" rx="4" fill="#D8D9D2" opacity="0.35"/>
+  <rect x="210" y="830" width="175" height="32" rx="4" class="c2"/>
+  <text x="400" y="855" font-size="18" font-weight="700">R$ 213,9 mi</text>
+  <text x="928" y="855" font-size="18" font-weight="700" text-anchor="end">98 eleitos</text>
+  <line x1="72" y1="892" x2="928" y2="892" class="rule"/>
+  <text x="72" y="925" font-size="16" class="muted">Totais não medem eficiência: partidos diferem em número de candidaturas, distribuição e contexto.</text>
+  <text x="72" y="957" font-size="16" class="muted">Escala das barras: despesas contratadas somadas, de R$ 0 a R$ 500 mi.</text>
+
+  <rect x="44" y="1016" width="912" height="320" rx="10" class="panel"/>
+  <text x="72" y="1058" font-size="23" font-weight="700">Acima de R$ 1 milhão: comum entre eleitos, não garantia de eleição</text>
+  <text x="72" y="1096" font-size="18" class="muted">Dos 510 eleitos, 420 (82,4%) declararam despesas acima de R$ 1 milhão.</text>
+  <text x="72" y="1150" font-size="17" font-weight="700">Entre 987 candidaturas acima de R$ 1 milhão</text>
+  <rect x="72" y="1172" width="856" height="42" rx="5" fill="var(--border, currentColor)" opacity="0.35"/>
+  <rect x="72" y="1172" width="365" height="42" rx="5" class="c1"/>
+  <rect x="437" y="1172" width="491" height="42" rx="5" class="c3"/>
+  <text x="72" y="1250" font-size="18" font-weight="700" class="accent">420 eleitos · 42,6%</text>
+  <text x="928" y="1250" font-size="18" font-weight="700" text-anchor="end" class="muted">567 não eleitos · 57,4%</text>
+  <text x="72" y="1300" font-size="16" class="muted">Os percentuais usam denominadores diferentes: eleitos totais versus candidaturas na faixa.</text>
+
+  <rect x="44" y="1360" width="912" height="330" rx="10" class="panel"/>
+  <text x="72" y="1402" font-size="23" font-weight="700">Desigualdades descritivas no resultado eleitoral</text>
+  <text x="72" y="1442" font-size="17" font-weight="700">Sexo · composição das candidaturas e dos eleitos</text>
+  <text x="72" y="1476" font-size="16">Mulheres: 35,5% das candidaturas · 17,6% dos eleitos</text>
+  <text x="72" y="1506" font-size="16">Homens: 64,5% das candidaturas · 82,4% dos eleitos</text>
+  <line x1="72" y1="1530" x2="928" y2="1530" class="rule"/>
+  <text x="72" y="1564" font-size="17" font-weight="700">Raça/cor · comparação observada</text>
+  <text x="72" y="1598" font-size="16">Pretas ou pardas: 47,6% das candidaturas · 27,3% dos eleitos</text>
+  <text x="72" y="1628" font-size="16">Taxa observada: 3,17% (139/4.381) · brancas: 7,75% (363/4.681)</text>
+  <text x="72" y="1664" font-size="15" class="muted">Recortes e coberturas variam. Comparações descritivas não explicam causas nem comportamento individual.</text>
+
+  <line x1="44" y1="1720" x2="956" y2="1720" class="rule"/>
+  <text x="44" y="1752" font-size="15" class="muted">Fonte: TSE · snapshot 2022. Ver relatório para população, denominadores, método, incerteza e sensibilidades.</text>
+  <text x="44" y="1780" font-size="15" class="muted">Receitas, despesas contratadas e pagamentos são medidas distintas; ausências não são tratadas como zero.</text>
+  <text x="44" y="1822" font-size="15" font-weight="700" class="accent">RESULTADOS OBSERVACIONAIS · NÃO DEMONSTRAM QUE DINHEIRO CAUSE VOTOS</text>
+</svg>

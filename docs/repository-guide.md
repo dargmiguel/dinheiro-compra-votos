@@ -3,7 +3,7 @@
 Este guia explica o que existe no GitHub, como as partes se relacionam e qual arquivo ler para cada pergunta. O projeto analisa as candidaturas a deputado federal no primeiro turno de 2022. Não é um estudo causal de compra de votos.
 
 - [README do projeto](../README.md): apresentação, resultados em contexto e comandos básicos.
-- [Índice de relatórios](../reports/README.md): catálogo de 47 saídas analíticas versionadas em `reports/`, com significado, recortes e cautelas.
+- [Índice de relatórios](../reports/README.md): catálogo de 47 saídas analíticas e um resumo visual versionados em `reports/`, com significado, recortes e cautelas.
 - [Protocolo de reprodução](pilot-2022-reproduction.md): comandos, entradas necessárias e sequência de processamento.
 
 ## Leitura recomendada
@@ -13,6 +13,19 @@ Este guia explica o que existe no GitHub, como as partes se relacionam e qual ar
 3. [Protocolo de reprodução](pilot-2022-reproduction.md) para executar o pipeline com UV.
 4. [Análise financeira principal](../reports/tse-2022-financial-analysis.md) para resultados e denominadores.
 5. [Índice de relatórios](../reports/README.md) para localizar tabelas, diagnósticos e análises complementares.
+
+## Leitura incremental para novas perguntas
+
+Comece pelos documentos desta página; não abra todos os módulos Python para cada pergunta.
+
+- **Escopo, resultados ou texto de portfólio:** leia o `README.md`, o índice `reports/README.md` e a seção correspondente do relatório principal. Esses documentos já registram população, denominadores e limitações.
+- **Aquisição, reprodução ou comandos:** use `pilot-2022-reproduction.md`; execute só o comando necessário. Abra o módulo de implementação quando a pergunta for sobre comportamento que o protocolo não resolve.
+- **Mudança de código:** use a tabela `Código tse_pilot/` para localizar o módulo; leia o trecho afetado, seus contratos/chamadores diretos e o teste correspondente. Consulte referências do símbolo antes de alterar interface exportada.
+- **Leitura completa do código:** reserve para pedido explícito de auditoria/arquitetura, investigação transversal, risco de segurança, conflito entre código e documentação, ou quando o caminho da execução depender de comportamento não documentado.
+- **Fonte de verdade:** código e testes atuais para implementação; relatório e dados versionados para resultados; protocolo para reprodução. Especificações, análises exploratórias e planos não provam que uma funcionalidade esteja implementada.
+
+Atualize este guia quando a estrutura, as responsabilidades dos módulos ou o caminho de dados mudar. Para números, preserve os recortes distintos do README: população APTO, distribuição com despesa observada e amostra completa do modelo não são intercambiáveis.
+
 
 ## Estrutura do repositório no GitHub
 
@@ -85,7 +98,7 @@ Os testes usam fixtures controladas; não substituem a validação com as fontes
 
 ### Relatórios `reports/`
 
-Há 47 saídas analíticas versionadas, além deste índice: relatório narrativo principal; resultados estruturados; CSVs de coeficientes, predições e denominadores; distribuição financeira e fontes; eleição; temporalidade; raça/cor; diagnósticos de deduplicação; documento exploratório histórico. A [página de índice de relatórios](../reports/README.md) enumera cada uma, explica unidades/denominadores e identifica arquivos exploratórios ou históricos. Consulte-a em vez de interpretar um CSV isoladamente.
+Há 47 saídas analíticas versionadas, além deste índice, e um resumo visual dos resultados usado no README: relatório narrativo principal; resultados estruturados; CSVs de coeficientes, predições e denominadores; distribuição financeira e fontes; eleição; temporalidade; raça/cor; diagnósticos de deduplicação; documento exploratório histórico. A [página de índice de relatórios](../reports/README.md) enumera as saídas e o resumo visual, explica unidades/denominadores e identifica arquivos exploratórios ou históricos. Consulte-a em vez de interpretar um CSV isoladamente.
 
 ## Como interpretar os números
 

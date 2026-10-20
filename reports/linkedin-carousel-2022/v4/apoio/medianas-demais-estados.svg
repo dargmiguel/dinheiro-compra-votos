@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+<title>E os demais estados?</title>
+<rect x="0" y="0" width="1080" height="1350" fill="#F7F6F1" rx="0"/>
+<text x="64.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="700" text-anchor="start" fill="#0B514D" letter-spacing="0.7">CADERNO DE DADOS  /  ELEIÇÕES 2022</text>
+<text x="1016.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="600" text-anchor="end" fill="#5D6D74">APOIO</text>
+<line x1="64" y1="69" x2="1016" y2="69" stroke="#172A3A" stroke-width="2"/>
+<text x="64.0" y="135.0" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-weight="700" text-anchor="start" fill="#172A3A">E os demais estados?</text>
+<text x="64.0" y="183.0" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-weight="700" text-anchor="start" fill="#172A3A">Medianas e cobertura por UF</text>
+<text x="64.0" y="218.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#5D6D74">Mediana das despesas declaradas dos eleitos APTO · reais; cobertura Final observada / eleitos.</text>
+<text x="64.0" y="300.0" font-family="Consolas, 'Courier New', monospace" font-size="18" font-weight="700" text-anchor="start" fill="#5D6D74">UF · mediana · cobertura Final</text>
+<text x="64.0" y="350.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">AC · R$ 1.326.381</text>
+<text x="64.0" y="380.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">8/8 eleitos APTO observados</text>
+<line x1="64" y1="394" x2="354" y2="394" stroke="#D8D9D2" stroke-width="1"/>
+<text x="64.0" y="440.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">AL · R$ 2.216.668</text>
+<text x="64.0" y="470.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">9/9 eleitos APTO observados</text>
+<line x1="64" y1="484" x2="354" y2="484" stroke="#D8D9D2" stroke-width="1"/>
+<text x="64.0" y="530.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">AM · R$ 2.078.911</text>
+<text x="64.0" y="560.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">8/8 eleitos APTO observados</text>
+<line x1="64" y1="574" x2="354" y2="574" stroke="#D8D9D2" stroke-width="1"/>
+<text x="64.0" y="620.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">AP · R$ 1.549.570</text>
+<text x="64.0" y="650.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">8/8 eleitos APTO observados</text>
+<line x1="64" y1="664" x2="354" y2="664" stroke="#D8D9D2" stroke-width="1"/>
+<text x="64.0" y="710.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">BA · R$ 1.991.841</text>
+<text x="64.0" y="740.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">38/39 eleitos APTO observados</text>
+<line x1="64" y1="754" x2="354" y2="754" stroke="#D8D9D2" stroke-width="1"/>
+<text x="64.0" y="800.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">CE · R$ 1.396.468</text>
+<text x="64.0" y="830.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">22/22 eleitos APTO observados</text>
+<line x1="64" y1="844" x2="354" y2="844" stroke="#D8D9D2" stroke-width="1"/>
+<text x="64.0" y="890.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">ES · R$ 1.772.896</text>
+<text x="64.0" y="920.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">10/10 eleitos APTO observados</text>
+<line x1="64" y1="934" x2="354" y2="934" stroke="#D8D9D2" stroke-width="1"/>
+<text x="387.0" y="300.0" font-family="Consolas, 'Courier New', monospace" font-size="18" font-weight="700" text-anchor="start" fill="#5D6D74">UF · mediana · cobertura Final</text>
+<text x="387.0" y="350.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">GO · R$ 2.249.124</text>
+<text x="387.0" y="380.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">17/17 eleitos APTO observados</text>
+<line x1="387" y1="394" x2="677" y2="394" stroke="#D8D9D2" stroke-width="1"/>
+<text x="387.0" y="440.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">MA · R$ 1.947.930</text>
+<text x="387.0" y="470.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">18/18 eleitos APTO observados</text>
+<line x1="387" y1="484" x2="677" y2="484" stroke="#D8D9D2" stroke-width="1"/>
+<text x="387.0" y="530.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">MS · R$ 1.628.988</text>
+<text x="387.0" y="560.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">8/8 eleitos APTO observados</text>
+<line x1="387" y1="574" x2="677" y2="574" stroke="#D8D9D2" stroke-width="1"/>
+<text x="387.0" y="620.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">MT · R$ 2.362.749</text>
+<text x="387.0" y="650.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">8/8 eleitos APTO observados</text>
+<line x1="387" y1="664" x2="677" y2="664" stroke="#D8D9D2" stroke-width="1"/>
+<text x="387.0" y="710.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">PA · R$ 1.170.380</text>
+<text x="387.0" y="740.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">17/17 eleitos APTO observados</text>
+<line x1="387" y1="754" x2="677" y2="754" stroke="#D8D9D2" stroke-width="1"/>
+<text x="387.0" y="800.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">PB · R$ 2.254.279</text>
+<text x="387.0" y="830.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">12/12 eleitos APTO observados</text>
+<line x1="387" y1="844" x2="677" y2="844" stroke="#D8D9D2" stroke-width="1"/>
+<text x="387.0" y="890.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">PI · R$ 1.741.775</text>
+<text x="387.0" y="920.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">10/10 eleitos APTO observados</text>
+<line x1="387" y1="934" x2="677" y2="934" stroke="#D8D9D2" stroke-width="1"/>
+<text x="710.0" y="300.0" font-family="Consolas, 'Courier New', monospace" font-size="18" font-weight="700" text-anchor="start" fill="#5D6D74">UF · mediana · cobertura Final</text>
+<text x="710.0" y="350.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">PR · R$ 2.339.059</text>
+<text x="710.0" y="380.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">29/29 eleitos APTO observados</text>
+<line x1="710" y1="394" x2="1000" y2="394" stroke="#D8D9D2" stroke-width="1"/>
+<text x="710.0" y="440.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">RN · R$ 1.779.839</text>
+<text x="710.0" y="470.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">8/8 eleitos APTO observados</text>
+<line x1="710" y1="484" x2="1000" y2="484" stroke="#D8D9D2" stroke-width="1"/>
+<text x="710.0" y="530.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">RO · R$ 1.955.241</text>
+<text x="710.0" y="560.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">8/8 eleitos APTO observados</text>
+<line x1="710" y1="574" x2="1000" y2="574" stroke="#D8D9D2" stroke-width="1"/>
+<text x="710.0" y="620.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">RS · R$ 1.807.207</text>
+<text x="710.0" y="650.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">31/31 eleitos APTO observados</text>
+<line x1="710" y1="664" x2="1000" y2="664" stroke="#D8D9D2" stroke-width="1"/>
+<text x="710.0" y="710.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">SC · R$ 1.708.443</text>
+<text x="710.0" y="740.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">16/16 eleitos APTO observados</text>
+<line x1="710" y1="754" x2="1000" y2="754" stroke="#D8D9D2" stroke-width="1"/>
+<text x="710.0" y="800.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">SE · R$ 1.928.775</text>
+<text x="710.0" y="830.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">8/8 eleitos APTO observados</text>
+<line x1="710" y1="844" x2="1000" y2="844" stroke="#D8D9D2" stroke-width="1"/>
+<text x="710.0" y="890.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="600" text-anchor="start" fill="#172A3A">TO · R$ 1.446.794</text>
+<text x="710.0" y="920.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="500" text-anchor="start" fill="#5D6D74">8/8 eleitos APTO observados</text>
+<line x1="710" y1="934" x2="1000" y2="934" stroke="#D8D9D2" stroke-width="1"/>
+<line x1="64" y1="1060" x2="1016" y2="1060" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1090.0" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#5D6D74">O mapa e seus cartões mostram RR, DF, PE, SP, RJ e MG; esta lâmina lista as outras 21 UFs.</text>
+<text x="64.0" y="1116.0" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#5D6D74">Ausência de despesa Final permanece ausente, nunca convertida em zero.</text>
+<text x="64.0" y="1170.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#5D6D74">Fonte: TSE 2022 · resultados oficiais e despesas Final; mediana por UF.</text>
+<line x1="64" y1="1235" x2="1016" y2="1235" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="start" fill="#0B514D" letter-spacing="0.2">ELEIÇÕES FEDERAIS 2022  ·  TSE</text>
+<text x="1016.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="end" fill="#5D6D74">2022</text>
+</svg>

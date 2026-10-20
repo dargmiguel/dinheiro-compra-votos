@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+<title>O que os dados mostram</title>
+<rect x="0" y="0" width="1080" height="1350" fill="#F7F6F1" rx="0"/>
+<text x="64.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="700" text-anchor="start" fill="#0B514D" letter-spacing="0.7">CADERNO DE DADOS  /  ELEIÇÕES 2022</text>
+<text x="1016.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="600" text-anchor="end" fill="#5D6D74">08 / 08</text>
+<line x1="64" y1="69" x2="1016" y2="69" stroke="#172A3A" stroke-width="2"/>
+<text x="64.0" y="148.0" font-family="Georgia, 'Times New Roman', serif" font-size="56" font-weight="700" text-anchor="start" fill="#172A3A">O que os dados mostram</text>
+<text x="64.0" y="204.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#5D6D74">Três padrões nas candidaturas a deputado federal em 2022</text>
+<rect x="64" y="260" width="952" height="205" fill="#FFFFFF" rx="4" stroke="#D8D9D2" stroke-width="2"/>
+<text x="95.0" y="376.0" font-family="Georgia, 'Times New Roman', serif" font-size="58" font-weight="700" text-anchor="start" fill="#0B514D">1</text>
+<text x="170.0" y="312.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#172A3A">Os líderes em despesas e em número de eleitos</text>
+<text x="170.0" y="346.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#172A3A">foram diferentes.</text>
+<text x="170.0" y="392.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="500" text-anchor="start" fill="#5D6D74">As candidaturas da UNIÃO somaram R$ 492,9 milhões e 57 eleitos;</text>
+<text x="170.0" y="421.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="500" text-anchor="start" fill="#5D6D74">as do PL, R$ 213,9 milhões e 98 eleitos.</text>
+<rect x="64" y="480" width="952" height="205" fill="#DDECE8" rx="4" stroke="#D8D9D2" stroke-width="2"/>
+<text x="95.0" y="596.0" font-family="Georgia, 'Times New Roman', serif" font-size="58" font-weight="700" text-anchor="start" fill="#0B514D">2</text>
+<text x="170.0" y="532.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#172A3A">Declarar mais de R$ 1 milhão em despesas</text>
+<text x="170.0" y="566.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#172A3A">não garantiu a eleição.</text>
+<text x="170.0" y="612.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="500" text-anchor="start" fill="#5D6D74">Embora 82,4% dos eleitos analisados tenham declarado</text>
+<text x="170.0" y="641.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="500" text-anchor="start" fill="#5D6D74">despesas acima desse valor, 57,4% dos candidatos que</text>
+<text x="170.0" y="670.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="500" text-anchor="start" fill="#5D6D74">também ultrapassaram R$ 1 milhão não se elegeram.</text>
+<rect x="64" y="700" width="952" height="205" fill="#FFFFFF" rx="4" stroke="#D8D9D2" stroke-width="2"/>
+<text x="95.0" y="816.0" font-family="Georgia, 'Times New Roman', serif" font-size="58" font-weight="700" text-anchor="start" fill="#0B514D">3</text>
+<text x="170.0" y="752.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#172A3A">Entre quem concorreu e quem se elegeu,</text>
+<text x="170.0" y="786.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#172A3A">a representação ficou mais masculina e branca.</text>
+<text x="170.0" y="832.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="500" text-anchor="start" fill="#5D6D74">Mulheres e candidaturas negras tiveram participação menor</text>
+<text x="170.0" y="861.0" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="500" text-anchor="start" fill="#5D6D74">entre os eleitos do que entre as candidaturas analisadas.</text>
+<line x1="64" y1="1060" x2="1016" y2="1060" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1090.0" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#5D6D74">Comparações descritivas do recorte analisado; não demonstram causalidade nem eficiência dos gastos.</text>
+<text x="64.0" y="1170.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#5D6D74">Fonte: TSE 2022 · despesas contratadas declaradas e resultados eleitorais.</text>
+<line x1="64" y1="1235" x2="1016" y2="1235" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="start" fill="#0B514D" letter-spacing="0.2">ELEIÇÕES FEDERAIS 2022  ·  TSE</text>
+<text x="1016.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="end" fill="#5D6D74">2022</text>
+</svg>

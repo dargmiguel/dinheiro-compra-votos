@@ -1,0 +1,3 @@
+metric,numerator,denominator,share,share_pct,denominator_label,detail
+Eleitos acima de R$ 1 milhão,420,510,0.8235294117647058,82.35294117647058,todos os eleitos do recorte,420 de 510 eleitos
+Não eleitos entre candidatos acima de R$ 1 milhão,567,987,0.574468085106383,57.446808510638306,todos os candidatos na faixa acima de R$ 1 milhão,567 de 987 candidatos

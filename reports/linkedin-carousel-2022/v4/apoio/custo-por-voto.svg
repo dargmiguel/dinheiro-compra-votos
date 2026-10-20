@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+<title>Quem se elege declara menos por voto?</title>
+<rect x="0" y="0" width="1080" height="1350" fill="#F7F6F1" rx="0"/>
+<text x="64.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="700" text-anchor="start" fill="#0B514D" letter-spacing="0.7">CADERNO DE DADOS  /  ELEIÇÕES 2022</text>
+<text x="1016.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="600" text-anchor="end" fill="#5D6D74">DADO DE APOIO</text>
+<line x1="64" y1="69" x2="1016" y2="69" stroke="#172A3A" stroke-width="2"/>
+<text x="64.0" y="135.0" font-family="Georgia, 'Times New Roman', serif" font-size="40" font-weight="700" text-anchor="start" fill="#172A3A">Quem se elege declara</text>
+<text x="64.0" y="183.0" font-family="Georgia, 'Times New Roman', serif" font-size="40" font-weight="700" text-anchor="start" fill="#172A3A">menos por voto?</text>
+<text x="64.0" y="218.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#5D6D74">Despesa contratada dividida pelos votos positivos · mediana entre candidaturas</text>
+<text x="64.0" y="287.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#172A3A">Despesa contratada por voto recebido</text>
+<text x="240.0" y="367.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">R$ 0</text>
+<line x1="240.0" y1="376" x2="240.0" y2="386" stroke="#E8E8E1" stroke-width="1"/>
+<text x="560.0" y="367.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">R$ 25</text>
+<line x1="560.0" y1="376" x2="560.0" y2="386" stroke="#E8E8E1" stroke-width="1"/>
+<text x="880.0" y="367.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">R$ 50</text>
+<line x1="880.0" y1="376" x2="880.0" y2="386" stroke="#E8E8E1" stroke-width="1"/>
+<line x1="240" y1="381" x2="880" y2="381" stroke="#D8D9D2" stroke-width="1"/>
+<text x="64.0" y="465.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#0B514D">Eleitos</text>
+<rect x="240" y="432" width="227.6942188165554" height="44" fill="#0B514D" rx="4"/>
+<text x="481.7" y="467.0" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700" text-anchor="start" fill="#0B514D">R$ 17,79</text>
+<text x="481.7" y="495.0" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#0B514D">por voto</text>
+<text x="64.0" y="541.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#B34F3D">Não eleitos</text>
+<rect x="240" y="508" width="598.4045130298631" height="44" fill="#B34F3D" rx="4"/>
+<text x="852.4" y="543.0" font-family="Arial, Helvetica, sans-serif" font-size="36" font-weight="700" text-anchor="start" fill="#B34F3D">R$ 46,75</text>
+<text x="852.4" y="571.0" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#B34F3D">por voto</text>
+<text x="64.0" y="780.0" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" text-anchor="start" fill="#172A3A">Entre os não eleitos, a despesa mediana por voto foi mais que o dobro da dos eleitos.</text>
+<text x="64.0" y="816.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#172A3A">Não é preço do voto nem custo só público: eleitos tiveram, em geral, muito mais votos.</text>
+<line x1="64" y1="1050" x2="1016" y2="1050" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1109.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">Mediana individual: cada candidatura divide a própria despesa pelos próprios votos;</text>
+<text x="64.0" y="1133.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">não é soma de despesas ÷ soma de votos.</text>
+<text x="64.0" y="1157.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">Eleitos: 510 candidaturas; não eleitos: 8.588. Candidaturas sem voto positivo ficam fora do cálculo.</text>
+<text x="64.0" y="1181.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">Comparação descritiva; não demonstra que a despesa causou o resultado.</text>
+<text x="64.0" y="1205.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">Fonte: TSE 2022 · despesa contratada (cenário principal) e votos nominais positivos.</text>
+<text x="64.0" y="1170.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#5D6D74"></text>
+<line x1="64" y1="1235" x2="1016" y2="1235" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="start" fill="#0B514D" letter-spacing="0.2">ELEIÇÕES FEDERAIS 2022  ·  TSE</text>
+<text x="1016.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="end" fill="#5D6D74">2022</text>
+</svg>

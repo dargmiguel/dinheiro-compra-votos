@@ -1,0 +1,5 @@
+expense_band_code,expense_band_label,elected_count,elected_denominator,share_of_elected_pct,candidate_count_in_band,elected_within_band_pct
+ate_50_mil,Até R$ 50 mil,0,510,0.00000000,4241,0.0
+50_a_200_mil,Acima de R$ 50 mil até R$ 200 mil,7,510,1.37254902,2122,0.3298774740810556
+200_mil_a_1_milhao,Acima de R$ 200 mil até R$ 1 milhão,83,510,16.27450980,1852,4.481641468682505
+acima_1_milhao,Acima de R$ 1 milhão,420,510,82.35294118,987,42.5531914893617

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+<title>Receitas e despesas medianas parecidas, quem se candidata é quem se elege?</title>
+<rect x="0" y="0" width="1080" height="1350" fill="#F7F6F1" rx="0"/>
+<text x="64.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="700" text-anchor="start" fill="#0B514D" letter-spacing="0.7">CADERNO DE DADOS  /  ELEIÇÕES 2022</text>
+<text x="1016.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="600" text-anchor="end" fill="#5D6D74">06 / 08</text>
+<line x1="64" y1="69" x2="1016" y2="69" stroke="#172A3A" stroke-width="2"/>
+<text x="64.0" y="135.0" font-family="Georgia, 'Times New Roman', serif" font-size="40" font-weight="700" text-anchor="start" fill="#172A3A">Receitas e despesas medianas parecidas,</text>
+<text x="64.0" y="183.0" font-family="Georgia, 'Times New Roman', serif" font-size="40" font-weight="700" text-anchor="start" fill="#172A3A">quem se candidata é quem se elege?</text>
+<text x="64.0" y="218.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#5D6D74">Candidaturas a deputado federal, 2022 · comparação descritiva</text>
+<text x="64.0" y="287.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#172A3A">Receita e despesa medianas</text>
+<rect x="240" y="318" width="14" height="14" fill="#B9BFC2" rx="0"/>
+<text x="262.0" y="332.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#5D6D74">receita financeira</text>
+<rect x="472" y="318" width="14" height="14" fill="#5D6D74" rx="0"/>
+<text x="494.0" y="332.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#5D6D74">despesa contratada</text>
+<text x="240.0" y="367.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">R$ 0</text>
+<line x1="240.0" y1="378" x2="240.0" y2="564" stroke="#E8E8E1" stroke-width="1"/>
+<text x="560.0" y="367.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">R$ 60 mil</text>
+<line x1="560.0" y1="378" x2="560.0" y2="564" stroke="#E8E8E1" stroke-width="1"/>
+<text x="880.0" y="367.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">R$ 120 mil</text>
+<line x1="880.0" y1="378" x2="880.0" y2="564" stroke="#E8E8E1" stroke-width="1"/>
+<text x="64.0" y="437.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#B34F3D">Mulheres</text>
+<text x="64.0" y="538.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#0B514D">Homens</text>
+<rect x="240" y="390" width="376.90666666666664" height="34" fill="#D8ABA0" rx="4"/>
+<text x="630.9" y="416.0" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" text-anchor="start" fill="#B34F3D">R$ 70,7 mil</text>
+<rect x="240" y="429" width="350.0368000000001" height="34" fill="#B34F3D" rx="4"/>
+<text x="604.0" y="455.0" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" text-anchor="start" fill="#B34F3D">R$ 65,6 mil</text>
+<rect x="240" y="491" width="403.52" height="34" fill="#8DACA7" rx="4"/>
+<text x="657.5" y="517.0" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" text-anchor="start" fill="#0B514D">R$ 75,7 mil</text>
+<rect x="240" y="530" width="346.7986933333334" height="34" fill="#0B514D" rx="4"/>
+<text x="600.8" y="556.0" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" text-anchor="start" fill="#0B514D">R$ 65,0 mil</text>
+<text x="64.0" y="633.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#172A3A">Participação no total</text>
+<rect x="240" y="661" width="14" height="14" fill="#B9BFC2" rx="0"/>
+<text x="262.0" y="675.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#5D6D74">das candidaturas</text>
+<rect x="472" y="661" width="14" height="14" fill="#5D6D74" rx="0"/>
+<text x="494.0" y="675.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#5D6D74">dos eleitos</text>
+<text x="240.0" y="712.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">0%</text>
+<line x1="240.0" y1="723" x2="240.0" y2="885" stroke="#E8E8E1" stroke-width="1"/>
+<text x="560.0" y="712.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">50%</text>
+<line x1="560.0" y1="723" x2="560.0" y2="885" stroke="#E8E8E1" stroke-width="1"/>
+<text x="880.0" y="712.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">100%</text>
+<line x1="880.0" y1="723" x2="880.0" y2="885" stroke="#E8E8E1" stroke-width="1"/>
+<text x="64.0" y="774.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#B34F3D">Mulheres</text>
+<rect x="240" y="727" width="227.2" height="34" fill="#D8ABA0" rx="4"/>
+<rect x="475.2" y="728" width="330" height="32" fill="#F7F6F1" rx="0"/>
+<text x="481.2" y="753" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#B34F3D"><tspan>35,5%</tspan><tspan font-size="22" font-weight="400"> 3.266 candidaturas</tspan></text>
+<rect x="240" y="766" width="112.63999999999999" height="34" fill="#B34F3D" rx="4"/>
+<rect x="360.64" y="767" width="236" height="32" fill="#F7F6F1" rx="0"/>
+<text x="366.6" y="792" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#B34F3D"><tspan>17,6%</tspan><tspan font-size="22" font-weight="400"> 90 eleitas</tspan></text>
+<text x="64.0" y="859.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#0B514D">Homens</text>
+<rect x="240" y="812" width="412.79999999999995" height="34" fill="#8DACA7" rx="4"/>
+<rect x="660.8" y="813" width="330" height="32" fill="#F7F6F1" rx="0"/>
+<text x="666.8" y="838" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#0B514D"><tspan>64,5%</tspan><tspan font-size="22" font-weight="400"> 5.936 candidaturas</tspan></text>
+<rect x="240" y="851" width="527.36" height="34" fill="#0B514D" rx="4"/>
+<rect x="775.36" y="852" width="236" height="32" fill="#F7F6F1" rx="0"/>
+<text x="781.4" y="877" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#0B514D"><tspan>82,4%</tspan><tspan font-size="22" font-weight="400"> 420 eleitos</tspan></text>
+<text x="64" y="949" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#172A3A"><tspan>Receitas e despesas medianas parecidas, mas participação diferente:</tspan></text>
+<text x="64" y="987" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="400" fill="#172A3A"><tspan>mulheres eram </tspan><tspan font-weight="700" fill="#B34F3D">35,5%</tspan><tspan> das candidaturas e </tspan><tspan font-weight="700" fill="#B34F3D">17,6%</tspan><tspan> dos eleitos.</tspan></text>
+<line x1="64" y1="1050" x2="1016" y2="1050" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1085.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">Mediana: valor central do grupo; proximidade não significa valores iguais para cada candidatura.</text>
+<text x="64.0" y="1109.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">Participação no total: parcela de cada grupo entre todas as candidaturas e entre todos os eleitos.</text>
+<text x="64.0" y="1133.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">Comparação descritiva; não demonstra que gênero ou despesa causou o resultado.</text>
+<text x="64.0" y="1157.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">Gênero conforme o registro de candidatura no TSE (feminino ou masculino);</text>
+<text x="64.0" y="1181.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">a base não identifica pessoas trans ou não binárias.</text>
+<text x="64.0" y="1205.0" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="400" text-anchor="start" fill="#5D6D74">Fonte: TSE 2022 · candidaturas APTO; receitas financeiras e despesas contratadas finais observadas.</text>
+<text x="64.0" y="1170.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#5D6D74"></text>
+<line x1="64" y1="1235" x2="1016" y2="1235" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="start" fill="#0B514D" letter-spacing="0.2">ELEIÇÕES FEDERAIS 2022  ·  TSE</text>
+<text x="1016.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="end" fill="#5D6D74">2022</text>
+</svg>

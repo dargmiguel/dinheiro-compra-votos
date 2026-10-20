@@ -1,0 +1,5 @@
+group_value,candidate_count,financial_receipt_candidates,financial_receipt_coverage_pct,no_financial_receipt_candidates,financial_receipts_median_centavos,expense_observed_candidates,expense_coverage_pct,contracted_expenses_median_centavos,elected_candidates,elected_denominator,elected_pct
+FEMININO,3266,3187,97.5811,79,7067000,3266,100.0,6563190,90,3266,2.7557
+MASCULINO,5936,5669,95.502,267,7566000,5936,100.0,6502475.5,420,5936,7.0755
+NÃO DIVULGÁVEL,2,2,100.0,0,152501819,2,100.0,145515893,0,2,0.0
+TODOS,9204,8858,96.2408,346,7500000,9204,100.0,6534228.5,510,9204,5.5411

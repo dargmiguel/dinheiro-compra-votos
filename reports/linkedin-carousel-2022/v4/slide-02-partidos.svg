@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
+<title>Quais partidos declararam mais despesas?</title>
+<rect x="0" y="0" width="1080" height="1350" fill="#F7F6F1" rx="0"/>
+<text x="64.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="700" text-anchor="start" fill="#0B514D" letter-spacing="0.7">CADERNO DE DADOS  /  ELEIÇÕES 2022</text>
+<text x="1016.0" y="48.0" font-family="Consolas, 'Courier New', monospace" font-size="19" font-weight="600" text-anchor="end" fill="#5D6D74">02 / 08</text>
+<line x1="64" y1="69" x2="1016" y2="69" stroke="#172A3A" stroke-width="2"/>
+<text x="64.0" y="135.0" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-weight="700" text-anchor="start" fill="#172A3A">Quais partidos declararam</text>
+<text x="64.0" y="183.0" font-family="Georgia, 'Times New Roman', serif" font-size="42" font-weight="700" text-anchor="start" fill="#172A3A">mais despesas?</text>
+<text x="64.0" y="218.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="400" text-anchor="start" fill="#5D6D74">Despesas contratadas dos candidatos filiados · recorte eleitoral N=9.202</text>
+<text x="64.0" y="264.0" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" text-anchor="start" fill="#172A3A">Despesas contratadas somadas por partido</text>
+<text x="64.0" y="298.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="500" text-anchor="start" fill="#5D6D74">Escala linear · R$ milhões · 0 a 500</text>
+<text x="1016.0" y="337.0" font-family="Consolas, 'Courier New', monospace" font-size="15" font-weight="700" text-anchor="end" fill="#5D6D74">ELEITOS</text>
+<text x="365.0" y="337.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">0</text>
+<line x1="365.0" y1="350" x2="365.0" y2="740" stroke="#D8D9D2" stroke-width="1"/>
+<text x="472.5" y="337.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">125</text>
+<line x1="472.5" y1="350" x2="472.5" y2="740" stroke="#D8D9D2" stroke-width="1"/>
+<text x="580.0" y="337.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">250</text>
+<line x1="580.0" y1="350" x2="580.0" y2="740" stroke="#D8D9D2" stroke-width="1"/>
+<text x="687.5" y="337.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">375</text>
+<line x1="687.5" y1="350" x2="687.5" y2="740" stroke="#D8D9D2" stroke-width="1"/>
+<text x="795.0" y="337.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="500" text-anchor="middle" fill="#5D6D74">500</text>
+<line x1="795.0" y1="350" x2="795.0" y2="740" stroke="#D8D9D2" stroke-width="1"/>
+<text x="64.0" y="400.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" text-anchor="start" fill="#172A3A">UNIÃO</text>
+<rect x="365" y="370" width="430" height="36" fill="#E8E8E1" rx="3"/>
+<rect x="365" y="370" width="423.8827779976" height="36" fill="#0B514D" rx="3"/>
+<text x="954.0" y="399.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#0B514D">R$ 492,9 mi</text>
+<text x="975.0" y="399.0" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#0B514D">•</text>
+<text x="1016.0" y="399.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#0B514D">57</text>
+<text x="64.0" y="452.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" text-anchor="start" fill="#172A3A">PP</text>
+<rect x="365" y="422" width="430" height="36" fill="#E8E8E1" rx="3"/>
+<rect x="365" y="422" width="254.3900226598" height="36" fill="#14766F" rx="3"/>
+<text x="954.0" y="451.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#14766F">R$ 295,8 mi</text>
+<text x="975.0" y="451.0" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#14766F">•</text>
+<text x="1016.0" y="451.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#14766F">47</text>
+<text x="64.0" y="504.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" text-anchor="start" fill="#172A3A">PT</text>
+<rect x="365" y="474" width="430" height="36" fill="#E8E8E1" rx="3"/>
+<rect x="365" y="474" width="205.5429024742" height="36" fill="#39566A" rx="3"/>
+<text x="954.0" y="503.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#39566A">R$ 239,0 mi</text>
+<text x="975.0" y="503.0" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#39566A">•</text>
+<text x="1016.0" y="503.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#39566A">69</text>
+<text x="64.0" y="556.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" text-anchor="start" fill="#172A3A">MDB</text>
+<rect x="365" y="526" width="430" height="36" fill="#E8E8E1" rx="3"/>
+<rect x="365" y="526" width="196.2770693784" height="36" fill="#C58D2A" rx="3"/>
+<text x="954.0" y="555.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#C58D2A">R$ 228,2 mi</text>
+<text x="975.0" y="555.0" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#C58D2A">•</text>
+<text x="1016.0" y="555.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#C58D2A">40</text>
+<text x="64.0" y="608.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" text-anchor="start" fill="#172A3A">PSD</text>
+<rect x="365" y="578" width="430" height="36" fill="#E8E8E1" rx="3"/>
+<rect x="365" y="578" width="193.9845828154" height="36" fill="#B34F3D" rx="3"/>
+<text x="954.0" y="607.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#B34F3D">R$ 225,6 mi</text>
+<text x="975.0" y="607.0" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#B34F3D">•</text>
+<text x="1016.0" y="607.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#B34F3D">42</text>
+<text x="64.0" y="660.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" text-anchor="start" fill="#172A3A">REPUBLICANOS</text>
+<rect x="365" y="630" width="430" height="36" fill="#E8E8E1" rx="3"/>
+<rect x="365" y="630" width="190.729061768" height="36" fill="#5D6D74" rx="3"/>
+<text x="954.0" y="659.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#5D6D74">R$ 221,8 mi</text>
+<text x="975.0" y="659.0" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#5D6D74">•</text>
+<text x="1016.0" y="659.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#5D6D74">40</text>
+<text x="64.0" y="712.0" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" text-anchor="start" fill="#172A3A">PL</text>
+<rect x="365" y="682" width="430" height="36" fill="#E8E8E1" rx="3"/>
+<rect x="365" y="682" width="183.98114461" height="36" fill="#172A3A" rx="3"/>
+<text x="954.0" y="711.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#172A3A">R$ 213,9 mi</text>
+<text x="975.0" y="711.0" font-family="Consolas, 'Courier New', monospace" font-size="14" font-weight="700" text-anchor="middle" fill="#172A3A">•</text>
+<text x="1016.0" y="711.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#172A3A">98</text>
+<rect x="64" y="775" width="952" height="232" fill="#FFFFFF" rx="4" stroke="#D8D9D2" stroke-width="2"/>
+<text x="88.0" y="812.0" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" text-anchor="start" fill="#172A3A">E quem elegeu deputados com os menores totais declarados?</text>
+<text x="96.0" y="850.0" font-family="Consolas, 'Courier New', monospace" font-size="15" font-weight="700" text-anchor="start" fill="#5D6D74">PARTIDO</text>
+<text x="610.0" y="850.0" font-family="Consolas, 'Courier New', monospace" font-size="15" font-weight="700" text-anchor="end" fill="#5D6D74">DESPESA TOTAL</text>
+<text x="984.0" y="850.0" font-family="Consolas, 'Courier New', monospace" font-size="15" font-weight="700" text-anchor="end" fill="#5D6D74">ELEITOS</text>
+<line x1="88" y1="862" x2="992" y2="862" stroke="#D8D9D2" stroke-width="1"/>
+<text x="96.0" y="899.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" text-anchor="start" fill="#172A3A">NOVO</text>
+<text x="610.0" y="899.0" font-family="Consolas, 'Courier New', monospace" font-size="21" font-weight="600" text-anchor="end" fill="#172A3A">R$ 19,28 milhões</text>
+<text x="984.0" y="899.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#0B514D">3</text>
+<line x1="88" y1="914" x2="992" y2="914" stroke="#D8D9D2" stroke-width="1"/>
+<text x="96.0" y="938.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" text-anchor="start" fill="#172A3A">PV</text>
+<text x="610.0" y="938.0" font-family="Consolas, 'Courier New', monospace" font-size="21" font-weight="600" text-anchor="end" fill="#172A3A">R$ 27,23 milhões</text>
+<text x="984.0" y="938.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#0B514D">5</text>
+<line x1="88" y1="953" x2="992" y2="953" stroke="#D8D9D2" stroke-width="1"/>
+<text x="96.0" y="977.0" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" text-anchor="start" fill="#172A3A">REDE</text>
+<text x="610.0" y="977.0" font-family="Consolas, 'Courier New', monospace" font-size="21" font-weight="600" text-anchor="end" fill="#172A3A">R$ 33,98 milhões</text>
+<text x="984.0" y="977.0" font-family="Consolas, 'Courier New', monospace" font-size="22" font-weight="700" text-anchor="end" fill="#0B514D">2</text>
+<text x="64.0" y="1042.0" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="600" text-anchor="start" fill="#172A3A">9 partidos somaram R$ 27,49 milhões em despesas declaradas e não elegeram nenhum deputado.</text>
+<line x1="64" y1="1060" x2="1016" y2="1060" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1090.0" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="400" text-anchor="start" fill="#5D6D74">Despesas de todas as candidaturas do partido no recorte, inclusive as não eleitas.</text>
+<text x="64.0" y="1170.0" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="400" text-anchor="start" fill="#5D6D74">Fonte: TSE 2022 · despesas contratadas deduplicadas por candidatura.</text>
+<line x1="64" y1="1235" x2="1016" y2="1235" stroke="#D8D9D2" stroke-width="2"/>
+<text x="64.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="start" fill="#0B514D" letter-spacing="0.2">ELEIÇÕES FEDERAIS 2022  ·  TSE</text>
+<text x="1016.0" y="1270.0" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="600" text-anchor="end" fill="#5D6D74">2022</text>
+</svg>
